@@ -1,0 +1,181 @@
+---
+/**
+ * BaseLayout.astro — Template (couche 6).
+ *
+ * Rôle : shell HTML commun à TOUTES les pages. Pose `<html lang="fr">`,
+ * le `<head>`, charge les polices Playfair Display + Inter via
+ * `@fontsource`, le skip-link, le Header, le <main>, le Footer, le
+ * StickyCallBar et le JSON-LD LocalBusiness/Plumber.
+ *
+ * Utilisé par : tous les autres layouts (ServiceLayout, ZoneLayout,
+ *               ContentLayout) ET les pages qui veulent un shell sans
+ *               template spécifique (accueil, contact, etc.).
+ *
+ * Données lues : src/data/site.ts (NAP pour JSON-LD).
+ */
+
+/* Polices d'identité — chargées en local via @fontsource pour
+   éviter la dépendance à Google Fonts en production. */
+import '@fontsource/playfair-display/500.css';
+import '@fontsource/playfair-display/600.css';
+import '@fontsource/playfair-display/500-italic.css';
+import '@fontsource/playfair-display/600-italic.css';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+
+import '@/styles/global.css';
+import Seo from '@/components/layout/Seo.astro';
+import Header from '@/components/layout/Header.astro';
+import Footer from '@/components/layout/Footer.astro';
+import StickyCallBar from '@/components/layout/StickyCallBar.astro';
+import { site, nap, labels } from '@/data/site';
+
+export interface Props {
+  title: string;
+  description: string;
+  canonicalPath?: string;
+  noindex?: boolean;
+  hideStickyCallBar?: boolean;
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+}
+
+const {
+  title,
+  description,
+  canonicalPath,
+  noindex = false,
+  hideStickyCallBar = false,
+  ogImage,
+  ogType = 'website',
+} = Astro.props;
+
+/* JSON-LD — LocalBusiness / Plumber (phase 3 enrichi).
+   Inclut : adresse, areaServed structuré (City), openingHours 24/7,
+   aggregateRating (5,0 / 13), priceRange et sameAs (Google Business).
+   Toutes les valeurs proviennent de src/data/site.ts (source unique). */
+const sameAs: string[] = [];
+if (
+  nap.socials.googleBusiness &&
+  !nap.socials.googleBusiness.startsWith('[')
+) {
+  sameAs.push(nap.socials.googleBusiness);
+}
+if (nap.socials.facebook) sameAs.push(nap.socials.facebook);
+if (nap.socials.instagram) sameAs.push(nap.socials.instagram);
+
+const jsonLdBusiness = {
+  '@context': 'https://schema.org',
+  '@type': ['LocalBusiness', 'Plumber'],
+  '@id': `${site.url}#business`,
+  name: nap.legalName,
+  url: site.url,
+  telephone: nap.phoneE164,
+  email: nap.email,
+  description: site.description,
+  image: `${site.url}/og-default.jpg`,
+  priceRange: nap.priceRange,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: nap.address.street,
+    postalCode: nap.address.postalCode,
+    addressLocality: nap.address.city,
+    addressRegion: nap.address.region,
+    addressCountry: nap.address.countryCode,
+  },
+  areaServed: [
+    { '@type': 'City', name: 'Nice' },
+    { '@type': 'City', name: 'Saint-Laurent-du-Var' },
+    { '@type': 'City', name: 'Cagnes-sur-Mer' },
+    { '@type': 'City', name: 'Villefranche-sur-Mer' },
+    { '@type': 'City', name: 'Villeneuve-Loubet' },
+    { '@type': 'City', name: 'Antibes' },
+    { '@type': 'City', name: 'Beaulieu-sur-Mer' },
+    { '@type': 'City', name: 'Èze' },
+    { '@type': 'City', name: 'Saint-Jean-Cap-Ferrat' },
+    { '@type': 'City', name: "Cap d'Ail" },
+  ],
+  openingHoursSpecification: nap.hours.schema.map((s) => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: s.dayOfWeek,
+    opens: s.opens,
+    closes: s.closes,
+  })),
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: site.rating.value,
+    reviewCount: site.rating.count,
+    bestRating: 5,
+    worstRating: 1,
+  },
+  ...(sameAs.length > 0 ? { sameAs } : {}),
+};
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0E6480" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" href="/favicon.ico" />
+
+    <Seo
+      title={title}
+      description={description}
+      canonicalPath={canonicalPath}
+      noindex={noindex}
+      ogImage={ogImage}
+      ogType={ogType}
+    />
+
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLdBusiness)} />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{labels.skipToContent}</a>
+
+    <Header />
+
+    <main id="main" class={hideStickyCallBar ? '' : 'has-sticky-cta'}>
+      <slot />
+    </main>
+
+    <Footer />
+
+    {!hideStickyCallBar && <StickyCallBar />}
+
+    {/* Petit runtime global : spotlight cursor-following pour les cartes
+        portant l'attribut [data-spotlight]. Inspiré de Magic UI Magic Card
+        / 21st.dev Spotlight Card, adapté CSS-only sans React. */}
+    <script>
+      function bindSpotlight(card: HTMLElement) {
+        if (card.dataset.spotlightBound) return;
+        card.dataset.spotlightBound = '1';
+        const onMove = (e: MouseEvent) => {
+          const rect = card.getBoundingClientRect();
+          card.style.setProperty('--spot-x', e.clientX - rect.left + 'px');
+          card.style.setProperty('--spot-y', e.clientY - rect.top + 'px');
+        };
+        const onEnter = () => card.style.setProperty('--spot-opacity', '1');
+        const onLeave = () => card.style.setProperty('--spot-opacity', '0');
+        card.addEventListener('mousemove', onMove);
+        card.addEventListener('mouseenter', onEnter);
+        card.addEventListener('mouseleave', onLeave);
+      }
+      function bindAll() {
+        document
+          .querySelectorAll<HTMLElement>('[data-spotlight]')
+          .forEach(bindSpotlight);
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', bindAll);
+      } else {
+        bindAll();
+      }
+      document.addEventListener('astro:page-load', bindAll);
+    </script>
+  </body>
+</html>

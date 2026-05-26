@@ -1,0 +1,253 @@
+---
+/**
+ * ServiceLayout.astro — Template (couche 6).
+ *
+ * Rôle : structure de page pour TOUS les services, conforme au design
+ * « Baie des Anges » (gabarit 3). Ordre figé :
+ *   breadcrumb → hero service (2-col) → accroche éditoriale (Markdown
+ *   body) → quand → process → tarifs → réassurance (4 cards) → FAQ
+ *   spécifique → maillage (3 autres services) → CTA final.
+ *
+ * Phase 3 :
+ *   - lit `data.faqItems` et le passe à FaqSection (FAQ propre au
+ *     service, sinon fallback générique) ;
+ *   - rend le slot enfant (Markdown body) en intro éditoriale ;
+ *   - émet le JSON-LD `Service` et `FAQPage` propres à cette page.
+ *
+ * Rendu par : src/pages/services/[slug].astro.
+ *
+ * Si une page service entière est cassée, ouvrir CE fichier.
+ * Si UN seul service est cassé, c'est son `.md`.
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Breadcrumb from '@/components/layout/Breadcrumb.astro';
+import ServiceHero from '@/components/sections/ServiceHero.astro';
+import ServiceWhenSection from '@/components/sections/ServiceWhenSection.astro';
+import ServiceProcessSection from '@/components/sections/ServiceProcessSection.astro';
+import ServicePricingSection from '@/components/sections/ServicePricingSection.astro';
+import Reassurance4Cards from '@/components/sections/Reassurance4Cards.astro';
+import FaqSection from '@/components/sections/FaqSection.astro';
+import ServiceCrossLinks from '@/components/sections/ServiceCrossLinks.astro';
+import FinalCta from '@/components/sections/FinalCta.astro';
+import { site, nap } from '@/data/site';
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface ServiceData {
+  title: string;
+  slug: string;
+  h1: string;
+  metaTitle: string;
+  metaDescription: string;
+  shortDescription: string;
+  accroche?: string;
+  faqItems?: FaqItem[];
+}
+
+export interface Props {
+  id: string;
+  data: ServiceData;
+}
+
+const { id, data } = Astro.props;
+
+/* FAQ : si l'entrée fournit `faqItems`, on l'utilise. Sinon, fallback
+   générique réutilisable. */
+const fallbackFaq: FaqItem[] = [
+  {
+    question: 'Combien de temps avant intervention ?',
+    answer:
+      "Sur Nice et la première couronne, intervention en moins d'une heure pour une urgence. Pour un chantier planifié, on convient ensemble d'un créneau précis.",
+  },
+  {
+    question: 'Le devis est-il gratuit ?',
+    answer:
+      'Pour tout projet de chantier (rénovation, installation, recherche de fuite), le devis et le déplacement sont gratuits. Pour un dépannage simple, le tarif est annoncé au téléphone avant la venue.',
+  },
+  {
+    question: 'Travaillez-vous avec les assurances ?',
+    answer:
+      "Oui. Un rapport d'intervention détaillé est remis à votre assureur en cas de dégât des eaux ou de sinistre.",
+  },
+  {
+    question: 'Quels moyens de paiement acceptez-vous ?',
+    answer:
+      'Carte bancaire sur place, virement, chèque. Une facture détaillée et conforme est systématiquement remise.',
+  },
+];
+
+const faqItems = data.faqItems && data.faqItems.length > 0 ? data.faqItems : fallbackFaq;
+
+const reassuranceItems = [
+  { icon: 'shield', title: 'Décennale incluse' },
+  { icon: 'clock', title: 'Délai < 1 heure' },
+  { icon: 'euro', title: 'Devis annoncé' },
+  { icon: 'star', title: '5/5 · 13 avis' },
+];
+
+/* ────────────────────────────────────────────────────────────────────
+   JSON-LD : Service + FAQPage propres à la page service.
+   - Service : rattaché au LocalBusiness via @id.
+   - FAQPage : reflète les questions/réponses affichées.
+   La validité est assurée par l'usage exclusif des données structurées
+   (pas de duplication, pas de markup décoratif).
+   ──────────────────────────────────────────────────────────────────── */
+const pageUrl = new URL(`/services/${data.slug}/`, site.url).toString();
+
+const serviceLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  '@id': `${pageUrl}#service`,
+  name: data.title,
+  url: pageUrl,
+  description: data.metaDescription,
+  serviceType: data.title,
+  category: 'Plomberie',
+  provider: {
+    '@id': `${site.url}#business`,
+  },
+  areaServed: [
+    { '@type': 'City', name: 'Nice' },
+    { '@type': 'City', name: 'Saint-Laurent-du-Var' },
+    { '@type': 'City', name: 'Cagnes-sur-Mer' },
+    { '@type': 'City', name: 'Villefranche-sur-Mer' },
+  ],
+  availableChannel: {
+    '@type': 'ServiceChannel',
+    servicePhone: nap.phoneE164,
+    serviceUrl: pageUrl,
+  },
+};
+
+const faqPageLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  '@id': `${pageUrl}#faq`,
+  mainEntity: faqItems.map((it: FaqItem) => ({
+    '@type': 'Question',
+    name: it.question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: it.answer,
+    },
+  })),
+};
+---
+
+<BaseLayout
+  title={data.metaTitle}
+  description={data.metaDescription}
+  canonicalPath={`/services/${data.slug}/`}
+>
+  {/* JSON-LD spécifique à cette page service. Les script tags
+       application/ld+json sont valides dans le <body> et reconnus par
+       tous les crawlers. */}
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(serviceLd)}
+  />
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(faqPageLd)}
+  />
+
+  <Container width="wide">
+    <Breadcrumb
+      items={[
+        { label: 'Accueil', href: '/' },
+        { label: 'Services', href: '/services/' },
+        { label: data.title },
+      ]}
+    />
+  </Container>
+
+  <ServiceHero
+    h1={data.h1}
+    intro={data.accroche ?? data.shortDescription}
+    tagLabel={`Service · ${data.title}`}
+  />
+
+  {/* Accroche éditoriale longue — rendue depuis le body Markdown du .md.
+       Section narrow pour confort de lecture (max-width 760). */}
+  <Section id="ServiceEditorial" surface="default" spacing="md" width="narrow">
+    <article class="service-editorial">
+      <slot />
+    </article>
+  </Section>
+
+  <ServiceWhenSection />
+
+  <ServiceProcessSection />
+
+  <ServicePricingSection />
+
+  <Reassurance4Cards
+    items={reassuranceItems}
+    title="Quatre engagements, écrits sur la facture"
+    eyebrow="Pourquoi nous"
+  />
+
+  <FaqSection
+    items={faqItems}
+    title={`Vos questions sur ${data.title.toLowerCase()}`}
+    surface="alt"
+    simple={false}
+    lead={undefined}
+  />
+
+  <ServiceCrossLinks currentServiceId={id} limit={3} />
+
+  <FinalCta />
+</BaseLayout>
+
+<style>
+  .service-editorial :global(p) {
+    color: var(--color-text-muted);
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    margin-top: var(--space-4);
+  }
+  .service-editorial :global(p:first-child) {
+    margin-top: 0;
+    font-family: var(--font-family-heading);
+    font-style: italic;
+    font-weight: var(--font-weight-medium);
+    font-size: 1.3125rem;
+    line-height: 1.5;
+    color: var(--color-text);
+  }
+  .service-editorial :global(h2) {
+    margin-top: var(--space-8);
+    font-size: var(--font-size-xl);
+    color: var(--color-text);
+  }
+  .service-editorial :global(h3) {
+    margin-top: var(--space-6);
+    font-size: var(--font-size-lg);
+    color: var(--color-text);
+  }
+  .service-editorial :global(ul) {
+    margin-top: var(--space-4);
+    padding-left: var(--space-6);
+    list-style: disc;
+    color: var(--color-text-muted);
+  }
+  .service-editorial :global(li) {
+    line-height: 1.75;
+  }
+  .service-editorial :global(li + li) { margin-top: var(--space-2); }
+  .service-editorial :global(strong) { color: var(--color-text); }
+  .service-editorial :global(a) {
+    color: var(--color-azur);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+</style>

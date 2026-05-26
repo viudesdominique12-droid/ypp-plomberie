@@ -1,0 +1,44 @@
+---
+/**
+ * src/pages/services/index.astro — Route : /services/ (Hub services).
+ *
+ * Hero court + grille des 6 services sur surface-alt + bandeau de
+ * réassurance 4 items + CTA final.
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Breadcrumb from '@/components/layout/Breadcrumb.astro';
+import ShortHero from '@/components/sections/ShortHero.astro';
+import ServicesGrid from '@/components/sections/ServicesGrid.astro';
+import Reassurance4Cards from '@/components/sections/Reassurance4Cards.astro';
+import FinalCta from '@/components/sections/FinalCta.astro';
+---
+
+<BaseLayout
+  title="Nos services de plomberie à Nice — Ypp Plomberie"
+  description="Découvrez nos services : dépannage 24h/24, recherche de fuite, débouchage, chauffe-eau, rénovation de salle de bain, installation sanitaire."
+  canonicalPath="/services/"
+>
+  <Container width="wide">
+    <Breadcrumb
+      items={[
+        { label: 'Accueil', href: '/' },
+        { label: 'Services' },
+      ]}
+    />
+  </Container>
+
+  <ShortHero
+    eyebrow="Nos services"
+    h1="Un seul plombier pour tous vos besoins"
+    intro="Du dépannage à la rénovation, six expertises adressées avec le même soin du détail et la même exigence de devis annoncé."
+    withActions={true}
+  />
+
+  <ServicesGrid surface="alt" hideHeading={true} />
+
+  <Reassurance4Cards />
+
+  <FinalCta />
+</BaseLayout>

@@ -1,0 +1,119 @@
+---
+/**
+ * ServiceWhenSection.astro — Section.
+ *
+ * Rôle : « Les signes qui doivent vous alerter ». Grille de 6 cards
+ * (icône stroke + H4 Playfair + desc) sur fond surface-alt.
+ *
+ * Rendu dans : src/layouts/ServiceLayout.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Icon from '@/components/ui/Icon.astro';
+
+export interface Sign {
+  icon: string;
+  title: string;
+  description: string;
+}
+
+export interface Props {
+  title?: string;
+  lead?: string;
+  /** Signes / situations qui justifient un appel. */
+  items?: Sign[];
+}
+
+const {
+  title = 'Les signes qui doivent vous alerter',
+  lead = "Plus on intervient tôt, moins la facture s'allonge — repérez ces indices et appelez sans tarder.",
+  items = [
+    {
+      icon: 'droplet',
+      title: 'Compteur qui tourne',
+      description: "Sans qu'aucun robinet ne soit ouvert dans le logement.",
+    },
+    {
+      icon: 'droplet',
+      title: "Tache d'humidité",
+      description: 'Apparue récemment au mur, au plafond ou au sol.',
+    },
+    {
+      icon: 'flame',
+      title: "Facture d'eau anormale",
+      description: 'Hausse soudaine inexpliquée de la consommation.',
+    },
+    {
+      icon: 'shield',
+      title: 'Carrelage qui cloque',
+      description: 'Soulèvement, décollement, joints noircis localement.',
+    },
+    {
+      icon: 'clock',
+      title: "Bruit d'écoulement",
+      description: 'Sifflement continu derrière une cloison ou un sol.',
+    },
+    {
+      icon: 'award',
+      title: 'Pression en baisse',
+      description: "Débit anormalement faible sur un point d'eau récent.",
+    },
+  ],
+} = Astro.props;
+---
+
+<Section id="ServiceWhenSection" surface="alt" spacing="lg">
+  <SectionHeading eyebrow="Quand faire appel" title={title} lead={lead} />
+  <ul class="service-when__grid" role="list">
+    {items.map((it) => (
+      <li>
+        <article class="service-when__card">
+          <span class="service-when__icon" aria-hidden="true">
+            <Icon name={it.icon} size={28} strokeWidth={1.4} />
+          </span>
+          <h4 class="service-when__title">{it.title}</h4>
+          <p class="service-when__desc">{it.description}</p>
+        </article>
+      </li>
+    ))}
+  </ul>
+</Section>
+
+<style>
+  .service-when__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  @media (min-width: 640px) {
+    .service-when__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .service-when__grid { grid-template-columns: repeat(3, 1fr); gap: var(--space-5); }
+  }
+  .service-when__card {
+    height: 100%;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+  }
+  .service-when__icon {
+    color: var(--color-azur);
+    display: inline-flex;
+    margin-bottom: var(--space-4);
+  }
+  .service-when__title {
+    margin: 0 0 var(--space-2) 0;
+    font-size: var(--font-size-lg);
+    line-height: 1.3;
+    color: var(--color-text);
+  }
+  .service-when__desc {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+  }
+</style>

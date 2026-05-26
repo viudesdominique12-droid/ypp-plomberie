@@ -1,0 +1,64 @@
+---
+/**
+ * src/pages/contact/index.astro — Route : /contact/.
+ *
+ * Gabarit 8 : hero court + grille `coordonnées | formulaire` + carte
+ * Maps placeholder pleine largeur.
+ *
+ * Pas de CtaFinal sur cette page — son but EST de capturer le contact.
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Breadcrumb from '@/components/layout/Breadcrumb.astro';
+import ShortHero from '@/components/sections/ShortHero.astro';
+import ContactDetails from '@/components/sections/ContactDetails.astro';
+import QuoteForm from '@/components/sections/QuoteForm.astro';
+import MapBand from '@/components/sections/MapBand.astro';
+---
+
+<BaseLayout
+  title="Contact — Ypp Plomberie, plombier à Nice"
+  description="Contactez Ypp Plomberie pour un dépannage rapide ou un devis : 06 03 34 03 05, formulaire en ligne, 24h/24."
+  canonicalPath="/contact/"
+>
+  <Container width="wide">
+    <Breadcrumb
+      items={[
+        { label: 'Accueil', href: '/' },
+        { label: 'Contact' },
+      ]}
+    />
+  </Container>
+
+  <ShortHero
+    eyebrow="Contact"
+    h1="Parlons de votre besoin"
+    intro="Une urgence ? Décrochez : on arrive en moins d'une heure sur Nice. Pour un devis ou un projet, le formulaire est traité sous 24 h ouvrées."
+  />
+
+  <Section id="ContactGrid" surface="bg" spacing="md" width="default">
+    <div class="contact-grid">
+      <ContactDetails />
+      <QuoteForm />
+    </div>
+  </Section>
+
+  <MapBand />
+</BaseLayout>
+
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+    align-items: flex-start;
+  }
+  @media (min-width: 768px) {
+    .contact-grid {
+      grid-template-columns: 1fr 1.4fr;
+      gap: 32px;
+    }
+  }
+</style>

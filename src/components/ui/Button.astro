@@ -1,0 +1,173 @@
+---
+/**
+ * Button.astro — Primitive UI.
+ *
+ * Rôle : bouton ou lien stylé. **Pastille pleine** (border-radius 999),
+ * Inter 600. Quatre variantes (urgence > primary > secondary > ghost) et
+ * trois tailles (sm / md / lg). Hiérarchie absolue sur les pages
+ * commerciales : urgence est toujours la plus saillante.
+ *
+ * Rendu dans : sections, Header, Footer, StickyCallBar, formulaires.
+ * Utilisé par : tout composant qui a un appel à l'action.
+ *
+ * Règle : si `href` est fourni, on rend un <a>. Sinon, un <button>.
+ *         Le label passe par <slot />.
+ */
+
+export interface Props {
+  href?: string;
+  variant?: 'urgence' | 'primary' | 'secondary' | 'ghost';
+  size?: 'sm' | 'md' | 'lg';
+  fullWidth?: boolean;
+  type?: 'button' | 'submit' | 'reset';
+  ariaLabel?: string;
+  rel?: string;
+  target?: string;
+  disabled?: boolean;
+  class?: string;
+}
+
+const {
+  href,
+  variant = 'primary',
+  size = 'md',
+  fullWidth = false,
+  type = 'button',
+  ariaLabel,
+  rel,
+  target,
+  disabled = false,
+  class: className,
+} = Astro.props;
+
+const classes = [
+  'btn',
+  `btn--${variant}`,
+  `btn--${size}`,
+  fullWidth ? 'btn--full' : null,
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+
+const isLink = typeof href === 'string' && href.length > 0;
+---
+
+{isLink ? (
+  <a
+    href={href}
+    class={classes}
+    aria-label={ariaLabel}
+    rel={rel}
+    target={target}
+  >
+    <slot name="icon-leading" />
+    <span class="btn__label"><slot /></span>
+    <slot name="icon-trailing" />
+  </a>
+) : (
+  <button
+    type={type}
+    class={classes}
+    aria-label={ariaLabel}
+    disabled={disabled}
+  >
+    <slot name="icon-leading" />
+    <span class="btn__label"><slot /></span>
+    <slot name="icon-trailing" />
+  </button>
+)}
+
+<style>
+  /* Base — pastille pleine, Inter 600. */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: var(--radius-full);
+    border: 1.5px solid transparent;
+    font-family: var(--font-family-base);
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+    letter-spacing: 0.005em;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition:
+      background-color var(--transition-fast) var(--ease-out),
+      color var(--transition-fast) var(--ease-out),
+      border-color var(--transition-fast) var(--ease-out),
+      box-shadow var(--transition-fast) var(--ease-out),
+      transform var(--transition-fast) var(--ease-out);
+  }
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  .btn:active:not(:disabled) {
+    transform: translateY(1px);
+  }
+
+  /* Tailles. */
+  .btn--sm {
+    padding: 10px 16px;
+    min-height: 38px;
+    font-size: 0.84rem; /* ~13.5px */
+  }
+  .btn--md {
+    padding: 14px 22px;
+    min-height: 48px;
+    font-size: 0.9375rem; /* 15px */
+  }
+  .btn--lg {
+    padding: 16px 26px;
+    min-height: 54px;
+    font-size: 1rem;
+  }
+
+  .btn--full { width: 100%; }
+
+  /* Variantes. */
+  .btn--urgence {
+    background: var(--color-urg);
+    color: #fff;
+    border-color: var(--color-urg);
+  }
+  .btn--urgence:hover:not(:disabled) {
+    background: var(--color-urg-hover);
+    border-color: var(--color-urg-hover);
+    box-shadow: 0 8px 24px rgba(176, 85, 24, 0.22);
+  }
+
+  .btn--primary {
+    background: var(--color-azur);
+    color: #fff;
+    border-color: var(--color-azur);
+  }
+  .btn--primary:hover:not(:disabled) {
+    background: var(--color-azur-hover);
+    border-color: var(--color-azur-hover);
+  }
+
+  .btn--secondary {
+    background: transparent;
+    color: var(--color-azur);
+    border-color: var(--color-azur);
+  }
+  .btn--secondary:hover:not(:disabled) {
+    background: var(--color-azur-light);
+  }
+
+  .btn--ghost {
+    background: transparent;
+    color: var(--color-text);
+    border-color: var(--color-border);
+  }
+  .btn--ghost:hover:not(:disabled) {
+    background: var(--color-surface-alt);
+    border-color: var(--color-text-muted);
+  }
+
+  .btn__label { display: inline-block; }
+</style>

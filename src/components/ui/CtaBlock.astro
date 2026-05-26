@@ -1,0 +1,124 @@
+---
+/**
+ * CtaBlock.astro — Primitive UI.
+ *
+ * Rôle : bandeau de conversion final — fond azur plein, filet laiton
+ * centré, H2 blanc Playfair, sous-titre 85 % blanc, duo CTAs (urgence
+ * + devis-secondary outline blanc).
+ *
+ * Rendu dans : FinalCta (qui ne fait que l'envelopper d'une Section).
+ */
+
+import Button from './Button.astro';
+import Icon from './Icon.astro';
+import Ripple from './Ripple.astro';
+import { nap, labels } from '@/data/site';
+
+export interface Props {
+  title?: string;
+  lead?: string;
+  /** Désactive le bouton « Demander un devis ». */
+  showQuoteButton?: boolean;
+  headingLevel?: 2 | 3;
+}
+
+const {
+  title = 'Une fuite, un projet de rénovation ?',
+  lead = 'Réponse rapide, devis annoncé avant intervention, et un seul interlocuteur du diagnostic à la dernière finition.',
+  showQuoteButton = true,
+  headingLevel = 2,
+} = Astro.props;
+
+const Heading = `h${headingLevel}` as 'h2' | 'h3';
+---
+
+<div class="cta-band">
+  <Ripple class="cta-band__ripple" size={260} opacity={0.16} count={6} />
+  <hr class="brass-rule is-center cta-band__rule" />
+  <Heading class="cta-band__title">{title}</Heading>
+  {lead && <p class="cta-band__lead">{lead}</p>}
+  <div class="cta-band__actions">
+    <Button
+      href={`tel:${nap.phoneE164}`}
+      variant="urgence"
+      size="lg"
+      ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+    >
+      <Icon slot="icon-leading" name="phone" size={18} />
+      {labels.callNow} · {nap.phoneDisplay}
+    </Button>
+    {showQuoteButton && (
+      <Button href="/contact/" variant="secondary" size="lg" class="cta-band__secondary">
+        {labels.requestQuote}
+      </Button>
+    )}
+  </div>
+</div>
+
+<style>
+  .cta-band {
+    position: relative;
+    background: var(--color-azur);
+    color: #fff;
+    text-align: center;
+    padding: var(--space-12) var(--space-5);
+    border-radius: var(--radius-xl);
+    max-width: 1024px;
+    margin-inline: auto;
+    overflow: hidden;
+  }
+  /* Le ripple ondule en fond, son fade-out du haut le rend discret. */
+  .cta-band > :global(.cta-band__ripple) {
+    z-index: 0;
+  }
+  .cta-band > *:not(.cta-band__ripple) {
+    position: relative;
+    z-index: 1;
+  }
+  @media (min-width: 768px) {
+    .cta-band { padding: 88px var(--space-8); }
+  }
+
+  .cta-band__rule {
+    margin-bottom: var(--space-5);
+  }
+  .cta-band__title {
+    margin: 0;
+    color: #fff;
+    font-size: clamp(1.875rem, 3vw, 2.375rem); /* 30→38 */
+    line-height: 1.15;
+  }
+  .cta-band__lead {
+    margin: var(--space-4) auto 0;
+    max-width: 60ch;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.6;
+  }
+  .cta-band__actions {
+    margin-top: var(--space-7);
+    display: flex;
+    gap: var(--space-3);
+    justify-content: center;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  @media (min-width: 640px) {
+    .cta-band__actions {
+      flex-direction: row;
+      align-items: center;
+    }
+  }
+
+  /* La variante secondary, sur fond azur, devient outline blanc. */
+  :global(.cta-band .btn--secondary) {
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.5);
+    background: transparent;
+  }
+  :global(.cta-band .btn--secondary:hover) {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: #fff;
+    color: #fff;
+  }
+</style>

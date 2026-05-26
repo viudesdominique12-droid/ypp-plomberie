@@ -1,0 +1,93 @@
+---
+/**
+ * src/pages/a-propos/index.astro — Route : /a-propos/.
+ *
+ * Gabarit 7 : hero court + présentation (image + 3 paragraphes + duo
+ * CTAs) + garanties (4 cards) + CTA final.
+ *
+ * Phase 3 — contenu réel rédigé. Les variables propres au gérant
+ * (nom, années d'expérience, année de création, n° de décennale)
+ * sont des placeholders [...] définis dans src/data/site.ts pour
+ * être remplis sur réception des informations client.
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Breadcrumb from '@/components/layout/Breadcrumb.astro';
+import ShortHero from '@/components/sections/ShortHero.astro';
+import AproposPresentation from '@/components/sections/AproposPresentation.astro';
+import Reassurance4Cards from '@/components/sections/Reassurance4Cards.astro';
+import FinalCta from '@/components/sections/FinalCta.astro';
+import { nap } from '@/data/site';
+
+const garanties = [
+  {
+    icon: 'shield',
+    title: 'Décennale',
+    description:
+      'Toutes installations couvertes par notre assurance décennale, déclarée et à jour.',
+  },
+  {
+    icon: 'star',
+    title: 'Note 5 / 5',
+    description:
+      'Note Google parfaite — 13 avis vérifiés de clients récents sur la baie des Anges.',
+  },
+  {
+    icon: 'award',
+    title: `${nap.yearsExperience}+ ans`,
+    description:
+      "Plus d'une décennie d'expérience en plomberie sanitaire, chauffage et rénovation.",
+  },
+  {
+    icon: 'doc',
+    title: 'Devis gratuit',
+    description:
+      'Déplacement et devis offerts pour toute demande de chantier. Tarif annoncé avant intervention.',
+  },
+];
+
+/* Paragraphes de présentation — signal E-E-A-T. Le nom du gérant
+   et les éléments factuels précis (année de création, décennale)
+   restent en placeholder jusqu'à validation client. */
+const presentationParagraphs = [
+  `Je suis ${nap.ownerName}, plombier installé à Nice depuis ${nap.yearCreated}. Formé à la plomberie sanitaire et au chauffage, j'ai exercé plusieurs années en entreprise avant de m'établir en propre : un seul interlocuteur pour le client, du devis à la garantie, sans cascade de sous-traitants ni rendez-vous décalés.`,
+  "Chaque intervention est expliquée, chiffrée et validée avec vous avant d'être engagée. Pas de pose de chantier sans tarif définitif annoncé. Pas de rendu sans une dernière inspection conjointe. C'est ce que j'attendrais d'un artisan qui vient chez moi, c'est ce que j'applique chez vous.",
+  `Je travaille seul pour les urgences et les interventions courtes, et avec un binôme de confiance (carrelage, plâtrerie) sur les chantiers de rénovation. Mes clients reviennent — pour un changement de chauffe-eau, une fuite cachée, une rénovation de salle de bain trois ans plus tard. C'est, je crois, ce qu'on peut souhaiter de mieux dans ce métier. Assurance décennale n° ${nap.identifiers.decennale}, SIRET ${nap.identifiers.siret}.`,
+];
+---
+
+<BaseLayout
+  title="À propos d'Ypp Plomberie — plombier à Nice"
+  description="L'artisan derrière Ypp Plomberie : plombier installé à Nice, assurance décennale, devis gratuit. Un seul interlocuteur pour vos dépannages et rénovations."
+  canonicalPath="/a-propos/"
+>
+  <Container width="wide">
+    <Breadcrumb
+      items={[
+        { label: 'Accueil', href: '/' },
+        { label: 'À propos' },
+      ]}
+    />
+  </Container>
+
+  <ShortHero
+    eyebrow="À propos"
+    h1="L'artisan derrière Ypp Plomberie"
+    intro="Un plombier installé à Nice, à votre écoute en direct, du premier appel à la garantie. Pas de standard, pas de cascade de sous-traitants — un seul interlocuteur de bout en bout."
+  />
+
+  <AproposPresentation
+    title={`${nap.ownerName}, plombier à Nice depuis ${nap.yearCreated}.`}
+    paragraphs={presentationParagraphs}
+  />
+
+  <Reassurance4Cards
+    title="Ce qui vous protège"
+    eyebrow="Garanties"
+    items={garanties}
+    surface="alt"
+  />
+
+  <FinalCta />
+</BaseLayout>

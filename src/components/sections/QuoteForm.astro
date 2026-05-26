@@ -1,0 +1,378 @@
+---
+/**
+ * QuoteForm.astro — Section.
+ *
+ * Rôle : carte « Demande de devis » FONCTIONNELLE (phase 4).
+ * Envoi vers Web3Forms (api.web3forms.com/submit) sans backend.
+ *
+ * Architecture :
+ *   - Markup ici. Logique JS dans src/scripts/quote-form.ts (un seul
+ *     endroit où déboguer).
+ *   - Clé d'accès via variable d'env `PUBLIC_WEB3FORMS_KEY`
+ *     (cf. .env.example).
+ *   - Honeypot Web3Forms (`botcheck`) inclus.
+ *   - Validation client : champs requis, e-mail, téléphone FR, RGPD.
+ *   - États visuels : idle / sending / success / error, avec aria-live.
+ *   - Dégradation gracieuse : sans JS, le `<form action>` natif POSTe
+ *     vers Web3Forms qui retourne sa page de confirmation.
+ *
+ * Le composant rend uniquement la CARTE — pas de section englobante.
+ */
+
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { getCollection } from 'astro:content';
+
+const services = (await getCollection('services')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+/* Clé Web3Forms côté client. Pas un secret : Web3Forms valide le
+   domaine de provenance côté serveur. Voir .env.example. */
+const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
+---
+
+<form
+  class="quote-form"
+  method="POST"
+  action="https://api.web3forms.com/submit"
+  data-quote-form
+  data-state="idle"
+  novalidate
+>
+  <h3 class="quote-form__title">Demande de devis</h3>
+  <hr class="brass-rule quote-form__brass" />
+
+  {/* Champs cachés Web3Forms. */}
+  <input type="hidden" name="access_key" value={accessKey} />
+  <input
+    type="hidden"
+    name="subject"
+    value="Nouvelle demande de devis — Ypp Plomberie"
+  />
+  <input type="hidden" name="from_name" value="Site Ypp Plomberie" />
+  <input type="hidden" name="redirect" value="false" />
+  {/* Honeypot anti-spam Web3Forms : un bot remplira ce champ, le service ignorera l'envoi. */}
+  <input
+    type="checkbox"
+    name="botcheck"
+    class="visually-hidden"
+    tabindex="-1"
+    autocomplete="off"
+    aria-hidden="true"
+  />
+
+  <div class="quote-form__fields">
+    <div class="quote-form__row">
+      <div class="quote-form__field">
+        <label for="qf-name">Nom <span class="quote-form__req" aria-hidden="true">*</span></label>
+        <input
+          id="qf-name"
+          name="name"
+          type="text"
+          autocomplete="name"
+          placeholder="Marie Dupont"
+          required
+          aria-required="true"
+          aria-describedby="name-error"
+        />
+        <p id="name-error" class="quote-form__error" role="alert" hidden></p>
+      </div>
+      <div class="quote-form__field">
+        <label for="qf-phone">Téléphone <span class="quote-form__req" aria-hidden="true">*</span></label>
+        <input
+          id="qf-phone"
+          name="phone"
+          type="tel"
+          inputmode="tel"
+          autocomplete="tel"
+          placeholder="06 12 34 56 78"
+          required
+          aria-required="true"
+          aria-describedby="phone-error"
+        />
+        <p id="phone-error" class="quote-form__error" role="alert" hidden></p>
+      </div>
+    </div>
+
+    <div class="quote-form__row">
+      <div class="quote-form__field">
+        <label for="qf-email">Email</label>
+        <input
+          id="qf-email"
+          name="email"
+          type="email"
+          autocomplete="email"
+          placeholder="marie.dupont@email.fr"
+          aria-describedby="email-error"
+        />
+        <p id="email-error" class="quote-form__error" role="alert" hidden></p>
+      </div>
+      <div class="quote-form__field">
+        <label for="qf-postcode">Code postal</label>
+        <input
+          id="qf-postcode"
+          name="postcode"
+          type="text"
+          inputmode="numeric"
+          autocomplete="postal-code"
+          placeholder="06000"
+          pattern="^\d{5}$"
+        />
+      </div>
+    </div>
+
+    <div class="quote-form__field">
+      <label for="qf-service">Nature du besoin</label>
+      <select id="qf-service" name="service" required aria-required="true">
+        <option value="" disabled selected>Choisir une prestation…</option>
+        {services.map((s) => (
+          <option value={s.data.slug}>{s.data.title}</option>
+        ))}
+        <option value="autre">Autre — précisez ci-dessous</option>
+      </select>
+    </div>
+
+    <fieldset class="quote-form__field quote-form__field--inline">
+      <legend>Urgence</legend>
+      <div class="quote-form__radio-group">
+        <label class="quote-form__radio">
+          <input type="radio" name="urgency" value="urgent" />
+          <span>Oui, c'est urgent</span>
+        </label>
+        <label class="quote-form__radio">
+          <input type="radio" name="urgency" value="planned" checked />
+          <span>Non, intervention planifiée</span>
+        </label>
+      </div>
+    </fieldset>
+
+    <div class="quote-form__field">
+      <label for="qf-message">Description</label>
+      <textarea
+        id="qf-message"
+        name="message"
+        rows="5"
+        placeholder="Décrivez la situation : type d'habitation, urgence, accès, photo si possible — chaque détail nous aide à mieux préparer notre venue."
+      ></textarea>
+    </div>
+
+    <label class="quote-form__consent" for="qf-consent">
+      <input
+        id="qf-consent"
+        type="checkbox"
+        name="consent"
+        required
+        aria-required="true"
+        aria-describedby="consent-error"
+      />
+      <span class="quote-form__consent-text">
+        J'accepte que mes informations soient utilisées pour me recontacter. Aucune
+        transmission à un tiers. Voir la
+        <a href="/politique-de-confidentialite/">politique de confidentialité</a>.
+        <span class="quote-form__req" aria-hidden="true">*</span>
+      </span>
+    </label>
+    <p id="consent-error" class="quote-form__error" role="alert" hidden></p>
+
+    <Button type="submit" variant="primary" size="lg" fullWidth={true}>
+      <span data-submit-label>Envoyer ma demande</span>
+      <Icon slot="icon-trailing" name="send" size={18} />
+    </Button>
+
+    <p class="quote-form__hint">
+      Réponse sous 24 h ouvrées · Pour une urgence, préférez l'appel au <a href="tel:+33603340305">06 03 34 03 05</a>.
+    </p>
+
+    {/* Région d'annonce des changements d'état pour les lecteurs d'écran. */}
+    <p
+      class="quote-form__status"
+      role="status"
+      aria-live="polite"
+      data-form-live
+    ></p>
+  </div>
+</form>
+
+<script>
+  import '@/scripts/quote-form.ts';
+</script>
+
+<style>
+  .quote-form {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+  }
+  @media (min-width: 768px) {
+    .quote-form { padding: 36px; }
+  }
+  .quote-form__title {
+    margin: 0;
+    font-size: var(--font-size-xl);
+  }
+  .quote-form__brass { margin-top: 14px; }
+
+  .quote-form__fields {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .quote-form__row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  @media (min-width: 640px) {
+    .quote-form__row { grid-template-columns: 1fr 1fr; }
+  }
+
+  .quote-form__field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .quote-form__field--inline { gap: 10px; }
+  .quote-form__field label,
+  .quote-form__field legend {
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+    padding: 0;
+  }
+  .quote-form__req { color: var(--color-urg); margin-left: 2px; }
+
+  .quote-form input[type="text"],
+  .quote-form input[type="tel"],
+  .quote-form input[type="email"],
+  .quote-form select,
+  .quote-form textarea {
+    width: 100%;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    padding: 13px 16px;
+    font: inherit;
+    font-size: 0.9375rem;
+    color: var(--color-text);
+    transition:
+      border-color var(--transition-fast) var(--ease-out),
+      box-shadow var(--transition-fast) var(--ease-out);
+  }
+  .quote-form input::placeholder,
+  .quote-form textarea::placeholder { color: var(--color-text-muted); opacity: 0.7; }
+  .quote-form input:focus,
+  .quote-form select:focus,
+  .quote-form textarea:focus {
+    outline: 0;
+    border-color: var(--color-azur);
+    box-shadow: 0 0 0 3px rgba(14, 100, 128, 0.18);
+  }
+  .quote-form [aria-invalid='true'] {
+    border-color: var(--color-urg);
+    box-shadow: 0 0 0 3px rgba(176, 85, 24, 0.18);
+  }
+  .quote-form textarea { min-height: 130px; resize: vertical; line-height: 1.5; }
+  .quote-form select {
+    appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none' stroke='%235A6B72' stroke-width='1.6' stroke-linecap='round'><path d='M2 4l4 4 4-4'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+
+  /* Urgence radio group. */
+  .quote-form__radio-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+  }
+  .quote-form__radio {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    color: var(--color-text);
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: var(--font-weight-regular);
+  }
+  .quote-form__radio input { accent-color: var(--color-azur); }
+
+  /* Consent (RGPD). */
+  .quote-form__consent {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.84rem;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    line-height: 1.55;
+    text-transform: none;
+    letter-spacing: 0;
+    font-weight: var(--font-weight-regular);
+  }
+  .quote-form__consent input[type="checkbox"] {
+    margin-top: 3px;
+    width: 16px; height: 16px;
+    accent-color: var(--color-azur);
+    flex-shrink: 0;
+  }
+
+  /* Erreurs : couleur urg + petit espacement. */
+  .quote-form__error {
+    margin: 4px 0 0 0;
+    font-size: 0.8125rem;
+    color: var(--color-urg);
+    font-weight: var(--font-weight-medium);
+  }
+
+  .quote-form__hint {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+  .quote-form__hint a {
+    color: inherit;
+    font-weight: var(--font-weight-semibold);
+    text-decoration: underline;
+  }
+
+  /* Status (aria-live). Visible quand on a un message. */
+  .quote-form__status:empty { display: none; }
+  .quote-form__status {
+    margin: 4px 0 0 0;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    border: 1px solid;
+  }
+  .quote-form[data-state='success'] .quote-form__status {
+    background: var(--color-azur-light);
+    color: var(--color-azur);
+    border-color: rgba(14, 100, 128, 0.25);
+  }
+  .quote-form[data-state='error'] .quote-form__status {
+    background: rgba(176, 85, 24, 0.08);
+    color: var(--color-urg);
+    border-color: rgba(176, 85, 24, 0.25);
+  }
+  .quote-form[data-state='success'] .quote-form__status::before {
+    content: '✓ ';
+    font-weight: var(--font-weight-bold);
+  }
+  .quote-form[data-state='error'] .quote-form__status::before {
+    content: '⚠ ';
+    font-weight: var(--font-weight-bold);
+  }
+</style>

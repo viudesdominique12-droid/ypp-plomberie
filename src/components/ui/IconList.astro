@@ -1,0 +1,97 @@
+---
+/**
+ * IconList.astro — Primitive UI.
+ *
+ * Rôle : liste avec puce-pastille azur (cercle 32×32 + check blanc),
+ * label gras + valeur grise sur la même ligne.
+ *
+ * Rendu dans : sections de réassurance / intervention locale.
+ */
+
+import Icon from './Icon.astro';
+
+export interface Item {
+  /** Label en gras (ex. « Délai < 1 h »). */
+  label: string;
+  /** Valeur en gris à côté (ex. « sur tout Nice »). */
+  value?: string;
+}
+
+export interface Props {
+  /** Soit une liste de strings, soit une liste d'objets { label, value }. */
+  items: (string | Item)[];
+  /** Variante : 'check' (par défaut) avec pastille pleine, ou 'plain'. */
+  variant?: 'check' | 'plain';
+}
+
+const { items, variant = 'check' } = Astro.props;
+
+function normalize(it: string | Item): Item {
+  return typeof it === 'string' ? { label: it } : it;
+}
+---
+
+<ul class={`icon-list icon-list--${variant}`} role="list">
+  {items.map((raw: string | Item) => {
+    const it = normalize(raw);
+    return (
+      <li class="icon-list__item">
+        {variant === 'check' ? (
+          <span class="icon-list__check" aria-hidden="true">
+            <Icon name="check" size={16} strokeWidth={2.2} />
+          </span>
+        ) : (
+          <span class="icon-list__bullet" aria-hidden="true"></span>
+        )}
+        <span class="icon-list__text">
+          <strong>{it.label}</strong>
+          {it.value && <span class="icon-list__value"> · {it.value}</span>}
+        </span>
+      </li>
+    );
+  })}
+</ul>
+
+<style>
+  .icon-list {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+  .icon-list__item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+  }
+  .icon-list__check {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--color-azur);
+    color: #fff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .icon-list__bullet {
+    flex-shrink: 0;
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: var(--color-azur);
+  }
+  .icon-list__text {
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .icon-list__text strong {
+    color: var(--color-text);
+    font-weight: var(--font-weight-semibold);
+  }
+  .icon-list__value {
+    color: var(--color-text-muted);
+  }
+</style>

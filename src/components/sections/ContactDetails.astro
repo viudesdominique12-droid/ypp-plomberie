@@ -1,0 +1,173 @@
+---
+/**
+ * ContactDetails.astro — Section.
+ *
+ * Rôle : carte coordonnées de la page contact, identité « Baie des
+ * Anges » :
+ *   - H3 « Coordonnées » + filet laiton ;
+ *   - 3 lignes (téléphone / email / secteur) — téléphone en Playfair
+ *     24 px gras ;
+ *   - Bordure soft + horaires (4 lignes) ;
+ *   - Bouton urgence pleine largeur en pied.
+ *
+ * Rendu dans : src/pages/contact/index.astro (à l'intérieur d'une
+ * grille `1fr 1.4fr` avec QuoteForm).
+ *
+ * Le composant rend uniquement la CARTE — pas de section englobante :
+ * c'est la page qui gère le layout 2 colonnes.
+ */
+
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { nap, labels } from '@/data/site';
+---
+
+<aside class="contact-details">
+  <h3 class="contact-details__title">Coordonnées</h3>
+  <hr class="brass-rule contact-details__brass" />
+
+  <ul class="contact-details__rows" role="list">
+    <li class="contact-details__row">
+      <span class="contact-details__icon" aria-hidden="true">
+        <Icon name="phone" size={18} strokeWidth={1.5} />
+      </span>
+      <div>
+        <p class="contact-details__label">Téléphone</p>
+        <p class="contact-details__value contact-details__value--big">
+          <a href={`tel:${nap.phoneE164}`}>{nap.phoneDisplay}</a>
+        </p>
+      </div>
+    </li>
+    <li class="contact-details__row">
+      <span class="contact-details__icon" aria-hidden="true">
+        <Icon name="mail" size={18} strokeWidth={1.5} />
+      </span>
+      <div>
+        <p class="contact-details__label">Email</p>
+        <p class="contact-details__value">
+          <a href={`mailto:${nap.email}`}>{nap.email}</a>
+        </p>
+      </div>
+    </li>
+    <li class="contact-details__row">
+      <span class="contact-details__icon" aria-hidden="true">
+        <Icon name="map-pin" size={18} strokeWidth={1.5} />
+      </span>
+      <div>
+        <p class="contact-details__label">Secteur</p>
+        <p class="contact-details__value">Nice & baie des Anges</p>
+      </div>
+    </li>
+  </ul>
+
+  <div class="contact-details__hours">
+    <p class="contact-details__label">Horaires</p>
+    <ul role="list">
+      {[
+        ['Lun – Ven', '8h – 19h'],
+        ['Samedi', '9h – 17h'],
+        ['Dimanche', 'Sur appel'],
+        ['Astreinte', '24h / 24'],
+      ].map(([d, h]) => (
+        <li>
+          <span>{d}</span>
+          <strong>{h}</strong>
+        </li>
+      ))}
+    </ul>
+  </div>
+
+  <div class="contact-details__cta">
+    <Button
+      href={`tel:${nap.phoneE164}`}
+      variant="urgence"
+      size="md"
+      fullWidth={true}
+      ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+    >
+      <Icon slot="icon-leading" name="phone" size={16} />
+      Appeler maintenant
+    </Button>
+  </div>
+</aside>
+
+<style>
+  .contact-details {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+  }
+  @media (min-width: 768px) {
+    .contact-details { padding: var(--space-8); }
+  }
+  .contact-details__title {
+    margin: 0;
+    font-size: var(--font-size-xl);
+  }
+  .contact-details__brass { margin-top: 14px; }
+  .contact-details__rows {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .contact-details__row {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+  }
+  .contact-details__icon {
+    flex-shrink: 0;
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: var(--color-azur-light);
+    color: var(--color-azur);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .contact-details__label {
+    margin: 0;
+    font-size: 0.6875rem; /* 11px */
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-muted);
+  }
+  .contact-details__value {
+    margin: 6px 0 0 0;
+    font-size: 0.9375rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
+  }
+  .contact-details__value a { color: inherit; text-decoration: none; }
+  .contact-details__value a:hover { color: var(--color-azur); }
+  .contact-details__value--big {
+    font-family: var(--font-family-heading);
+    font-size: 1.5rem; /* 24px */
+    font-weight: var(--font-weight-semibold);
+  }
+
+  .contact-details__hours {
+    margin-top: 24px;
+    padding-top: 22px;
+    border-top: 1px solid var(--color-border-soft);
+  }
+  .contact-details__hours ul {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .contact-details__hours li {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.875rem;
+  }
+  .contact-details__hours li span { color: var(--color-text-muted); }
+  .contact-details__hours li strong { color: var(--color-text); font-weight: var(--font-weight-semibold); }
+
+  .contact-details__cta { margin-top: 24px; }
+</style>

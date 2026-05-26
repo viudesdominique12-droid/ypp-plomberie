@@ -1,0 +1,95 @@
+---
+/**
+ * FallingDrops.astro — Primitive UI.
+ *
+ * Rôle : gouttes d'eau qui tombent, perceptibles mais discrètes,
+ * positionnées en arrière-plan. Réelle métaphore de la plomberie.
+ *
+ * Chaque goutte est une div absolument positionnée, avec :
+ *   - left : pourcentage horizontal aléatoire mais déterministe ;
+ *   - animation : ypp-drop-fall, durée et delay variés ;
+ *   - --drop-distance : distance verticale de chute.
+ *
+ * Le rendu utilise un seed numérique pour distribuer les positions
+ * de manière reproductible (pas de Math.random() en SSR).
+ *
+ * Respect prefers-reduced-motion : règle globale.
+ */
+
+export interface Props {
+  /** Nombre de gouttes générées. */
+  count?: number;
+  /** Hauteur de chute en pixels. */
+  distance?: number;
+  /** Couleur. */
+  color?: string;
+  class?: string;
+}
+
+const {
+  count = 12,
+  distance = 320,
+  color = 'rgba(255, 255, 255, 0.55)',
+  class: className,
+} = Astro.props;
+
+/* Distribution déterministe : on répartit les gouttes sur 100% de
+   la largeur, en variant durées (5-9s) et delays (0-6s). */
+const drops = Array.from({ length: count }, (_, i) => {
+  const left = ((i * 137.5) % 100); // golden angle modulo → pseudo-random uniform
+  const duration = 5 + ((i * 1.7) % 4);
+  const delay = (i * 0.7) % 6;
+  const size = 6 + ((i * 11) % 7);
+  return { left, duration, delay, size };
+});
+
+const classes = ['falling-drops', className].filter(Boolean).join(' ');
+---
+
+<div
+  class={classes}
+  aria-hidden="true"
+  style={`--drop-distance: ${distance}px;`}
+>
+  {drops.map((d) => (
+    <span
+      class="falling-drops__drop"
+      style={`
+        left: ${d.left}%;
+        animation-duration: ${d.duration}s;
+        animation-delay: -${d.delay}s;
+      `}
+    >
+      <svg
+        width={d.size}
+        height={d.size * 1.4}
+        viewBox="0 0 10 14"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="M5 1.2s3.6 4.2 3.6 7.2A3.6 3.6 0 0 1 1.4 8.4C1.4 5.4 5 1.2 5 1.2z"
+          fill={color}
+        />
+      </svg>
+    </span>
+  ))}
+</div>
+
+<style>
+  .falling-drops {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .falling-drops__drop {
+    position: absolute;
+    top: -20px;
+    animation-name: ypp-drop-fall;
+    animation-timing-function: cubic-bezier(0.55, 0, 0.4, 1);
+    animation-iteration-count: infinite;
+    opacity: 0;
+    will-change: transform, opacity;
+  }
+</style>

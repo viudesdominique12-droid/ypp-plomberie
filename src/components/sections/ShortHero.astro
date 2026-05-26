@@ -1,0 +1,111 @@
+---
+/**
+ * ShortHero.astro — Section.
+ *
+ * Rôle : hero court centré pour les pages internes simples (hub
+ * services, hub zone, réalisations, à-propos, contact, légal).
+ * Eyebrow + H1 + filet laiton centré + intro + duo CTAs optionnel.
+ *
+ * Rendu dans : /services/, /zone-intervention/, /realisations/,
+ *              /a-propos/, /contact/, /mentions-legales/, /politique-…/.
+ */
+
+import Container from '@/components/ui/Container.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { nap, labels } from '@/data/site';
+
+export interface Props {
+  eyebrow: string;
+  h1: string;
+  intro?: string;
+  /** Afficher les CTAs (duo téléphone + devis). */
+  withActions?: boolean;
+  /** Taille du H1 — par défaut clamp tokens (48), `lg` pour les hub. */
+  size?: 'md' | 'lg' | 'xl';
+}
+
+const {
+  eyebrow,
+  h1,
+  intro,
+  withActions = false,
+  size = 'md',
+} = Astro.props;
+---
+
+<!-- [Section: ShortHero] -->
+<section id="ShortHero" class={`short-hero short-hero--${size}`}>
+  <Container width="default" class="short-hero__inner">
+    <p class="eyebrow">{eyebrow}</p>
+    <h1 class="short-hero__title">{h1}</h1>
+    <hr class="brass-rule is-center short-hero__brass" />
+    {intro && <p class="short-hero__lead">{intro}</p>}
+    {withActions && (
+      <div class="short-hero__actions">
+        <Button
+          href={`tel:${nap.phoneE164}`}
+          variant="urgence"
+          size="md"
+          ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+        >
+          <Icon slot="icon-leading" name="phone" size={16} />
+          {labels.callNow} · {nap.phoneDisplay}
+        </Button>
+        <Button href="/contact/" variant="primary" size="md">
+          {labels.requestQuote}
+        </Button>
+      </div>
+    )}
+  </Container>
+</section>
+
+<style>
+  .short-hero {
+    background: var(--color-bg);
+    padding-block: var(--space-8) var(--space-12);
+  }
+  @media (min-width: 768px) {
+    .short-hero { padding-block: 40px 80px; }
+  }
+  .short-hero :global(.container) {
+    text-align: center;
+    max-width: 760px;
+  }
+  .short-hero .eyebrow { display: inline-block; }
+  .short-hero__title {
+    margin: 14px 0 0 0;
+    font-size: clamp(2rem, 4vw, 3rem); /* 32→48 */
+    line-height: 1.1;
+  }
+  .short-hero--xl .short-hero__title {
+    font-size: clamp(2.125rem, 4.4vw, 3.25rem); /* 34→52 */
+  }
+  .short-hero__brass { margin-top: 22px; }
+  .short-hero__lead {
+    margin: 22px auto 0;
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    max-width: 60ch;
+  }
+  @media (min-width: 768px) {
+    .short-hero__lead { font-size: 1.0625rem; }
+  }
+  .short-hero__actions {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    justify-content: center;
+  }
+  .short-hero__actions :global(.btn) { width: 100%; }
+  @media (min-width: 640px) {
+    .short-hero__actions {
+      flex-direction: row;
+      align-items: center;
+    }
+    .short-hero__actions :global(.btn) { width: auto; }
+  }
+</style>

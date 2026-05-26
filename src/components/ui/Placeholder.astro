@@ -1,0 +1,127 @@
+---
+/**
+ * Placeholder.astro — Primitive UI.
+ *
+ * Rôle : occuper visuellement un emplacement image / carte en attente
+ * d'un visuel réel. Identité « Baie des Anges » : lavage tonal
+ * gris-azur ou bleu profond, AUCUN label criard.
+ *
+ * Variantes :
+ *   - 'photo' (par défaut) : dégradé sombre avec ligne d'horizon
+ *     subtile (« comme un cadrage réel »).
+ *   - 'map' : radial gradient bleu/ocre sur fond clair.
+ *   - 'plain' : surface alt unie.
+ *   - 'tonal' : dégradé azur profond (utilisé sous le Hero de l'accueil).
+ *
+ * Rendu dans : HomeHero, RealisationsPreview, ServiceHero, ZoneHero,
+ *              page À propos, page Réalisations, etc.
+ *
+ * Phase 3 : remplacer ces placeholders par des <picture>/<Image>
+ * (AVIF/WebP, srcset responsive, loading=lazy).
+ */
+
+export interface Props {
+  variant?: 'photo' | 'map' | 'plain' | 'tonal';
+  /** Aspect ratio (utilisé si height n'est pas fourni). */
+  ratio?: string;
+  /** Hauteur fixe (CSS, ex. "440px"). Prioritaire sur ratio. */
+  height?: string;
+  /** Radius CSS — par défaut --radius-xl. */
+  radius?: string;
+  /** Label discret, affiché en bas (uppercase, ink-2). Optionnel. */
+  label?: string;
+  class?: string;
+}
+
+const {
+  variant = 'photo',
+  ratio,
+  height,
+  radius,
+  label,
+  class: className,
+} = Astro.props;
+
+const style = [
+  height ? `height: ${height};` : ratio ? `aspect-ratio: ${ratio};` : '',
+  radius ? `border-radius: ${radius};` : '',
+]
+  .filter(Boolean)
+  .join(' ');
+
+const classes = ['placeholder', `placeholder--${variant}`, className]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<div class={classes} style={style} aria-hidden="true">
+  {label && <span class="placeholder__label">{label}</span>}
+</div>
+
+<style>
+  .placeholder {
+    position: relative;
+    width: 100%;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    border: 1px solid var(--color-border-soft);
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+  }
+
+  .placeholder--photo {
+    border: none;
+    background:
+      linear-gradient(180deg, rgba(22,42,51,0) 60%, rgba(22,42,51,.10) 100%),
+      linear-gradient(155deg, #c9d8de 0%, #9eb9c1 55%, #6f939e 100%);
+  }
+  .placeholder--photo::after {
+    /* Ligne d'horizon discrète. */
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 64%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.5), transparent);
+  }
+
+  .placeholder--map {
+    background:
+      radial-gradient(80% 60% at 30% 70%, rgba(14,100,128,.18), transparent 60%),
+      radial-gradient(60% 40% at 80% 20%, rgba(201,119,47,.10), transparent 60%),
+      linear-gradient(160deg, #eef3f4 0%, #dde8eb 100%);
+  }
+
+  .placeholder--plain {
+    background: var(--color-surface-alt);
+  }
+
+  .placeholder--tonal {
+    background:
+      radial-gradient(90% 70% at 50% 55%, rgba(255,255,255,.16), transparent 60%),
+      linear-gradient(160deg, #1d4757 0%, #0E6480 38%, #0c3f52 75%, #0a2b38 100%);
+    border: none;
+  }
+  .placeholder--tonal::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0; top: 62%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  }
+
+  .placeholder__label {
+    position: absolute;
+    left: var(--space-5);
+    bottom: var(--space-5);
+    font-size: 0.6875rem; /* 11px */
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(22, 42, 51, 0.5);
+    font-weight: var(--font-weight-semibold);
+  }
+  .placeholder--photo .placeholder__label,
+  .placeholder--tonal .placeholder__label {
+    color: rgba(255, 255, 255, 0.7);
+  }
+</style>

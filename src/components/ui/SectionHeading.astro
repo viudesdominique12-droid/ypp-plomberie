@@ -1,0 +1,93 @@
+---
+/**
+ * SectionHeading.astro — Primitive UI.
+ *
+ * Rôle : en-tête sémantique d'une section (eyebrow + titre + lead).
+ * Filet de laiton **OFF par défaut** (« employé avec parcimonie ») ;
+ * activable via `brass` pour les hero / H1 / accents éditoriaux.
+ *
+ * Rendu dans : la plupart des composants de `sections/`.
+ * Utilisé par : tout bloc qui débute par un titre.
+ */
+
+export interface Props {
+  /** Petite étiquette au-dessus du titre (uppercase, .16em). */
+  eyebrow?: string;
+  /** Texte du titre. */
+  title: string;
+  /** Niveau du titre rendu (h1–h4). */
+  level?: 1 | 2 | 3 | 4;
+  /** Texte d'introduction sous le titre. */
+  lead?: string;
+  /** Alignement. */
+  align?: 'start' | 'center';
+  /** Filet de laiton sous le titre (OFF par défaut). */
+  brass?: boolean;
+  class?: string;
+}
+
+const {
+  eyebrow,
+  title,
+  level = 2,
+  lead,
+  align = 'center',
+  brass = false,
+  class: className,
+} = Astro.props;
+
+const Tag = `h${level}` as 'h1' | 'h2' | 'h3' | 'h4';
+const classes = [
+  'section-heading',
+  `section-heading--${align}`,
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<header class={classes}>
+  {eyebrow && <p class="eyebrow section-heading__eyebrow">{eyebrow}</p>}
+  <Tag class="section-heading__title">{title}</Tag>
+  {brass && (
+    <hr class={`brass-rule${align === 'center' ? ' is-center' : ''} section-heading__brass`} />
+  )}
+  {lead && <p class="section-heading__lead">{lead}</p>}
+</header>
+
+<style>
+  .section-heading {
+    max-width: 760px;
+    margin-bottom: var(--space-12);
+  }
+  .section-heading--center {
+    margin-inline: auto;
+    text-align: center;
+  }
+  .section-heading--start { margin-inline: 0; }
+
+  .section-heading__eyebrow {
+    margin: 0 0 var(--space-3) 0;
+  }
+  .section-heading__title {
+    margin: 0;
+    /* Le clamp() de h2 (tokens) gère la taille — on s'aligne dessus. */
+  }
+  .section-heading__brass {
+    margin-top: var(--space-5);
+  }
+  .section-heading__lead {
+    margin: var(--space-5) 0 0 0;
+    font-size: var(--font-size-md);
+    color: var(--color-text-muted);
+    line-height: var(--line-height-normal);
+    max-width: 36em;
+  }
+  .section-heading--center .section-heading__lead {
+    margin-inline: auto;
+  }
+
+  @media (min-width: 768px) {
+    .section-heading { margin-bottom: var(--space-16); }
+  }
+</style>

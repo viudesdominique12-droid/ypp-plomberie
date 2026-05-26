@@ -1,0 +1,60 @@
+---
+/**
+ * ProcessSteps.astro — Section.
+ *
+ * Rôle : process en 4 étapes via `Stepper`. Sur l'accueil et les
+ * pages services, communique la prévisibilité de la prestation.
+ *
+ * Rendu dans : src/pages/index.astro, ServiceProcessSection (qui
+ * réutilise Stepper directement avec contenu spécifique).
+ */
+
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Stepper from '@/components/ui/Stepper.astro';
+
+export interface Props {
+  eyebrow?: string;
+  title?: string;
+  lead?: string;
+  surface?: 'default' | 'alt';
+  steps?: {
+    title: string;
+    description: string;
+  }[];
+}
+
+const {
+  eyebrow = 'Méthode',
+  title = 'Quatre étapes, zéro mauvaise surprise',
+  lead,
+  surface = 'default',
+  steps = [
+    {
+      title: 'Appel & écoute',
+      description:
+        "Un échange direct pour comprendre la situation, évaluer l'urgence et fixer un créneau précis.",
+    },
+    {
+      title: 'Diagnostic sur place',
+      description:
+        'Visite, localisation du problème, explication claire des options et du périmètre des travaux.',
+    },
+    {
+      title: 'Devis annoncé',
+      description:
+        'Tarif définitif validé avec vous avant toute intervention. Aucune surprise en facturation.',
+    },
+    {
+      title: 'Intervention & suivi',
+      description:
+        'Travail propre, chantier rendu net, garantie décennale et suivi en cas de doute postérieur.',
+    },
+  ],
+} = Astro.props;
+---
+
+<Section id="ProcessSteps" surface={surface} spacing="lg">
+  <SectionHeading eyebrow={eyebrow} title={title} lead={lead} />
+  <Stepper steps={steps} headingLevel={3} columns={4} />
+</Section>

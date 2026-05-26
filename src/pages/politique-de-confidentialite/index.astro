@@ -1,0 +1,170 @@
+---
+/**
+ * src/pages/politique-de-confidentialite/index.astro
+ * Route : /politique-de-confidentialite/.
+ *
+ * Politique de confidentialité conforme RGPD (Règlement UE 2016/679)
+ * et à la loi Informatique et Libertés modifiée. Placeholders [...]
+ * pour les informations spécifiques à l'éditeur (durée de
+ * conservation exacte, prestataire d'analytique, etc.) — à valider
+ * avec l'éditeur avant mise en ligne définitive.
+ */
+
+import ContentLayout from '@/layouts/ContentLayout.astro';
+import { nap, site } from '@/data/site';
+---
+
+<ContentLayout
+  title="Politique de confidentialité — Ypp Plomberie"
+  description="Politique de confidentialité d'Ypp Plomberie : données collectées, finalité, durée de conservation, droits RGPD."
+  h1="Politique de confidentialité"
+  eyebrow="Informations légales"
+  breadcrumb={[{ label: 'Accueil', href: '/' }]}
+  canonicalPath="/politique-de-confidentialite/"
+  updatedAt="Dernière mise à jour — à compléter à la mise en ligne"
+  noStickyCallBar={true}
+>
+  <section>
+    <h2>Responsable du traitement</h2>
+    <p>
+      Le responsable du traitement des données personnelles collectées
+      sur le site {site.url} est <strong>{nap.legalName}</strong>,
+      domicilié au {nap.address.street}, {nap.address.postalCode}
+      {nap.address.city}, joignable au
+      <a href={`tel:${nap.phoneE164}`}>{nap.phoneDisplay}</a> ou par
+      e-mail à <a href={`mailto:${nap.email}`}>{nap.email}</a>.
+    </p>
+  </section>
+
+  <section>
+    <h2>Données collectées</h2>
+    <p>
+      Nous collectons uniquement les données strictement nécessaires
+      au traitement de votre demande via le formulaire de devis :
+    </p>
+    <ul>
+      <li>nom et prénom,</li>
+      <li>numéro de téléphone,</li>
+      <li>adresse e-mail (facultatif),</li>
+      <li>code postal,</li>
+      <li>nature du besoin (type d'intervention),</li>
+      <li>description libre de la demande.</li>
+    </ul>
+    <p>
+      Aucune donnée sensible au sens de l'article 9 du RGPD (santé,
+      opinions, etc.) n'est demandée.
+    </p>
+  </section>
+
+  <section>
+    <h2>Finalité du traitement</h2>
+    <p>
+      Les données collectées servent <strong>exclusivement</strong> à
+      vous recontacter pour traiter votre demande de devis ou
+      d'intervention. La base légale du traitement est votre
+      consentement explicite (case à cocher avant envoi du formulaire)
+      ainsi que l'exécution de mesures précontractuelles prises à votre
+      demande (article 6.1.b RGPD).
+    </p>
+  </section>
+
+  <section>
+    <h2>Destinataires des données</h2>
+    <p>
+      Les données collectées sont destinées uniquement à
+      {nap.legalName} et ne sont transmises à aucun tiers commercial.
+      Elles peuvent être communiquées, sur demande, à un assureur
+      mandaté dans le cadre d'un sinistre dont vous nous auriez confié
+      la résolution.
+    </p>
+  </section>
+
+  <section>
+    <h2>Durée de conservation</h2>
+    <p>
+      Les données issues du formulaire de contact sont conservées
+      pendant une durée de [DUREE_CONSERVATION] à compter de votre
+      dernier contact avec nous, conformément aux recommandations de
+      la CNIL. Au-delà, elles sont anonymisées ou supprimées.
+    </p>
+    <p>
+      Les pièces comptables liées à une intervention facturée sont
+      conservées 10 ans conformément à l'obligation légale (article
+      L.123-22 du Code de commerce).
+    </p>
+  </section>
+
+  <section>
+    <h2>Vos droits</h2>
+    <p>
+      Conformément au Règlement général sur la protection des données
+      (UE 2016/679) et à la loi Informatique et Libertés modifiée, vous
+      disposez des droits suivants sur vos données :
+    </p>
+    <ul>
+      <li>droit d'accès et de copie,</li>
+      <li>droit de rectification,</li>
+      <li>droit à l'effacement (droit à l'oubli),</li>
+      <li>droit à la limitation du traitement,</li>
+      <li>droit d'opposition,</li>
+      <li>droit à la portabilité de vos données,</li>
+      <li>droit de retirer votre consentement à tout moment.</li>
+    </ul>
+    <p>
+      Pour exercer ces droits, écrivez à
+      <a href={`mailto:${nap.email}`}>{nap.email}</a> en précisant
+      votre demande. Une réponse vous sera apportée sous un mois.
+    </p>
+    <p>
+      Vous disposez également du droit d'introduire une réclamation
+      auprès de la Commission Nationale de l'Informatique et des
+      Libertés (CNIL) — <a href="https://www.cnil.fr" rel="noopener">www.cnil.fr</a>.
+    </p>
+  </section>
+
+  <section>
+    <h2>Sécurité</h2>
+    <p>
+      Le site est servi en HTTPS. Les données soumises via le
+      formulaire de contact sont transmises de manière chiffrée. Elles
+      sont conservées sur un environnement sécurisé chez notre
+      hébergeur. {nap.legalName} met en œuvre les mesures techniques
+      et organisationnelles appropriées pour garantir la confidentialité
+      et l'intégrité des données collectées.
+    </p>
+  </section>
+
+  <section>
+    <h2>Cookies</h2>
+    <p>
+      Le site utilise deux catégories de cookies :
+    </p>
+    <ul>
+      <li>
+        <strong>Cookies fonctionnels</strong> strictement nécessaires
+        au fonctionnement du site. Ces cookies ne nécessitent pas votre
+        consentement.
+      </li>
+      <li>
+        <strong>Cookies de mesure d'audience anonymisée</strong>
+        ([NOM_OUTIL_ANALYTIQUE]) — soumis à votre consentement
+        explicite via le bandeau dédié. Vous pouvez retirer ce
+        consentement à tout moment.
+      </li>
+    </ul>
+    <p>
+      Aucun cookie publicitaire ni de traçage cross-site n'est utilisé
+      sur ce site.
+    </p>
+  </section>
+
+  <section>
+    <h2>Modification de la politique</h2>
+    <p>
+      {nap.legalName} se réserve le droit de modifier la présente
+      politique de confidentialité à tout moment. En cas de modification
+      substantielle, vous serez informé(e) par un message affiché sur
+      le site lors de votre prochaine visite.
+    </p>
+  </section>
+</ContentLayout>

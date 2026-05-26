@@ -1,0 +1,156 @@
+---
+/**
+ * ZoneHero.astro — Section.
+ *
+ * Rôle : hero d'une page zone — 2 colonnes desktop. À gauche : tag
+ * « Zone locale », H1, filet laiton, paragraphe, duo CTAs, chips
+ * communes. À droite : image placeholder map 440 px.
+ *
+ * Rendu dans : src/layouts/ZoneLayout.astro.
+ */
+
+import Container from '@/components/ui/Container.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { nap, labels } from '@/data/site';
+
+export interface Props {
+  h1: string;
+  intro: string;
+  /** Liste de quartiers / communes voisines à afficher en chips. */
+  chips?: string[];
+}
+
+const { h1, intro, chips = [] } = Astro.props;
+---
+
+<!-- [Section: ZoneHero] -->
+<section id="ZoneHero" class="zone-hero">
+  <Container width="default" class="zone-hero__inner">
+    <div class="zone-hero__copy">
+      <span class="zone-hero__tag">
+        <span class="zone-hero__dot" aria-hidden="true"></span>
+        Zone locale
+      </span>
+      <h1 class="zone-hero__title">{h1}</h1>
+      <hr class="brass-rule zone-hero__brass" />
+      <p class="zone-hero__lead">{intro}</p>
+      <div class="zone-hero__actions">
+        <Button
+          href={`tel:${nap.phoneE164}`}
+          variant="urgence"
+          size="md"
+          ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+        >
+          <Icon slot="icon-leading" name="phone" size={16} />
+          {labels.callNow} · {nap.phoneDisplay}
+        </Button>
+        <Button href="/contact/" variant="primary" size="md">
+          {labels.requestQuote}
+        </Button>
+      </div>
+      {chips.length > 0 && (
+        <ul class="zone-hero__chips" role="list">
+          {chips.map((c) => (
+            <li class="zone-hero__chip">{c}</li>
+          ))}
+        </ul>
+      )}
+    </div>
+    <Placeholder variant="map" class="zone-hero__visual" />
+  </Container>
+</section>
+
+<style>
+  .zone-hero {
+    background: var(--color-bg);
+    padding-block: var(--space-10);
+  }
+  @media (min-width: 768px) {
+    .zone-hero { padding-block: 80px; }
+  }
+  .zone-hero__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: center;
+  }
+  @media (min-width: 768px) {
+    .zone-hero__inner {
+      grid-template-columns: 1.05fr 1fr;
+      gap: 56px;
+    }
+  }
+  .zone-hero__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: var(--radius-full);
+    background: var(--color-azur-light);
+    color: var(--color-azur);
+    border: 1px solid rgba(14, 100, 128, 0.18);
+    font-size: 0.78rem;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+  }
+  .zone-hero__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--color-azur);
+  }
+  .zone-hero__title {
+    margin: 18px 0 0;
+    font-size: clamp(1.875rem, 3.6vw, 2.875rem); /* 30→46 */
+    line-height: 1.1;
+  }
+  .zone-hero__brass { margin-top: 22px; }
+  .zone-hero__lead {
+    margin: 22px 0 0;
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+  @media (min-width: 768px) {
+    .zone-hero__lead { font-size: 1.0625rem; }
+  }
+  .zone-hero__actions {
+    margin-top: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .zone-hero__actions :global(.btn) { width: 100%; }
+  @media (min-width: 640px) {
+    .zone-hero__actions {
+      flex-direction: row;
+      align-items: center;
+    }
+    .zone-hero__actions :global(.btn) { width: auto; }
+  }
+  .zone-hero__chips {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .zone-hero__chip {
+    padding: 7px 13px;
+    border-radius: var(--radius-full);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-text);
+    font-size: 0.8125rem;
+    font-weight: var(--font-weight-medium);
+    line-height: 1;
+  }
+  .zone-hero__visual {
+    height: 220px;
+  }
+  @media (min-width: 768px) {
+    .zone-hero__visual { height: 440px; }
+  }
+</style>

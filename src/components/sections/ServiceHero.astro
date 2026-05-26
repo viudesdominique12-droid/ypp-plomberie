@@ -1,0 +1,164 @@
+---
+/**
+ * ServiceHero.astro — Section.
+ *
+ * Rôle : hero d'une page service.
+ *
+ * Identité « Baie des Anges » :
+ *   - grille `1.05fr 1fr` desktop / pile mobile, gap 56 px ;
+ *   - gauche : tag azur "● Service · …", H1 (clamp 40→50), filet
+ *     laiton, paragraphe, duo CTAs, note Google ;
+ *   - droite : image placeholder photo radius xl 440 px.
+ *
+ * Rendu dans : src/layouts/ServiceLayout.astro.
+ */
+
+import Container from '@/components/ui/Container.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { nap, labels, site } from '@/data/site';
+
+export interface Props {
+  /** Titre H1 — vient de la collection `services`. */
+  h1: string;
+  /** Texte d'introduction. */
+  intro: string;
+  /** Libellé du tag (ex. « Service · Recherche de fuite »). */
+  tagLabel: string;
+}
+
+const { h1, intro, tagLabel } = Astro.props;
+---
+
+<!-- [Section: ServiceHero] -->
+<section id="ServiceHero" class="service-hero">
+  <Container width="default" class="service-hero__inner">
+    <div class="service-hero__copy">
+      <span class="service-hero__tag">
+        <span class="service-hero__dot" aria-hidden="true"></span>
+        {tagLabel}
+      </span>
+      <h1 class="service-hero__title">{h1}</h1>
+      <hr class="brass-rule service-hero__brass" />
+      <p class="service-hero__lead">{intro}</p>
+      <div class="service-hero__actions">
+        <Button
+          href={`tel:${nap.phoneE164}`}
+          variant="urgence"
+          size="md"
+          ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+        >
+          <Icon slot="icon-leading" name="phone" size={16} />
+          {labels.callNow} · {nap.phoneDisplay}
+        </Button>
+        <Button href="/contact/" variant="primary" size="md">
+          {labels.requestQuote}
+        </Button>
+      </div>
+      <div class="service-hero__rating">
+        <span class="stars" aria-label={`Note : ${site.rating.value} sur 5`}>
+          {Array.from({ length: 5 }).map(() => (
+            <Icon name="star" size={16} />
+          ))}
+        </span>
+        <span class="service-hero__rating-text">
+          <strong>{site.rating.value.toString().replace('.', ',')} / 5</strong>
+          <span> · {site.rating.count} avis Google</span>
+        </span>
+      </div>
+    </div>
+    <Placeholder variant="photo" class="service-hero__visual" />
+  </Container>
+</section>
+
+<style>
+  .service-hero {
+    background: var(--color-bg);
+    padding-block: var(--space-10);
+  }
+  @media (min-width: 768px) {
+    .service-hero { padding-block: 80px; }
+  }
+  .service-hero__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: center;
+  }
+  @media (min-width: 768px) {
+    .service-hero__inner {
+      grid-template-columns: 1.05fr 1fr;
+      gap: 56px;
+    }
+  }
+  .service-hero__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 14px;
+    border-radius: var(--radius-full);
+    background: var(--color-azur-light);
+    color: var(--color-azur);
+    border: 1px solid rgba(14, 100, 128, 0.18);
+    font-size: 0.78rem;
+    font-weight: var(--font-weight-semibold);
+    line-height: 1;
+  }
+  .service-hero__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: var(--color-azur);
+  }
+  .service-hero__title {
+    margin: 18px 0 0;
+    font-size: clamp(2rem, 4vw, 3.125rem); /* 32→50 */
+    line-height: 1.1;
+  }
+  .service-hero__brass { margin-top: 22px; }
+  .service-hero__lead {
+    margin: 22px 0 0;
+    font-size: 0.9375rem;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+  }
+  @media (min-width: 768px) {
+    .service-hero__lead { font-size: 1.0625rem; }
+  }
+  .service-hero__actions {
+    margin-top: 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .service-hero__actions :global(.btn) { width: 100%; }
+  @media (min-width: 640px) {
+    .service-hero__actions {
+      flex-direction: row;
+      align-items: center;
+    }
+    .service-hero__actions :global(.btn) { width: auto; }
+  }
+  .service-hero__rating {
+    margin-top: 22px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .service-hero__rating-text {
+    font-size: 0.84rem;
+    color: var(--color-text-muted);
+  }
+  .service-hero__rating-text strong {
+    color: var(--color-text);
+    font-weight: var(--font-weight-semibold);
+  }
+  .service-hero__visual {
+    height: 280px;
+  }
+  @media (min-width: 768px) {
+    .service-hero__visual { height: 440px; }
+  }
+</style>

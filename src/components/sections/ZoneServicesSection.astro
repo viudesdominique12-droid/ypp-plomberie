@@ -1,0 +1,61 @@
+---
+/**
+ * ZoneServicesSection.astro — Section.
+ *
+ * Rôle : sur une page zone, présenter les services qu'on propose
+ * dans cette commune (renvoi vers les pages services).
+ *
+ * Rendu dans : src/layouts/ZoneLayout.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ServiceCard from '@/components/ui/ServiceCard.astro';
+import { getCollection } from 'astro:content';
+
+export interface Props {
+  commune: string;
+}
+
+const { commune } = Astro.props;
+
+const services = (await getCollection('services')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<Section id="ZoneServicesSection" surface="default" spacing="lg" width="wide">
+  <SectionHeading
+    eyebrow="Services"
+    title={`Toutes nos prestations à ${commune}`}
+  />
+  <ul class="zone-services__list" role="list">
+    {services.map((entry) => (
+      <li>
+        <ServiceCard
+          href={`/services/${entry.data.slug}/`}
+          title={entry.data.title}
+          description={entry.data.shortDescription}
+          icon={entry.data.icon}
+        />
+      </li>
+    ))}
+  </ul>
+</Section>
+
+<style>
+  .zone-services__list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  @media (min-width: 640px) {
+    .zone-services__list { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .zone-services__list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+  }
+</style>

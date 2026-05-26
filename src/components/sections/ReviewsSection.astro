@@ -1,0 +1,105 @@
+---
+/**
+ * ReviewsSection.astro — Section.
+ *
+ * Rôle : section d'avis Google. Eyebrow + H2 + filet centré +
+ * pastille azur-light avec étoiles ocre + récap (« 5,0/5 sur Google
+ * · 13 avis certifiés ») + 3 ReviewCard.
+ *
+ * Rendu dans : src/pages/index.astro et, en variante, pages services.
+ *
+ * Phase 3 : remplacer les placeholders par les vrais avis. Le markup
+ * est prêt pour un futur AggregateRating JSON-LD (à brancher).
+ */
+
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ReviewCard from '@/components/ui/ReviewCard.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { site } from '@/data/site';
+
+const reviews = [
+  {
+    rating: 5,
+    quote:
+      "Fuite chez nous un dimanche soir. Arrivé en quarante minutes, diagnostic clair, tarif annoncé avant d'intervenir. Du travail propre.",
+    author: 'Camille R.',
+    place: 'Nice — Cimiez',
+  },
+  {
+    rating: 5,
+    quote:
+      'Rénovation complète de la salle de bain en deux semaines. Pas un jour de retard, finitions impeccables. Je le recommande les yeux fermés.',
+    author: 'Antoine D.',
+    place: 'Villefranche-sur-Mer',
+  },
+  {
+    rating: 5,
+    quote:
+      "Chaudière capricieuse depuis trois hivers, deux artisans avant lui n'avaient rien trouvé. Réparée en une intervention. Bravo.",
+    author: 'Hélène M.',
+    place: 'Cagnes-sur-Mer',
+  },
+];
+---
+
+<Section id="ReviewsSection" surface="default" spacing="lg" width="wide">
+  <SectionHeading
+    eyebrow="Avis clients"
+    title="Ce que disent les gens chez qui nous intervenons"
+  />
+
+  <div class="reviews-section__pill" aria-hidden="true">
+    <span class="stars">
+      {Array.from({ length: 5 }).map(() => (
+        <Icon name="star" size={16} />
+      ))}
+    </span>
+    <span>
+      {site.rating.value.toString().replace('.', ',')} / 5 sur Google
+      · {site.rating.count} avis certifiés
+    </span>
+  </div>
+
+  <ul class="reviews-section__list" role="list">
+    {reviews.map((review) => (
+      <li>
+        <ReviewCard
+          rating={review.rating}
+          quote={review.quote}
+          author={review.author}
+          place={review.place}
+        />
+      </li>
+    ))}
+  </ul>
+</Section>
+
+<style>
+  .reviews-section__pill {
+    margin: calc(var(--space-12) * -1) auto var(--space-10);
+    width: fit-content;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 7px 14px;
+    border-radius: var(--radius-full);
+    background: var(--color-azur-light);
+    color: var(--color-azur);
+    border: 1px solid rgba(14, 100, 128, 0.18);
+    font-size: 0.78rem;
+    font-weight: var(--font-weight-semibold);
+    text-align: center;
+  }
+  .reviews-section__list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  @media (min-width: 768px) {
+    .reviews-section__list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+  }
+</style>

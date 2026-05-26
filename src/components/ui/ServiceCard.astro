@@ -1,0 +1,163 @@
+---
+/**
+ * ServiceCard.astro — Primitive UI.
+ *
+ * Rôle : carte cliquable représentant un service. Icône stroke +
+ * H3 Playfair + description courte + hairline + lien azur « En savoir
+ * plus → ». La carte entière est cliquable (lien stretched).
+ *
+ * Identité « Baie des Anges » :
+ *   - PAS de pastille azur-light arrondie autour de l'icône.
+ *   - Hairline (1px border-top) avant le lien en pied.
+ *   - Hover : **spotlight cursor-following** (inspiration 21st.dev /
+ *     Magic UI Magic Card) + border azur + shadow-md + translateY(-2).
+ *   - Reflet laiton qui passe UNE FOIS au hover (water shimmer).
+ *
+ * Rendu dans : ServicesGrid, ServiceCrossLinks.
+ */
+
+import Icon from './Icon.astro';
+
+export interface Props {
+  href: string;
+  title: string;
+  description: string;
+  icon: string;
+  headingLevel?: 2 | 3 | 4;
+}
+
+const { href, title, description, icon, headingLevel = 3 } = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
+---
+
+<article class="service-card" data-spotlight>
+  <div class="service-card__icon" aria-hidden="true">
+    <Icon name={icon} size={28} strokeWidth={1.4} />
+  </div>
+  <Heading class="service-card__title">
+    <a class="service-card__link" href={href}>
+      <span class="service-card__title-text">{title}</span>
+      <span class="visually-hidden"> : en savoir plus</span>
+    </a>
+  </Heading>
+  <p class="service-card__description">{description}</p>
+  <span class="service-card__cta" aria-hidden="true">
+    En savoir plus
+    <Icon name="arrow-right" size={14} />
+  </span>
+</article>
+
+<style>
+  .service-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-8);
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    isolation: isolate;
+    transition:
+      border-color var(--transition-fast) var(--ease-out),
+      box-shadow var(--transition-fast) var(--ease-out),
+      transform var(--transition-fast) var(--ease-out);
+    height: 100%;
+    --spot-opacity: 0;
+  }
+
+  /* Spotlight cursor-following — radial-gradient azur-light. */
+  .service-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      360px circle at var(--spot-x, 50%) var(--spot-y, 50%),
+      rgba(14, 100, 128, 0.18),
+      transparent 70%
+    );
+    opacity: var(--spot-opacity, 0);
+    transition: opacity var(--transition-base) var(--ease-out);
+    z-index: 0;
+  }
+
+  /* Reflet laiton qui passe UNE FOIS au hover (water shimmer). */
+  .service-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: linear-gradient(
+      105deg,
+      transparent 38%,
+      rgba(182, 138, 62, 0.12) 50%,
+      transparent 62%
+    );
+    background-size: 220% 100%;
+    background-position: -150% 0;
+    opacity: 0;
+    transition: opacity var(--transition-base) var(--ease-out);
+    z-index: 1;
+  }
+
+  .service-card:hover {
+    border-color: var(--color-azur);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .service-card:hover::before {
+    opacity: 1;
+    animation: ypp-water-shimmer 1.1s var(--ease-out) forwards;
+  }
+  .service-card > * {
+    position: relative;
+    z-index: 2;
+  }
+  .service-card__icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--color-azur);
+    transition: transform var(--transition-base) var(--ease-out);
+  }
+  .service-card:hover .service-card__icon {
+    transform: translateY(-2px);
+  }
+  .service-card__title {
+    margin: var(--space-1) 0 0 0;
+    font-size: 1.375rem; /* 22px */
+    line-height: 1.2;
+    color: var(--color-text);
+  }
+  .service-card__link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .service-card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    z-index: 3;
+  }
+  .service-card__description {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    flex: 1;
+  }
+  .service-card__cta {
+    padding-top: var(--space-4);
+    margin-top: var(--space-1);
+    border-top: 1px solid var(--color-border-soft);
+    color: var(--color-azur);
+    font-weight: var(--font-weight-semibold);
+    font-size: 0.8125rem;
+    letter-spacing: 0.02em;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+</style>

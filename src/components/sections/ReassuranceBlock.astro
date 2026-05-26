@@ -1,0 +1,230 @@
+---
+/**
+ * ReassuranceBlock.astro — Section.
+ *
+ * Rôle : « Quand chaque minute compte, on est déjà en route. »
+ * Bloc éditorial validé par l'utilisateur en remplacement de la
+ * grille image + checklist (anti-AI-slop).
+ *
+ *   - Top : grille 1.4fr 1fr — gauche H2 massif Playfair avec
+ *     accent italique, droite paragraphe.
+ *   - Bottom : 3 blocs typographiques (eyebrow + Playfair 44 px +
+ *     description), séparés par une hairline.
+ *   - Bouton urgence en pied.
+ *
+ * Rendu dans : src/pages/index.astro et toute page qui souhaite ré-utiliser
+ * le bloc de réactivité (ServiceLayout, ZoneLayout).
+ */
+
+import Container from '@/components/ui/Container.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import NumberTicker from '@/components/ui/NumberTicker.astro';
+import { nap, labels } from '@/data/site';
+
+export interface Block {
+  eyebrow: string;
+  /** Valeur statique (rendue telle quelle si pas de ticker). */
+  value: string;
+  description: string;
+  /**
+   * Optionnel : valeur cible pour NumberTicker. Si fournie, anime
+   * le chiffre quand le bloc devient visible.
+   */
+  ticker?: {
+    target: number;
+    decimals?: number;
+    prefix?: string;
+    suffix?: string;
+  };
+}
+
+export interface Props {
+  blocks?: Block[];
+  /** Surface du bloc. */
+  surface?: 'default' | 'alt';
+}
+
+const {
+  blocks = [
+    {
+      eyebrow: "Délai d'arrivée",
+      value: '< 1 h',
+      ticker: { target: 1, prefix: '< ', suffix: ' h' },
+      description:
+        'Sur tout Nice et la première couronne. Astreinte nuit et week-ends comprise.',
+    },
+    {
+      eyebrow: 'Disponibilité',
+      value: '24 / 7',
+      ticker: { target: 24, suffix: ' / 7' },
+      description:
+        "Un seul numéro, décroché en personne — pas de standard, pas de cascade d'opérateurs.",
+    },
+    {
+      eyebrow: 'Devis',
+      value: 'annoncé',
+      description:
+        'Tarif définitif validé avec vous au téléphone ou sur place, avant la moindre intervention.',
+    },
+  ],
+  surface = 'default',
+} = Astro.props;
+---
+
+<!-- [Section: ReassuranceBlock] -->
+<section
+  id="ReassuranceBlock"
+  class={`reassurance reassurance--${surface}`}
+>
+  <Container width="default">
+    <div class="reassurance__top">
+      <h2 class="reassurance__title">
+        Quand chaque<br />
+        <em>minute</em> compte,<br />
+        on est déjà en route.
+      </h2>
+      <p class="reassurance__lead">
+        Permanence téléphonique réelle, intervention en moins d'une heure
+        sur Nice et la baie des Anges. Un seul artisan vous prend en
+        charge, du diagnostic à la dernière finition — et vous le savez
+        avant qu'il sonne à la porte.
+      </p>
+    </div>
+
+    <ul class="reassurance__blocks" role="list">
+      {blocks.map((b) => (
+        <li class="reassurance__block">
+          <p class="eyebrow">{b.eyebrow}</p>
+          <p class="reassurance__value">
+            {b.ticker ? (
+              <NumberTicker
+                value={b.ticker.target}
+                decimals={b.ticker.decimals ?? 0}
+                prefix={b.ticker.prefix ?? ''}
+                suffix={b.ticker.suffix ?? ''}
+                duration={1500}
+              />
+            ) : (
+              b.value
+            )}
+          </p>
+          <p class="reassurance__desc">{b.description}</p>
+        </li>
+      ))}
+    </ul>
+
+    <div class="reassurance__cta">
+      <Button
+        href={`tel:${nap.phoneE164}`}
+        variant="urgence"
+        size="md"
+        ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+      >
+        <Icon slot="icon-leading" name="phone" size={16} />
+        Appeler maintenant
+      </Button>
+    </div>
+  </Container>
+</section>
+
+<style>
+  .reassurance {
+    padding-block: var(--space-14);
+    border-top: 1px solid var(--color-border-soft);
+  }
+  @media (min-width: 768px) {
+    .reassurance { padding-block: 120px 88px; }
+  }
+  .reassurance--default { background: var(--color-surface); }
+  .reassurance--alt     { background: var(--color-surface-alt); }
+
+  .reassurance__top {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-5);
+    align-items: flex-start;
+    margin-bottom: var(--space-10);
+  }
+  @media (min-width: 768px) {
+    .reassurance__top {
+      grid-template-columns: 1.4fr 1fr;
+      gap: 80px;
+      margin-bottom: 64px;
+    }
+  }
+
+  .reassurance__title {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-semibold);
+    font-size: 2.375rem; /* 38 mobile */
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    color: var(--color-text);
+    max-width: 14ch;
+  }
+  @media (min-width: 768px) {
+    .reassurance__title { font-size: 4.5rem; max-width: none; }
+  }
+  .reassurance__title em {
+    font-style: italic;
+    font-weight: var(--font-weight-medium);
+  }
+  .reassurance__lead {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.75;
+  }
+  @media (min-width: 768px) {
+    .reassurance__lead { padding-top: 18px; font-size: 1rem; }
+  }
+
+  .reassurance__blocks {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-7);
+    padding-top: var(--space-7);
+    border-top: 1px solid var(--color-border-soft);
+  }
+  @media (min-width: 768px) {
+    .reassurance__blocks {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+      padding-top: 48px;
+    }
+  }
+  .reassurance__block { margin: 0; }
+  .reassurance__value {
+    margin: 12px 0 0;
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-semibold);
+    font-size: 2.25rem; /* 36 mobile */
+    line-height: 1;
+    color: var(--color-text);
+    letter-spacing: -0.01em;
+  }
+  @media (min-width: 768px) {
+    .reassurance__value { font-size: 2.75rem; }
+  }
+  .reassurance__desc {
+    margin: 14px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.65;
+    color: var(--color-text-muted);
+  }
+
+  .reassurance__cta {
+    margin-top: var(--space-9, 36px);
+    display: flex;
+    justify-content: flex-start;
+  }
+  .reassurance__cta :global(.btn) { width: 100%; }
+  @media (min-width: 640px) {
+    .reassurance__cta :global(.btn) { width: auto; }
+  }
+  @media (min-width: 768px) {
+    .reassurance__cta { margin-top: 48px; }
+  }
+</style>

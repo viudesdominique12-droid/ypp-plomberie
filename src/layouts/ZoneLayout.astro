@@ -1,0 +1,96 @@
+---
+/**
+ * ZoneLayout.astro — Template (couche 6).
+ *
+ * Rôle : structure de page pour TOUTES les zones (gabarit 5) :
+ *   breadcrumb → hero local (2-col + chips) → contenu local (slot
+ *   Markdown) → intervention locale (image + checklist) → services
+ *   dans la zone → CTA final.
+ *
+ * Rendu par : src/pages/zones/[slug].astro.
+ *
+ * Si UNE seule zone a un contenu faux, c'est son `.md`.
+ * Si TOUTES sont cassées, c'est ICI.
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Breadcrumb from '@/components/layout/Breadcrumb.astro';
+import ZoneHero from '@/components/sections/ZoneHero.astro';
+import InterventionLocaleSection from '@/components/sections/InterventionLocaleSection.astro';
+import ZoneServicesSection from '@/components/sections/ZoneServicesSection.astro';
+import FinalCta from '@/components/sections/FinalCta.astro';
+
+export interface ZoneData {
+  commune: string;
+  slug: string;
+  codePostal: string;
+  h1: string;
+  metaTitle: string;
+  metaDescription: string;
+  intro: string;
+}
+
+export interface Props {
+  data: ZoneData;
+  /** Chips (quartiers / villages) à afficher dans le hero. */
+  chips?: string[];
+}
+
+const { data, chips } = Astro.props;
+---
+
+<BaseLayout
+  title={data.metaTitle}
+  description={data.metaDescription}
+  canonicalPath={`/zones/${data.slug}/`}
+>
+  <Container width="wide">
+    <Breadcrumb
+      items={[
+        { label: 'Accueil', href: '/' },
+        { label: "Zone d'intervention", href: '/zone-intervention/' },
+        { label: data.commune },
+      ]}
+    />
+  </Container>
+
+  <ZoneHero h1={data.h1} intro={data.intro} chips={chips} />
+
+  {/* Contenu local — corps Markdown */}
+  <Section id="ZoneLocalContent" surface="default" spacing="md" width="narrow">
+    <article class="zone-local-content">
+      <slot />
+    </article>
+  </Section>
+
+  <InterventionLocaleSection
+    title={`${data.commune} et son terrain`}
+  />
+
+  <ZoneServicesSection commune={data.commune} />
+
+  <FinalCta title={`Besoin d'un plombier à ${data.commune} maintenant ?`} />
+</BaseLayout>
+
+<style>
+  .zone-local-content :global(p) {
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+  .zone-local-content :global(p + p) {
+    margin-top: var(--space-4);
+  }
+  .zone-local-content :global(ul) {
+    margin-top: var(--space-4);
+    padding-left: var(--space-6);
+    list-style: disc;
+    color: var(--color-text-muted);
+  }
+  .zone-local-content :global(li) {
+    line-height: 1.7;
+  }
+  .zone-local-content :global(li + li) { margin-top: var(--space-2); }
+</style>

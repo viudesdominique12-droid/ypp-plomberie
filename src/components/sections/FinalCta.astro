@@ -1,0 +1,26 @@
+---
+/**
+ * FinalCta.astro — Section.
+ *
+ * Rôle : bloc de conversion final, juste avant le footer. Enveloppe
+ * le `CtaBlock` (azur + filet laiton + duo CTAs) dans une Section.
+ *
+ * Rendu dans : toutes les pages principales (accueil, services, zones,
+ *              réalisations, à-propos, contact n'en a pas — son CTA
+ *              est ailleurs).
+ */
+
+import Section from '@/components/ui/Section.astro';
+import CtaBlock from '@/components/ui/CtaBlock.astro';
+
+export interface Props {
+  title?: string;
+  lead?: string;
+}
+
+const { title, lead } = Astro.props;
+---
+
+<Section id="FinalCta" surface="bg" spacing="md" width="wide">
+  <CtaBlock title={title} lead={lead} />
+</Section>

@@ -1,0 +1,126 @@
+---
+/**
+ * ContentLayout.astro — Template (couche 6).
+ *
+ * Rôle : template sobre, une seule colonne, pour les pages de
+ * contenu (à propos, mentions légales, politique de
+ * confidentialité). Mise en page narrow (760 px).
+ *
+ * Variante « légale » : pas de StickyCallBar mobile (lecture longue,
+ * non commerciale) — utilisé par `noStickyCallBar`.
+ *
+ * Rendu par : src/pages/a-propos/index.astro,
+ *             src/pages/mentions-legales/index.astro,
+ *             src/pages/politique-de-confidentialite/index.astro.
+ */
+
+import BaseLayout from './BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Section from '@/components/ui/Section.astro';
+import Breadcrumb from '@/components/layout/Breadcrumb.astro';
+
+export interface Props {
+  title: string;
+  description: string;
+  h1: string;
+  eyebrow?: string;
+  /** Fil d'Ariane (sans la page courante). */
+  breadcrumb: { label: string; href?: string }[];
+  canonicalPath?: string;
+  /** Sous-titre (« Dernière mise à jour — … »). */
+  updatedAt?: string;
+  /** Désactive la sticky call bar (page légale). */
+  noStickyCallBar?: boolean;
+}
+
+const {
+  title,
+  description,
+  h1,
+  eyebrow = 'Informations',
+  breadcrumb,
+  canonicalPath,
+  updatedAt,
+  noStickyCallBar = false,
+} = Astro.props;
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  canonicalPath={canonicalPath}
+  hideStickyCallBar={noStickyCallBar}
+>
+  <Container width="wide">
+    <Breadcrumb items={[...breadcrumb, { label: h1 }]} />
+  </Container>
+
+  <Section id="ContentHeader" surface="bg" spacing="sm" width="narrow">
+    <p class="eyebrow">{eyebrow}</p>
+    <h1 class="content-layout__title">{h1}</h1>
+    <hr class="brass-rule content-layout__brass" />
+    {updatedAt && (
+      <p class="content-layout__updated">{updatedAt}</p>
+    )}
+  </Section>
+
+  <Section id="ContentBody" surface="bg" spacing="md" width="narrow">
+    <article class="content-layout__article">
+      <slot />
+    </article>
+  </Section>
+</BaseLayout>
+
+<style>
+  .content-layout__title {
+    margin: 14px 0 0;
+    font-size: clamp(2.125rem, 4.4vw, 3.25rem); /* 34→52 */
+    line-height: 1.1;
+  }
+  .content-layout__brass { margin-top: 22px; }
+  .content-layout__updated {
+    margin: 22px 0 0;
+    font-size: 0.8125rem;
+    color: var(--color-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .content-layout__article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+  }
+  .content-layout__article :global(h2) {
+    margin: 0;
+    font-size: var(--font-size-xl);
+  }
+  .content-layout__article :global(h3) {
+    margin: var(--space-6) 0 0;
+    font-size: var(--font-size-lg);
+  }
+  .content-layout__article :global(p) {
+    margin: 14px 0 0;
+    color: var(--color-text-muted);
+    line-height: 1.75;
+  }
+  .content-layout__article :global(ul) {
+    margin: 14px 0 0;
+    padding-left: var(--space-6);
+    list-style: disc;
+    color: var(--color-text-muted);
+  }
+  .content-layout__article :global(li) {
+    line-height: 1.7;
+  }
+  .content-layout__article :global(li + li) { margin-top: var(--space-2); }
+  .content-layout__article :global(strong) { color: var(--color-text); }
+  .content-layout__article :global(a) {
+    color: var(--color-azur);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  /* Pour la page légale : chaque section H2 + p est espacée verticalement. */
+  .content-layout__article :global(section + section) { margin-top: var(--space-4); }
+</style>

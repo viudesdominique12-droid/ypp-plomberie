@@ -1,0 +1,103 @@
+---
+/**
+ * ServicesMarquee.astro — Section.
+ *
+ * Rôle : bandeau de services qui défilent comme un courant continu.
+ * Inspiration directe de Magic UI Marquee, adaptée à l'identité
+ * « Baie des Anges » :
+ *   - typographie Playfair Display (chacun des 6 services), taille 28 px,
+ *     ink-2 par défaut, ink au hover de l'item ;
+ *   - séparateur entre items = goutte d'eau stylisée ;
+ *   - fond surface-alt, hairline haute et basse ;
+ *   - pause au hover pour la lisibilité ;
+ *   - prefers-reduced-motion respecté (animation désactivée).
+ *
+ * Métaphore : un fil ininterrompu — comme l'eau qui coule.
+ *
+ * Rendu dans : src/pages/index.astro (entre une section et l'autre,
+ *              en filigrane).
+ */
+
+import Marquee from '@/components/ui/Marquee.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { getCollection } from 'astro:content';
+
+const services = (await getCollection('services')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+---
+
+<!-- [Section: ServicesMarquee] -->
+<section id="ServicesMarquee" class="services-marquee" aria-label="Aperçu des services">
+  <Marquee duration="42s" gap="2.5rem" pauseOnHover={true} fade={true}>
+    {services.map((s) => (
+      <a class="services-marquee__item" href={`/services/${s.data.slug}/`}>
+        <span class="services-marquee__icon" aria-hidden="true">
+          <Icon name={s.data.icon} size={20} strokeWidth={1.5} />
+        </span>
+        <span class="services-marquee__label">{s.data.title}</span>
+        <span class="services-marquee__sep" aria-hidden="true">
+          {/* Goutte d'eau séparatrice */}
+          <svg width="10" height="14" viewBox="0 0 10 14" fill="none">
+            <path
+              d="M5 1.2s3.6 4.2 3.6 7.2A3.6 3.6 0 0 1 1.4 8.4C1.4 5.4 5 1.2 5 1.2z"
+              fill="var(--color-laiton)"
+              opacity="0.55"
+            />
+          </svg>
+        </span>
+      </a>
+    ))}
+  </Marquee>
+</section>
+
+<style>
+  .services-marquee {
+    background: var(--color-surface-alt);
+    border-top: 1px solid var(--color-border-soft);
+    border-bottom: 1px solid var(--color-border-soft);
+    padding-block: var(--space-6);
+  }
+  @media (min-width: 768px) {
+    .services-marquee { padding-block: var(--space-8); }
+  }
+
+  .services-marquee__item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    text-decoration: none;
+    color: var(--color-text-muted);
+    transition: color var(--transition-fast) var(--ease-out);
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .services-marquee__item:hover { color: var(--color-text); }
+  .services-marquee__item:hover .services-marquee__icon {
+    color: var(--color-azur);
+  }
+
+  .services-marquee__icon {
+    color: var(--color-azur);
+    opacity: 0.85;
+    display: inline-flex;
+    transition: color var(--transition-fast) var(--ease-out);
+  }
+
+  .services-marquee__label {
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-medium);
+    font-style: italic;
+    font-size: 1.5rem; /* 24px */
+    letter-spacing: -0.01em;
+    line-height: 1;
+  }
+  @media (min-width: 768px) {
+    .services-marquee__label { font-size: 1.75rem; /* 28px */ }
+  }
+
+  .services-marquee__sep {
+    display: inline-flex;
+    align-items: center;
+  }
+</style>

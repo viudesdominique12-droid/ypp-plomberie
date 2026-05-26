@@ -1,0 +1,142 @@
+---
+/**
+ * ServicePricingSection.astro — Section.
+ *
+ * Rôle : bloc « Tarifs indicatifs / repères clairs ». Identité
+ * « Baie des Anges » :
+ *   - Desktop : table 3 colonnes (Prestation / Durée / Tarif TTC),
+ *     en-tête sur fond azur-light, lignes séparées par hairline.
+ *   - Mobile : liste 2 colonnes (libellé gauche, prix droite en gras).
+ *
+ * Rendu dans : src/layouts/ServiceLayout.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+
+export interface PricingRow {
+  label: string;
+  duration: string;
+  price: string;
+}
+
+export interface Props {
+  eyebrow?: string;
+  title?: string;
+  lead?: string;
+  rows?: PricingRow[];
+}
+
+const {
+  eyebrow = 'Tarifs indicatifs',
+  title = 'Repères clairs, tarif définitif annoncé',
+  lead = "Ces fourchettes vous donnent un ordre d'idée. Le tarif définitif est validé avec vous avant la moindre intervention.",
+  rows = [
+    { label: 'Détection acoustique', duration: '1h', price: '180 € TTC' },
+    { label: 'Caméra thermique', duration: '1h30', price: '240 € TTC' },
+    { label: 'Gaz traceur (hydrogène)', duration: '2h', price: '320 € TTC' },
+    { label: 'Inspection caméra endoscopique', duration: '1h', price: '160 € TTC' },
+    { label: "Rapport d'expertise pour assurance", duration: '—', price: '90 € TTC' },
+  ],
+} = Astro.props;
+---
+
+<Section id="ServicePricingSection" surface="alt" spacing="lg">
+  <SectionHeading eyebrow={eyebrow} title={title} lead={lead} />
+
+  {/* Mobile : liste 2 colonnes */}
+  <div class="pricing pricing--mob">
+    {rows.map((row, i) => (
+      <div class={`pricing__row${i < rows.length - 1 ? ' pricing__row--divided' : ''}`}>
+        <span class="pricing__label">{row.label}</span>
+        <span class="pricing__price">{row.price}</span>
+      </div>
+    ))}
+  </div>
+
+  {/* Desktop : table 3 colonnes */}
+  <div class="pricing pricing--desk">
+    <table>
+      <thead>
+        <tr>
+          <th>Prestation</th>
+          <th>Durée</th>
+          <th class="pricing__th-right">Tarif TTC</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.map((row) => (
+          <tr>
+            <td>{row.label}</td>
+            <td class="pricing__td-muted">{row.duration}</td>
+            <td class="pricing__td-right">{row.price}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</Section>
+
+<style>
+  .pricing {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .pricing--desk { display: none; }
+  @media (min-width: 768px) {
+    .pricing--mob { display: none; }
+    .pricing--desk { display: block; }
+  }
+
+  /* Mobile rows */
+  .pricing__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+  }
+  .pricing__row--divided {
+    border-bottom: 1px solid var(--color-border-soft);
+  }
+  .pricing__label {
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+  }
+  .pricing__price {
+    color: var(--color-text);
+    font-weight: var(--font-weight-bold);
+    font-size: 0.9rem;
+  }
+
+  /* Desktop table */
+  .pricing table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .pricing thead tr {
+    background: var(--color-azur-light);
+  }
+  .pricing th {
+    text-align: left;
+    padding: 16px 26px;
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-azur);
+  }
+  .pricing__th-right { text-align: right; }
+  .pricing tbody tr {
+    border-top: 1px solid var(--color-border-soft);
+  }
+  .pricing td {
+    padding: 18px 26px;
+    color: var(--color-text);
+    font-size: 0.9375rem;
+    font-weight: var(--font-weight-medium);
+  }
+  .pricing__td-muted { color: var(--color-text-muted); font-weight: var(--font-weight-regular); }
+  .pricing__td-right { font-weight: var(--font-weight-semibold); text-align: right; }
+</style>

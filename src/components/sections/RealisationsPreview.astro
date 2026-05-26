@@ -1,0 +1,101 @@
+---
+/**
+ * RealisationsPreview.astro — Section.
+ *
+ * Rôle : aperçu visuel des dernières réalisations sur l'accueil.
+ *
+ * Identité « Baie des Anges » :
+ *   - Desktop : mosaïque 3 colonnes × 2 lignes, premier visuel sur
+ *     deux lignes (rendu via grid-area).
+ *   - Mobile : carousel horizontal scroll-snap, 5 cartes 240 px.
+ *   - Visuels : placeholder.photo (lavage tonal, ligne d'horizon).
+ *
+ * Rendu dans : src/pages/index.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+---
+
+<Section id="RealisationsPreview" surface="alt" spacing="lg" width="wide">
+  <SectionHeading
+    eyebrow="Chantiers récents"
+    title="Du dépannage discret à la rénovation pleine page"
+  />
+
+  {/* Mosaïque desktop */}
+  <div class="realisations-preview__grid">
+    <Placeholder variant="photo" class="realisations-preview__hero" radius="14px" />
+    <Placeholder variant="photo" class="realisations-preview__cell" radius="14px" />
+    <Placeholder variant="photo" class="realisations-preview__cell" radius="14px" />
+    <Placeholder variant="photo" class="realisations-preview__cell" radius="14px" />
+    <Placeholder variant="photo" class="realisations-preview__cell" radius="14px" />
+  </div>
+
+  {/* Carousel mobile */}
+  <ul class="realisations-preview__rail" role="list">
+    {Array.from({ length: 5 }).map(() => (
+      <li class="realisations-preview__rail-item">
+        <Placeholder variant="photo" height="180px" radius="14px" />
+      </li>
+    ))}
+  </ul>
+
+  <div class="realisations-preview__cta">
+    <Button href="/realisations/" variant="secondary" size="md">
+      Voir toutes les réalisations
+      <Icon slot="icon-trailing" name="arrow-right" size={16} />
+    </Button>
+  </div>
+</Section>
+
+<style>
+  /* Desktop : mosaïque 3 cols × 2 lignes. */
+  .realisations-preview__grid {
+    display: none;
+  }
+  @media (min-width: 768px) {
+    .realisations-preview__grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 200px);
+      gap: var(--space-4);
+    }
+    .realisations-preview__hero {
+      grid-column: 1;
+      grid-row: 1 / 3;
+    }
+    .realisations-preview__cell {
+      height: 200px;
+    }
+  }
+
+  /* Mobile : carousel horizontal scroll-snap. */
+  .realisations-preview__rail {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 4px 0 8px;
+    margin: 0 calc(-1 * var(--grid-gutter));
+    padding-left: var(--grid-gutter);
+    padding-right: var(--grid-gutter);
+    -webkit-overflow-scrolling: touch;
+  }
+  @media (min-width: 768px) {
+    .realisations-preview__rail { display: none; }
+  }
+  .realisations-preview__rail-item {
+    flex: 0 0 240px;
+    scroll-snap-align: start;
+  }
+
+  .realisations-preview__cta {
+    margin-top: var(--space-8);
+    display: flex;
+    justify-content: center;
+  }
+</style>

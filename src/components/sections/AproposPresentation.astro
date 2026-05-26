@@ -1,0 +1,123 @@
+---
+/**
+ * AproposPresentation.astro — Section.
+ *
+ * Rôle : présentation de l'artisan (à propos). Grille `1fr 1.3fr` :
+ * gauche image portrait (4/5 mobile, 520 px desktop), droite eyebrow
+ * + H2 + filet + 3 paragraphes + duo CTAs.
+ *
+ * Rendu dans : src/pages/a-propos/index.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import { nap, labels } from '@/data/site';
+
+export interface Props {
+  /** Titre principal de la section. */
+  title?: string;
+  /** Liste de paragraphes à rendre dans l'ordre. */
+  paragraphs?: string[];
+}
+
+const {
+  title = `${nap.ownerName}, dix ans à servir la baie des Anges.`,
+  paragraphs = [
+    "J'ai grandi à Nice, formé dans la plomberie sanitaire et le chauffage. Après plusieurs années en entreprise, j'ai voulu un autre rapport au métier : un seul interlocuteur pour le client, du devis à la garantie, sans cascade de sous-traitants.",
+    "Chaque intervention est expliquée, chiffrée et validée avant d'être engagée. Pas de pose de chantier sans tarif définitif annoncé. Pas de rendu sans une dernière inspection conjointe.",
+    "Je travaille seul ou avec un binôme de confiance pour les chantiers de rénovation. Mes clients reviennent — c'est, je crois, ce qu'on peut souhaiter de mieux dans ce métier.",
+  ],
+} = Astro.props;
+---
+
+<Section id="AproposPresentation" surface="bg" spacing="lg">
+  <div class="apropos-presentation__grid">
+    <Placeholder variant="photo" class="apropos-presentation__media" />
+    <div>
+      <p class="eyebrow">Présentation</p>
+      <h2 class="apropos-presentation__title">{title}</h2>
+      <hr class="brass-rule apropos-presentation__brass" />
+      <div class="apropos-presentation__paragraphs">
+        {paragraphs.map((p) => (
+          <p>{p}</p>
+        ))}
+      </div>
+      <div class="apropos-presentation__actions">
+        <Button
+          href={`tel:${nap.phoneE164}`}
+          variant="urgence"
+          size="md"
+          ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+        >
+          <Icon slot="icon-leading" name="phone" size={16} />
+          {labels.callNow} · {nap.phoneDisplay}
+        </Button>
+        <Button href="/contact/" variant="primary" size="md">
+          {labels.requestQuote}
+        </Button>
+      </div>
+    </div>
+  </div>
+</Section>
+
+<style>
+  .apropos-presentation__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: flex-start;
+  }
+  @media (min-width: 768px) {
+    .apropos-presentation__grid {
+      grid-template-columns: 1fr 1.3fr;
+      gap: 56px;
+    }
+  }
+  .apropos-presentation__media {
+    aspect-ratio: 4 / 5;
+    height: 320px;
+  }
+  @media (min-width: 768px) {
+    .apropos-presentation__media {
+      aspect-ratio: auto;
+      height: 520px;
+    }
+  }
+  .apropos-presentation__title {
+    margin: 14px 0 0;
+    font-size: clamp(1.625rem, 2.6vw, 2rem); /* 26→32 */
+    line-height: 1.2;
+  }
+  .apropos-presentation__brass { margin-top: 20px; }
+  .apropos-presentation__paragraphs {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .apropos-presentation__paragraphs p {
+    color: var(--color-text-muted);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+  }
+  @media (min-width: 768px) {
+    .apropos-presentation__paragraphs p { font-size: 1.0625rem; }
+  }
+  .apropos-presentation__actions {
+    margin-top: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+  }
+  .apropos-presentation__actions :global(.btn) { width: 100%; }
+  @media (min-width: 640px) {
+    .apropos-presentation__actions {
+      flex-direction: row;
+      align-items: center;
+    }
+    .apropos-presentation__actions :global(.btn) { width: auto; }
+  }
+</style>

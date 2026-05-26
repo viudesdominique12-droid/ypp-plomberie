@@ -1,0 +1,297 @@
+---
+/**
+ * HomeHero.astro — Section.
+ *
+ * Rôle : hero d'accueil avec une **scène d'eau immersive en
+ * arrière-plan** qui couvre tout le bloc. Le texte (eyebrow + H1
+ * massif + lead + duo CTAs + note Google) vient PAR-DESSUS, en
+ * couleur claire pour rester lisible.
+ *
+ * Couches d'arrière-plan (du fond vers l'avant) :
+ *   1. Sky — dégradé baie des Anges (bleu nuit → azur).
+ *   2. Glow — lueur diagonale subtile (ray of light).
+ *   3. Ripple — anneaux concentriques qui pulsent en surface.
+ *   4. FallingDrops — gouttes qui tombent en continu.
+ *   5. AnimatedWaves — 3 couches de vagues qui glissent en pied.
+ *   6. Vignette — atténuation pour booster la lisibilité du texte.
+ *
+ * Au-dessus :
+ *   7. Container avec le contenu éditorial centré.
+ *
+ * Toutes les animations sont désactivées par `prefers-reduced-motion`
+ * (règle globale dans global.css).
+ *
+ * Rendu dans : src/pages/index.astro.
+ * Données : src/data/site.ts (téléphone, note, libellés).
+ */
+
+import Container from '@/components/ui/Container.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Ripple from '@/components/ui/Ripple.astro';
+import AnimatedWaves from '@/components/ui/AnimatedWaves.astro';
+import FallingDrops from '@/components/ui/FallingDrops.astro';
+import NumberTicker from '@/components/ui/NumberTicker.astro';
+import { nap, labels, site } from '@/data/site';
+---
+
+<!-- [Section: HomeHero] -->
+<section id="HomeHero" class="home-hero">
+  {/* ── ARRIÈRE-PLAN D'EAU (couvre la totalité de la section) ── */}
+  <div class="home-hero__bg" aria-hidden="true">
+    <div class="home-hero__sky"></div>
+    <div class="home-hero__glow"></div>
+    <Ripple class="home-hero__ripple" size={320} opacity={0.32} count={8} color="rgba(255, 255, 255, 0.5)" />
+    <FallingDrops count={18} distance={780} class="home-hero__drops" color="rgba(255, 255, 255, 0.55)" />
+    <AnimatedWaves variant="hero" height={220} class="home-hero__waves" />
+    <div class="home-hero__vignette"></div>
+  </div>
+
+  {/* ── CONTENU ── */}
+  <Container width="default" class="home-hero__content">
+    <p class="home-hero__eyebrow">Plombier de confiance, à Nice.</p>
+    <h1 class="home-hero__title">
+      Du dépannage<br />
+      à la <em>rénovation.</em>
+    </h1>
+    <p class="home-hero__lead">
+      Diagnostic clair, devis annoncé avant intervention, garantie
+      décennale. Un seul interlocuteur, du premier appel à la dernière
+      finition.
+    </p>
+
+    <div class="home-hero__actions">
+      <Button
+        href={`tel:${nap.phoneE164}`}
+        variant="urgence"
+        size="md"
+        ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+      >
+        <Icon slot="icon-leading" name="phone" size={16} />
+        Appeler le {nap.phoneDisplay}
+        <Icon slot="icon-trailing" name="arrow-right" size={14} />
+      </Button>
+      <Button href="/contact/" variant="ghost" size="md" class="home-hero__ghost">
+        {labels.requestQuote}
+      </Button>
+    </div>
+
+    <div class="home-hero__rating">
+      <span class="stars" aria-label={`Note : ${site.rating.value} sur 5`}>
+        {Array.from({ length: 5 }).map(() => (
+          <Icon name="star" size={16} />
+        ))}
+      </span>
+      <span class="home-hero__rating-text">
+        <strong>
+          <NumberTicker value={site.rating.value} decimals={1} duration={1600} />
+          {' / 5'}
+        </strong>
+        <span>
+          {' · '}
+          <NumberTicker value={site.rating.count} duration={1400} delay={200} />
+          {' avis Google'}
+        </span>
+      </span>
+    </div>
+  </Container>
+</section>
+
+<style>
+  /* ── La section entière : grande, en relief sur fond foncé. ── */
+  .home-hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 640px;
+    display: flex;
+    align-items: center;
+    padding-block: var(--space-16) var(--space-12);
+    color: #fff;
+  }
+  @media (min-width: 768px) {
+    .home-hero {
+      min-height: 780px;
+      padding-block: 120px 96px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .home-hero {
+      min-height: 860px;
+    }
+  }
+
+  /* ── Arrière-plan (toutes les couches d'eau) ── */
+  .home-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+  }
+
+  .home-hero__sky {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(120% 80% at 50% 25%, rgba(255, 255, 255, 0.18), transparent 60%),
+      linear-gradient(170deg, #1d4757 0%, #0E6480 35%, #0c3f52 70%, #0a2b38 100%);
+  }
+
+  .home-hero__glow {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      110deg,
+      transparent 30%,
+      rgba(255, 255, 255, 0.08) 50%,
+      transparent 70%
+    );
+    mix-blend-mode: screen;
+  }
+
+  /* Ripple central — au-dessus du dégradé, plus visible. */
+  .home-hero__bg :global(.home-hero__ripple) {
+    top: 50%;
+    -webkit-mask-image: radial-gradient(closest-side, black 30%, transparent 100%);
+    mask-image: radial-gradient(closest-side, black 30%, transparent 100%);
+  }
+
+  /* Drops sur toute la hauteur. */
+  .home-hero__bg :global(.home-hero__drops) {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Vagues animées en pied — débordent légèrement vers le bas. */
+  .home-hero__bg :global(.home-hero__waves) {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -10px;
+    height: 220px;
+  }
+
+  /* Vignette discrète pour densifier les coins et améliorer le contraste. */
+  .home-hero__vignette {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(80% 70% at 50% 50%, transparent 55%, rgba(10, 30, 45, 0.45) 100%);
+    pointer-events: none;
+  }
+
+  /* ── Contenu — par-dessus l'eau, texte clair. ── */
+  .home-hero__content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 960px;
+  }
+
+  .home-hero__eyebrow {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-style: italic;
+    font-weight: var(--font-weight-medium);
+    font-size: 1.0625rem; /* 17px mobile */
+    color: rgba(255, 255, 255, 0.78);
+    letter-spacing: 0.005em;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.25);
+  }
+  @media (min-width: 768px) {
+    .home-hero__eyebrow { font-size: 1.3125rem; /* 21px */ }
+  }
+
+  .home-hero__title {
+    margin: 14px 0 0 0;
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-semibold);
+    font-size: 2.875rem; /* 46px mobile */
+    line-height: 1.02;
+    letter-spacing: -0.022em;
+    color: #fff;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
+  }
+  @media (min-width: 768px) {
+    .home-hero__title { font-size: 4.5rem; }
+  }
+  @media (min-width: 1024px) {
+    .home-hero__title {
+      font-size: 5.75rem;
+      margin-top: 18px;
+    }
+  }
+  .home-hero__title em {
+    font-style: italic;
+    font-weight: var(--font-weight-medium);
+    color: #fff;
+  }
+
+  .home-hero__lead {
+    margin: var(--space-6) auto 0;
+    max-width: 560px;
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.25);
+  }
+  @media (min-width: 768px) {
+    .home-hero__lead {
+      margin-top: var(--space-8);
+      font-size: 1.03rem;
+    }
+  }
+
+  .home-hero__actions {
+    margin-top: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    justify-content: center;
+    align-items: stretch;
+  }
+  .home-hero__actions :global(.btn) { width: 100%; }
+  @media (min-width: 640px) {
+    .home-hero__actions {
+      margin-top: 36px;
+      flex-direction: row;
+      align-items: center;
+    }
+    .home-hero__actions :global(.btn) { width: auto; }
+  }
+
+  /* Bouton ghost (devis) sur fond sombre : devient verre dépoli clair. */
+  .home-hero__content :global(.home-hero__ghost) {
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+  .home-hero__content :global(.home-hero__ghost:hover) {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: #fff;
+    color: #fff;
+  }
+
+  .home-hero__rating {
+    margin-top: var(--space-5);
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+  }
+  @media (min-width: 768px) {
+    .home-hero__rating { margin-top: 28px; }
+  }
+  /* Les étoiles ocre restent visibles sur fond bleu (contrast élevé). */
+  .home-hero__rating .stars { color: var(--color-ocre); }
+  .home-hero__rating-text {
+    font-size: 0.84rem;
+    color: rgba(255, 255, 255, 0.78);
+  }
+  .home-hero__rating-text strong {
+    color: #fff;
+    font-weight: var(--font-weight-semibold);
+  }
+</style>

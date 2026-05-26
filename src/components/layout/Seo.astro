@@ -1,0 +1,69 @@
+---
+/**
+ * Seo.astro — Layout chrome (couche 4).
+ *
+ * Rôle : centraliser TOUTES les balises meta SEO (title, description,
+ * canonical, Open Graph, robots). Une seule porte d'entrée → si une
+ * meta est fausse, on ouvre CE fichier.
+ *
+ * Rendu dans : src/layouts/BaseLayout.astro via slot `head`.
+ * Données lues : props (provenant de la page ou du template).
+ *
+ * Le JSON-LD LocalBusiness/Plumber est rendu globalement par
+ * BaseLayout (lien : src/data/site.ts). Le BreadcrumbList est rendu
+ * par Breadcrumb.astro. Les schémas spécifiques (Service, FAQPage,
+ * AggregateRating) seront ajoutés en phase 3.
+ */
+
+import { site } from '@/data/site';
+
+export interface Props {
+  title: string;
+  description: string;
+  /** Chemin canonique ; si absent, on utilise l'URL courante. */
+  canonicalPath?: string;
+  /** Permet d'empêcher l'indexation (404, contact pré-prod, etc.). */
+  noindex?: boolean;
+  /** Image de partage Open Graph. */
+  ogImage?: string;
+  /** Type Open Graph. */
+  ogType?: 'website' | 'article';
+}
+
+const {
+  title,
+  description,
+  canonicalPath,
+  noindex = false,
+  ogImage,
+  ogType = 'website',
+} = Astro.props;
+
+const canonical = new URL(canonicalPath ?? Astro.url.pathname, site.url).toString();
+const ogImageUrl = ogImage ? new URL(ogImage, site.url).toString() : undefined;
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+
+{noindex ? (
+  <meta name="robots" content="noindex,nofollow" />
+) : (
+  <meta name="robots" content="index,follow,max-snippet:-1,max-image-preview:large,max-video-preview:-1" />
+)}
+
+<!-- Open Graph -->
+<meta property="og:site_name" content={site.name} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonical} />
+<meta property="og:locale" content={site.locale.replace('-', '_')} />
+{ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+
+<!-- Twitter / X -->
+<meta name="twitter:card" content={ogImageUrl ? 'summary_large_image' : 'summary'} />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+{ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}

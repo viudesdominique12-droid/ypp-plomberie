@@ -1,0 +1,100 @@
+---
+/**
+ * HubZoneSection.astro — Section.
+ *
+ * Rôle : grille `carte + 12 communes` du hub d'intervention.
+ *   - Gauche : placeholder.map 440 px ;
+ *   - Droite : eyebrow + H3 « Douze communes, un seul artisan » +
+ *     filet + grille 2 colonnes de tiles de communes cliquables
+ *     (variante `tile` du ZoneCard avec chevron à droite).
+ *
+ * Rendu dans : src/pages/zone-intervention/index.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import ZoneCard from '@/components/ui/ZoneCard.astro';
+import { getCollection } from 'astro:content';
+
+const collectionZones = await getCollection('zones');
+const collectionSlugs = new Set(collectionZones.map((z) => z.data.slug));
+
+/* Même liste que ZonesSection — la carte et les 12 communes sont
+   l'angle d'attaque géographique du hub. */
+const tiles = [
+  { commune: 'Nice', slug: null },
+  { commune: 'Cagnes-sur-Mer', slug: 'cagnes-sur-mer' },
+  { commune: 'Saint-Laurent-du-Var', slug: 'saint-laurent-du-var' },
+  { commune: 'Villeneuve-Loubet', slug: null },
+  { commune: 'Antibes', slug: null },
+  { commune: 'Cap d\'Ail', slug: null },
+  { commune: 'Beaulieu-sur-Mer', slug: null },
+  { commune: 'Villefranche-sur-Mer', slug: 'villefranche-sur-mer' },
+  { commune: 'La Trinité', slug: null },
+  { commune: 'Èze', slug: null },
+  { commune: 'Saint-Jean-Cap-Ferrat', slug: null },
+  { commune: 'Roquebrune', slug: null },
+];
+
+function tileHref(slug: string | null) {
+  if (slug && collectionSlugs.has(slug)) return `/zones/${slug}/`;
+  return '#';
+}
+---
+
+<Section id="HubZoneSection" surface="alt" spacing="lg" width="default">
+  <div class="hub-zone__grid">
+    <Placeholder variant="map" class="hub-zone__map" />
+    <div class="hub-zone__list">
+      <p class="eyebrow">Communes desservies</p>
+      <h3 class="hub-zone__title">Douze communes, un seul artisan</h3>
+      <hr class="brass-rule hub-zone__brass" />
+      <ul class="hub-zone__tiles" role="list">
+        {tiles.map((t) => (
+          <li>
+            <ZoneCard
+              href={tileHref(t.slug)}
+              commune={t.commune}
+              variant="tile"
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</Section>
+
+<style>
+  .hub-zone__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: flex-start;
+  }
+  @media (min-width: 768px) {
+    .hub-zone__grid {
+      grid-template-columns: 1.25fr 1fr;
+      gap: 56px;
+    }
+  }
+  .hub-zone__map {
+    height: 220px;
+  }
+  @media (min-width: 768px) {
+    .hub-zone__map { height: 440px; }
+  }
+  .hub-zone__title {
+    margin: 14px 0 0 0;
+    font-size: var(--font-size-xl);
+    line-height: 1.25;
+  }
+  .hub-zone__brass {
+    margin: 18px 0 0 0;
+  }
+  .hub-zone__tiles {
+    margin-top: 26px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+</style>

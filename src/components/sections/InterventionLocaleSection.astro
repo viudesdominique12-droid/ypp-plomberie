@@ -1,0 +1,87 @@
+---
+/**
+ * InterventionLocaleSection.astro — Section.
+ *
+ * Rôle : sur une page zone, bloc « Une connaissance fine du terrain »
+ * — image gauche, contenu droite : eyebrow + H2 + filet laiton +
+ * paragraphe + 3 items check (label + valeur).
+ *
+ * Rendu dans : src/layouts/ZoneLayout.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import IconList from '@/components/ui/IconList.astro';
+
+export interface Props {
+  title?: string;
+  paragraph?: string;
+  /** Liste d'items à 2 champs (label gras + valeur grise). */
+  items?: { label: string; value: string }[];
+}
+
+const {
+  title = 'Une connaissance fine du terrain',
+  paragraph = "Bâtiments anciens du Vieux-Nice, copropriétés des années 60 à Saint-Roch, villas du Mont-Boron : chaque secteur a ses particularités de plomberie. On les connaît.",
+  items = [
+    { label: 'Délai < 1 h', value: 'sur tout Nice' },
+    { label: 'Aucun frais de déplacement', value: 'dans la commune' },
+    { label: 'Disponibilité 7 j / 7', value: 'astreinte nuit & week-end' },
+  ],
+} = Astro.props;
+---
+
+<Section id="InterventionLocaleSection" surface="alt" spacing="lg">
+  <div class="intervention-locale__grid">
+    <Placeholder variant="photo" class="intervention-locale__media" />
+    <div>
+      <p class="eyebrow">Intervention locale</p>
+      <h2 class="intervention-locale__title">{title}</h2>
+      <hr class="brass-rule intervention-locale__brass" />
+      <p class="intervention-locale__paragraph">{paragraph}</p>
+      <div class="intervention-locale__list">
+        <IconList items={items} variant="check" />
+      </div>
+    </div>
+  </div>
+</Section>
+
+<style>
+  .intervention-locale__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: center;
+  }
+  @media (min-width: 768px) {
+    .intervention-locale__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 56px;
+    }
+  }
+  .intervention-locale__media {
+    aspect-ratio: 16 / 10;
+  }
+  @media (min-width: 768px) {
+    .intervention-locale__media {
+      aspect-ratio: auto;
+      height: 420px;
+    }
+  }
+  .intervention-locale__title {
+    margin: 14px 0 0;
+    font-size: clamp(1.625rem, 2.5vw, 2rem); /* 26→32 */
+    line-height: 1.2;
+  }
+  .intervention-locale__brass { margin-top: 20px; }
+  .intervention-locale__paragraph {
+    margin: 20px 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    color: var(--color-text-muted);
+  }
+  @media (min-width: 768px) {
+    .intervention-locale__paragraph { font-size: 1.0625rem; }
+  }
+  .intervention-locale__list { margin-top: 26px; }
+</style>

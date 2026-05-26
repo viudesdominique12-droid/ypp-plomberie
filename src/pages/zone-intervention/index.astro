@@ -1,0 +1,43 @@
+---
+/**
+ * src/pages/zone-intervention/index.astro — Route : /zone-intervention/.
+ *
+ * Hub zone (gabarit 4) : hero court + carte/12 communes + 3 cards de
+ * zones dédiées + CTA final.
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Breadcrumb from '@/components/layout/Breadcrumb.astro';
+import ShortHero from '@/components/sections/ShortHero.astro';
+import HubZoneSection from '@/components/sections/HubZoneSection.astro';
+import HubZoneCards from '@/components/sections/HubZoneCards.astro';
+import FinalCta from '@/components/sections/FinalCta.astro';
+---
+
+<BaseLayout
+  title="Zone d'intervention du plombier à Nice — Ypp Plomberie"
+  description="Plombier intervenant à Nice et toutes les communes alentours : Saint-Laurent-du-Var, Cagnes-sur-Mer, Villefranche-sur-Mer. Devis au 06 03 34 03 05."
+  canonicalPath="/zone-intervention/"
+>
+  <Container width="wide">
+    <Breadcrumb
+      items={[
+        { label: 'Accueil', href: '/' },
+        { label: "Zone d'intervention" },
+      ]}
+    />
+  </Container>
+
+  <ShortHero
+    eyebrow="Zone d'intervention"
+    h1="De Nice à Cap-Ferrat"
+    intro="Une connaissance fine du territoire. Des résidences haussmanniennes du centre aux villas du Cap-Ferrat, en passant par les copropriétés de Cagnes — pas un appartement ne nous est étranger."
+  />
+
+  <HubZoneSection />
+
+  <HubZoneCards />
+
+  <FinalCta />
+</BaseLayout>

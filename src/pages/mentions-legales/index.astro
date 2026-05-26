@@ -1,0 +1,136 @@
+---
+/**
+ * src/pages/mentions-legales/index.astro — Route : /mentions-legales/.
+ *
+ * Gabarit 9 — mentions légales conformes LCEN (loi pour la confiance
+ * dans l'économie numérique). Tous les champs spécifiques à
+ * l'entreprise sont des placeholders [...] définis dans
+ * src/data/site.ts à remplir lors de la transmission des informations
+ * client (phase 4).
+ *
+ * ⚠️ Le texte ci-dessous est un modèle à VALIDER par l'éditeur avant
+ * mise en ligne définitive (article 6 III-1 LCEN).
+ */
+
+import ContentLayout from '@/layouts/ContentLayout.astro';
+import { nap, site } from '@/data/site';
+---
+
+<ContentLayout
+  title="Mentions légales — Ypp Plomberie"
+  description="Mentions légales du site Ypp Plomberie : éditeur, hébergeur, données personnelles, propriété intellectuelle."
+  h1="Mentions légales"
+  eyebrow="Informations légales"
+  breadcrumb={[{ label: 'Accueil', href: '/' }]}
+  canonicalPath="/mentions-legales/"
+  updatedAt="Dernière mise à jour — à compléter à la mise en ligne"
+  noStickyCallBar={true}
+>
+  <section>
+    <h2>Éditeur du site</h2>
+    <p>
+      Le présent site est édité par <strong>{nap.legalName}</strong>,
+      entrepreneur individuel exerçant sous l'enseigne commerciale
+      <em>{site.name}</em>, immatriculé au Répertoire des Métiers / Registre
+      du Commerce et des Sociétés des Alpes-Maritimes.
+    </p>
+    <p>
+      Siège social : {nap.address.street}, {nap.address.postalCode}
+      {nap.address.city}, France.<br />
+      SIRET : {nap.identifiers.siret}<br />
+      SIREN : {nap.identifiers.siren}<br />
+      TVA intracommunautaire : {nap.identifiers.vat}<br />
+      RCS / RM : {nap.identifiers.rcs}
+    </p>
+    <p>
+      Directeur de la publication : <strong>{nap.ownerName}</strong>.<br />
+      Téléphone : <a href={`tel:${nap.phoneE164}`}>{nap.phoneDisplay}</a><br />
+      E-mail : <a href={`mailto:${nap.email}`}>{nap.email}</a>
+    </p>
+    <p>
+      Assurance professionnelle décennale n° {nap.identifiers.decennale},
+      couvrant l'ensemble des installations effectuées dans le cadre de
+      l'activité.
+    </p>
+  </section>
+
+  <section>
+    <h2>Hébergement</h2>
+    <p>
+      Le site est hébergé par <strong>[NOM_HEBERGEUR]</strong>,
+      [ADRESSE_HEBERGEUR]. Pour toute question relative à l'hébergement,
+      contactez l'éditeur du site aux coordonnées ci-dessus.
+    </p>
+  </section>
+
+  <section>
+    <h2>Propriété intellectuelle</h2>
+    <p>
+      L'ensemble des contenus présentés sur ce site — textes,
+      photographies, illustrations, logo, marque {site.name} — est
+      protégé par le droit d'auteur et reste la propriété exclusive de
+      {nap.legalName} ou de ses ayants droit. Toute reproduction,
+      représentation, modification, publication ou adaptation, totale
+      ou partielle, est interdite sans autorisation écrite préalable de
+      l'éditeur, conformément aux articles L.111-1 et suivants du Code
+      de la propriété intellectuelle.
+    </p>
+  </section>
+
+  <section>
+    <h2>Données personnelles</h2>
+    <p>
+      Les informations recueillies via le formulaire de contact (nom,
+      téléphone, e-mail, code postal, type d'intervention, message)
+      sont traitées par {nap.legalName} aux seules fins de répondre à
+      votre demande de devis ou d'intervention. Aucune donnée n'est
+      transmise à un tiers commercial.
+    </p>
+    <p>
+      Conformément au Règlement Général sur la Protection des Données
+      (UE 2016/679) et à la loi Informatique et Libertés modifiée, vous
+      disposez d'un droit d'accès, de rectification, d'effacement,
+      d'opposition et de portabilité de vos données. Pour exercer ces
+      droits, écrivez à
+      <a href={`mailto:${nap.email}`}>{nap.email}</a>.
+    </p>
+    <p>
+      Pour plus d'informations, consultez la
+      <a href="/politique-de-confidentialite/">politique de confidentialité</a>.
+    </p>
+  </section>
+
+  <section>
+    <h2>Cookies</h2>
+    <p>
+      Le site utilise uniquement des cookies fonctionnels strictement
+      nécessaires à son fonctionnement et, sous réserve de votre
+      consentement explicite, des cookies de mesure d'audience anonymisée
+      (statistiques de visite). Aucun cookie publicitaire ni de
+      traçage cross-site n'est utilisé.
+    </p>
+  </section>
+
+  <section>
+    <h2>Crédits</h2>
+    <p>
+      Conception et développement : [NOM_PRESTATAIRE_WEB]. Polices
+      Playfair Display et Inter sous licence Open Font Licence (OFL).
+      Icônes Lucide sous licence ISC.
+    </p>
+  </section>
+
+  <section>
+    <h2>Contact et droit applicable</h2>
+    <p>
+      Pour toute question relative aux présentes mentions ou pour
+      exercer vos droits, écrivez à
+      <a href={`mailto:${nap.email}`}>{nap.email}</a> ou appelez le
+      <a href={`tel:${nap.phoneE164}`}>{nap.phoneDisplay}</a>.
+    </p>
+    <p>
+      Le présent site est régi par le droit français. En cas de litige,
+      les tribunaux français sont seuls compétents.
+    </p>
+  </section>
+</ContentLayout>

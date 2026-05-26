@@ -1,0 +1,139 @@
+---
+/**
+ * ZoneCard.astro — Primitive UI.
+ *
+ * Rôle : carte d'une commune desservie. Icône map-pin azur + nom +
+ * chevron. Variante avec intro pour les pages dédiées (hub zones).
+ *
+ * Rendu dans : ZonesSection, ServiceCrossLinks, HubZoneSection.
+ */
+
+import Icon from './Icon.astro';
+
+export interface Props {
+  href: string;
+  commune: string;
+  codePostal?: string;
+  headingLevel?: 2 | 3 | 4;
+  intro?: string;
+  /** Variante compacte : juste une ligne avec map-pin + nom + chevron. */
+  variant?: 'card' | 'tile';
+}
+
+const {
+  href,
+  commune,
+  codePostal,
+  headingLevel = 3,
+  intro,
+  variant = 'tile',
+} = Astro.props;
+const Heading = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
+---
+
+{variant === 'tile' ? (
+  <a class="zone-tile" href={href}>
+    <span class="zone-tile__pin" aria-hidden="true">
+      <Icon name="map-pin" size={16} />
+    </span>
+    <span class="zone-tile__commune">{commune}</span>
+    {codePostal && <span class="zone-tile__postal"> · {codePostal}</span>}
+    <span class="zone-tile__chevron" aria-hidden="true">
+      <Icon name="chevron-right" size={14} />
+    </span>
+  </a>
+) : (
+  <article class="zone-card">
+    <Heading class="zone-card__title">
+      <a class="zone-card__link" href={href}>{commune}</a>
+    </Heading>
+    {intro && <p class="zone-card__intro">{intro}</p>}
+    <span class="zone-card__cta" aria-hidden="true">
+      Détails de la zone
+      <Icon name="arrow-right" size={14} />
+    </span>
+  </article>
+)}
+
+<style>
+  /* ── Variante tile (commune-tag listée par lot) ── */
+  .zone-tile {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: 12px 14px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    text-decoration: none;
+    font-size: 0.875rem; /* 14px */
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
+    transition:
+      border-color var(--transition-fast) var(--ease-out),
+      background var(--transition-fast) var(--ease-out);
+  }
+  .zone-tile:hover {
+    border-color: var(--color-azur);
+    background: var(--color-surface);
+  }
+  .zone-tile__pin {
+    color: var(--color-azur);
+    display: inline-flex;
+  }
+  .zone-tile__commune { flex: 1; color: var(--color-text); }
+  .zone-tile__postal { color: var(--color-text-muted); font-weight: var(--font-weight-regular); }
+  .zone-tile__chevron { color: var(--color-text-muted); display: inline-flex; }
+
+  /* ── Variante card (pages dédiées sur hub zone) ── */
+  .zone-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-6);
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    transition:
+      border-color var(--transition-fast) var(--ease-out),
+      box-shadow var(--transition-fast) var(--ease-out),
+      transform var(--transition-fast) var(--ease-out);
+  }
+  .zone-card:hover {
+    border-color: var(--color-azur);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .zone-card__title {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    color: var(--color-text);
+  }
+  .zone-card__link {
+    color: inherit;
+    text-decoration: none;
+  }
+  .zone-card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .zone-card__intro {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.65;
+    flex: 1;
+  }
+  .zone-card__cta {
+    color: var(--color-azur);
+    font-weight: var(--font-weight-semibold);
+    font-size: 0.875rem;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+</style>

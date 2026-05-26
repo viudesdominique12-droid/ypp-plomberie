@@ -1,0 +1,106 @@
+---
+/**
+ * Reassurance4Cards.astro — Section.
+ *
+ * Rôle : « Quatre engagements, écrits sur la facture ». Grille de
+ * 4 cards (icône stroke + H4 + desc). Variante utilisée sur le hub
+ * services et les pages services (sans description).
+ *
+ * Rendu dans : src/pages/services/index.astro,
+ *              src/layouts/ServiceLayout.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Icon from '@/components/ui/Icon.astro';
+
+export interface Item {
+  icon: string;
+  title: string;
+  /** Description courte. Si absente, on rend une variante compacte. */
+  description?: string;
+}
+
+export interface Props {
+  eyebrow?: string;
+  title?: string;
+  surface?: 'default' | 'alt';
+  /** Affiche un en-tête (par défaut oui). */
+  showHeading?: boolean;
+  items?: Item[];
+}
+
+const {
+  eyebrow = 'Pourquoi nous',
+  title = 'Quatre engagements, écrits sur la facture',
+  surface = 'default',
+  showHeading = true,
+  items = [
+    { icon: 'shield', title: 'Décennale incluse', description: 'Toute installation est couverte par notre garantie décennale.' },
+    { icon: 'clock', title: 'Délai < 1 heure', description: "Intervention en moins d'une heure sur Nice et alentours." },
+    { icon: 'euro', title: 'Devis annoncé', description: 'Tarif définitif validé avec vous avant toute intervention.' },
+    { icon: 'star', title: '5/5 · 13 avis', description: 'Note Google parfaite confirmée par nos clients récents.' },
+  ],
+} = Astro.props;
+---
+
+<Section id="Reassurance4Cards" surface={surface} spacing="md">
+  {showHeading && <SectionHeading eyebrow={eyebrow} title={title} />}
+  <ul class="reassurance4__grid" role="list">
+    {items.map((it) => (
+      <li>
+        <article class="reassurance4__card">
+          <span class="reassurance4__icon" aria-hidden="true">
+            <Icon name={it.icon} size={30} strokeWidth={1.4} />
+          </span>
+          <h4 class="reassurance4__title">{it.title}</h4>
+          {it.description && (
+            <p class="reassurance4__desc">{it.description}</p>
+          )}
+        </article>
+      </li>
+    ))}
+  </ul>
+</Section>
+
+<style>
+  .reassurance4__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+  }
+  @media (min-width: 1024px) {
+    .reassurance4__grid {
+      grid-template-columns: repeat(4, 1fr);
+      gap: var(--space-5);
+    }
+  }
+  .reassurance4__card {
+    text-align: center;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
+    height: 100%;
+  }
+  @media (min-width: 768px) {
+    .reassurance4__card { padding: var(--space-7); }
+  }
+  .reassurance4__icon {
+    display: inline-flex;
+    color: var(--color-azur);
+    margin-bottom: var(--space-4);
+  }
+  .reassurance4__title {
+    margin: 0 0 var(--space-2) 0;
+    font-size: var(--font-size-lg);
+    line-height: 1.3;
+    color: var(--color-text);
+  }
+  .reassurance4__desc {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    line-height: 1.55;
+  }
+</style>

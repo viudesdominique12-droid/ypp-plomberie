@@ -1,0 +1,122 @@
+---
+/**
+ * AnimatedGridPattern.astro — Primitive UI.
+ *
+ * Rôle : grille SVG animée en arrière-plan. Inspiré du Magic UI
+ * Animated Grid Pattern, adapté CSS-only (pas de JS, pas de React).
+ *
+ * Mécanique :
+ *   - pattern SVG répétable (carrés vides) ;
+ *   - N rectangles aléatoires posés au-dessus, chacun avec une
+ *     animation CSS opacité 0→max→0, delay et duration différents ;
+ *   - positions calculées en SSR de manière déterministe (pas de
+ *     Math.random() qui casserait l'hydratation).
+ *
+ * Usage : derrière une section (ZonesSection, HubZoneSection) en
+ * `position: absolute; inset: 0;`.
+ */
+
+export interface Props {
+  /** Taille de la cellule en pixels. */
+  cellSize?: number;
+  /** Nombre de squares animés. */
+  numSquares?: number;
+  /** Opacité maximale d'un square. */
+  maxOpacity?: number;
+  /** Couleur des traits + remplissage des squares. */
+  color?: string;
+  /** Durée d'un cycle d'apparition en secondes. */
+  duration?: number;
+  class?: string;
+}
+
+const {
+  cellSize = 48,
+  numSquares = 40,
+  maxOpacity = 0.4,
+  color = 'rgba(14, 100, 128, 0.45)',
+  duration = 5,
+  class: className,
+} = Astro.props;
+
+/* Distribution déterministe des squares — golden angle pour x et y. */
+const squares = Array.from({ length: numSquares }, (_, i) => {
+  const x = (i * 137.5) % 100;
+  const y = (i * 89.3 + 17) % 100;
+  const delay = (i * 0.21) % duration;
+  const dur = duration + ((i * 0.4) % 2.5);
+  return { x, y, delay, dur };
+});
+
+const id = `grid-${Math.random().toString(36).slice(2, 8)}`;
+const classes = ['animated-grid-pattern', className].filter(Boolean).join(' ');
+---
+
+<svg
+  class={classes}
+  aria-hidden="true"
+  width="100%"
+  height="100%"
+  preserveAspectRatio="xMidYMid slice"
+>
+  <defs>
+    <pattern
+      id={id}
+      width={cellSize}
+      height={cellSize}
+      patternUnits="userSpaceOnUse"
+    >
+      <path
+        d={`M ${cellSize} 0 L 0 0 0 ${cellSize}`}
+        fill="none"
+        stroke={color}
+        stroke-width="0.5"
+        opacity="0.5"
+      />
+    </pattern>
+  </defs>
+  <rect width="100%" height="100%" fill={`url(#${id})`} />
+
+  {squares.map((sq) => (
+    <rect
+      class="animated-grid-pattern__square"
+      width={cellSize - 2}
+      height={cellSize - 2}
+      x={`calc(${sq.x}% + 1px)`}
+      y={`calc(${sq.y}% + 1px)`}
+      fill={color}
+      style={`
+        --max-opacity: ${maxOpacity};
+        animation-delay: -${sq.delay}s;
+        animation-duration: ${sq.dur}s;
+      `}
+    />
+  ))}
+</svg>
+
+<style>
+  .animated-grid-pattern {
+    pointer-events: none;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  .animated-grid-pattern__square {
+    opacity: 0;
+    animation-name: ypp-grid-pulse;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    will-change: opacity;
+  }
+  @keyframes ypp-grid-pulse {
+    0%,
+    100% {
+      opacity: 0;
+    }
+    50% {
+      opacity: var(--max-opacity, 0.4);
+    }
+  }
+</style>

@@ -1,0 +1,107 @@
+---
+/**
+ * Section.astro — Primitive UI.
+ *
+ * Rôle : encadrer un bloc vertical de page avec un rythme cohérent —
+ * 48 px de padding vertical mobile, 80 px desktop (cf. spec « Baie
+ * des Anges »).
+ *
+ * Rendu dans : chaque composant de `src/components/sections/`.
+ * Utilisé par : tous les blocs de page.
+ *
+ * IMPORTANT : pose un commentaire HTML `<!-- [Section: Nom] -->`
+ * et un `id` stable. Indispensable au debug — on remonte du DOM
+ * inspecté à la source en un coup d'œil.
+ */
+
+export interface Props {
+  /**
+   * Identifiant stable (PascalCase recommandé : nom du composant de
+   * section qui consomme). Devient `id` ET commentaire `[Section: Nom]`.
+   */
+  id: string;
+  /** Variante de fond (par défaut : surface blanche). */
+  surface?: 'default' | 'alt' | 'inverse' | 'bg';
+  /** Largeur du Container interne. */
+  width?: 'narrow' | 'default' | 'wide';
+  /** Padding vertical. */
+  spacing?: 'sm' | 'md' | 'lg' | 'none';
+  /** Élément sémantique. */
+  as?: 'section' | 'header' | 'footer' | 'aside' | 'div';
+  /** ARIA label (utile sur les <section> sans heading). */
+  ariaLabel?: string;
+  /** Bordure haute discrète. */
+  borderTop?: boolean;
+  class?: string;
+}
+
+import Container from './Container.astro';
+
+const {
+  id,
+  surface = 'default',
+  width = 'default',
+  spacing = 'md',
+  as: Tag = 'section',
+  ariaLabel,
+  borderTop = false,
+  class: className,
+} = Astro.props;
+
+const classes = [
+  'section',
+  `section--${surface}`,
+  `section--spacing-${spacing}`,
+  borderTop ? 'section--border-top' : null,
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<!-- [Section: {id}] -->
+<Tag id={id} class={classes} aria-label={ariaLabel}>
+  <Container width={width}>
+    <slot />
+  </Container>
+</Tag>
+
+<style>
+  .section {
+    padding-block: var(--space-12); /* mobile 48px */
+  }
+  @media (min-width: 768px) {
+    .section { padding-block: 80px; }
+  }
+
+  .section--spacing-none { padding-block: 0; }
+  .section--spacing-sm   { padding-block: var(--space-8); }
+  .section--spacing-md   { padding-block: var(--space-12); }
+  .section--spacing-lg   { padding-block: var(--space-16); }
+
+  @media (min-width: 768px) {
+    .section--spacing-sm { padding-block: 56px; }
+    .section--spacing-md { padding-block: 80px; }
+    .section--spacing-lg { padding-block: 96px; }
+  }
+
+  .section--default { background-color: var(--color-surface); }
+  .section--alt     { background-color: var(--color-surface-alt); }
+  .section--bg      { background-color: var(--color-bg); }
+  .section--inverse {
+    background-color: var(--color-azur);
+    color: var(--color-on-accent);
+  }
+
+  .section--inverse :global(h1),
+  .section--inverse :global(h2),
+  .section--inverse :global(h3),
+  .section--inverse :global(h4) {
+    color: var(--color-on-accent);
+  }
+  .section--inverse :global(p) {
+    color: rgba(255, 255, 255, 0.85);
+  }
+
+  .section--border-top { border-top: 1px solid var(--color-border-soft); }
+</style>

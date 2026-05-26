@@ -1,0 +1,94 @@
+---
+/**
+ * TrustBar.astro — Primitive UI.
+ *
+ * Rôle : bandeau de confiance sous le Hero. Format identitaire :
+ * icône azur + **valeur forte ink** + libellé léger ink-2.
+ *
+ * Anti-AI-slop : pas de cartes empilées, pas de cercles uniformes —
+ * une simple rangée horizontale (qui scroll en mobile).
+ *
+ * Rendu dans : HomeHero (et toute page qui souhaite réafficher la
+ * bande de confiance).
+ */
+
+import Icon from './Icon.astro';
+
+export interface TrustItem {
+  icon: string;
+  /** Valeur forte (ex. « 5,0 / 5 »). */
+  strong: string;
+  /** Libellé qui suit (ex. « sur Google »). */
+  label: string;
+}
+
+export interface Props {
+  items: TrustItem[];
+}
+
+const { items } = Astro.props;
+---
+
+<div class="trust-bar">
+  <ul class="trust-bar__list" role="list">
+    {items.map((item) => (
+      <li class="trust-bar__item">
+        <span class="trust-bar__icon" aria-hidden="true">
+          <Icon name={item.icon} size={16} strokeWidth={1.4} />
+        </span>
+        <span class="trust-bar__text">
+          <strong>{item.strong}</strong>
+          <span class="trust-bar__label">{item.label}</span>
+        </span>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .trust-bar {
+    background: var(--color-surface);
+    border-block: 1px solid var(--color-border-soft);
+  }
+  .trust-bar__list {
+    margin: 0 auto;
+    padding: 18px var(--space-5);
+    max-width: var(--container-default);
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 28px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    white-space: nowrap;
+    -webkit-overflow-scrolling: touch;
+  }
+  @media (min-width: 768px) {
+    .trust-bar__list {
+      justify-content: center;
+      gap: 48px;
+      overflow-x: visible;
+      padding: 18px var(--space-8);
+    }
+  }
+  .trust-bar__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8125rem; /* 13px */
+    flex-shrink: 0;
+    scroll-snap-align: start;
+  }
+  .trust-bar__icon {
+    color: var(--color-azur);
+    display: inline-flex;
+  }
+  .trust-bar__text strong {
+    color: var(--color-text);
+    font-weight: var(--font-weight-semibold);
+    margin-right: 6px;
+  }
+  .trust-bar__label {
+    color: var(--color-text-muted);
+  }
+</style>

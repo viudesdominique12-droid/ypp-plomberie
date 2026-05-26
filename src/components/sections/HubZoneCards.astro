@@ -1,0 +1,122 @@
+---
+/**
+ * HubZoneCards.astro — Section.
+ *
+ * Rôle : « Explorez votre secteur ». 3 cards de zone (image + titre +
+ * desc + lien) sur fond surface, pour les 3 zones génériques décrites
+ * dans le brief (Nice & alentours, Cagnes/Villeneuve, Antibes/Cap d'Ail).
+ *
+ * Rendu dans : src/pages/zone-intervention/index.astro.
+ *
+ * NB : ces cartes pointent toutes vers `/zone-intervention/` faute
+ * de page « groupe de communes » dans l'architecture (la collection
+ * `zones` est commune-par-commune). On reliera ces groupes en phase 3
+ * si nécessaire.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+import Icon from '@/components/ui/Icon.astro';
+
+const zones = [
+  {
+    title: 'Nice & alentours',
+    description: 'Centre, Cimiez, Mont-Boron, Saint-Roch, Riquier — intervention en moins d\'une heure.',
+    href: '/',
+  },
+  {
+    title: 'Cagnes & Villeneuve',
+    description: 'Cagnes-sur-Mer, Cros-de-Cagnes, Saint-Laurent-du-Var, Villeneuve-Loubet — bord de mer et arrière-pays.',
+    href: '/zones/cagnes-sur-mer/',
+  },
+  {
+    title: 'Villefranche & Cap-Ferrat',
+    description: 'Villefranche-sur-Mer, Beaulieu, Èze, Saint-Jean-Cap-Ferrat, Cap d\'Ail — la corniche et ses villages.',
+    href: '/zones/villefranche-sur-mer/',
+  },
+];
+---
+
+<Section id="HubZoneCards" surface="default" spacing="lg" width="wide">
+  <SectionHeading eyebrow="Pages dédiées" title="Explorez votre secteur" />
+  <ul class="hub-zone-cards__grid" role="list">
+    {zones.map((z) => (
+      <li>
+        <a href={z.href} class="hub-zone-cards__card">
+          <Placeholder variant="photo" class="hub-zone-cards__media" />
+          <div class="hub-zone-cards__body">
+            <h3 class="hub-zone-cards__title">{z.title}</h3>
+            <p class="hub-zone-cards__desc">{z.description}</p>
+            <span class="hub-zone-cards__cta">
+              Détails de la zone
+              <Icon name="arrow-right" size={14} />
+            </span>
+          </div>
+        </a>
+      </li>
+    ))}
+  </ul>
+</Section>
+
+<style>
+  .hub-zone-cards__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  @media (min-width: 768px) {
+    .hub-zone-cards__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+  }
+  .hub-zone-cards__card {
+    display: block;
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    transition:
+      border-color var(--transition-fast) var(--ease-out),
+      box-shadow var(--transition-fast) var(--ease-out),
+      transform var(--transition-fast) var(--ease-out);
+    height: 100%;
+  }
+  .hub-zone-cards__card:hover {
+    border-color: var(--color-azur);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .hub-zone-cards__media {
+    height: 180px;
+    border-radius: 0;
+    border: none;
+  }
+  @media (min-width: 768px) {
+    .hub-zone-cards__media { height: 200px; }
+  }
+  .hub-zone-cards__body { padding: var(--space-6); }
+  .hub-zone-cards__title {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    line-height: 1.25;
+  }
+  .hub-zone-cards__desc {
+    margin: 10px 0 0;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+  .hub-zone-cards__cta {
+    margin-top: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--color-azur);
+    font-weight: var(--font-weight-semibold);
+    font-size: 0.875rem;
+  }
+</style>

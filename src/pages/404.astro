@@ -1,0 +1,81 @@
+---
+/**
+ * src/pages/404.astro — Page d'erreur 404.
+ *
+ * Identité « Baie des Anges » : centré, sobre, deux portes de sortie
+ * (retour à l'accueil + appel téléphone), noindex.
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Section from '@/components/ui/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { nap, labels } from '@/data/site';
+---
+
+<BaseLayout
+  title="Page introuvable — Ypp Plomberie"
+  description="La page que vous cherchez n'existe pas ou a été déplacée."
+  noindex={true}
+  canonicalPath="/404"
+>
+  <Section id="NotFound" surface="bg" spacing="lg" width="narrow">
+    <div class="not-found">
+      <p class="not-found__code" aria-hidden="true">404</p>
+      <h1 class="not-found__title">Cette page n'existe pas</h1>
+      <hr class="brass-rule is-center not-found__brass" />
+      <p class="not-found__lead">
+        Le lien est peut-être obsolète, ou l'adresse a été modifiée.
+        Reprenons depuis le début.
+      </p>
+      <div class="not-found__actions">
+        <Button href="/" variant="primary" size="lg">
+          Retour à l'accueil
+        </Button>
+        <Button
+          href={`tel:${nap.phoneE164}`}
+          variant="urgence"
+          size="lg"
+          ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+        >
+          <Icon slot="icon-leading" name="phone" size={16} />
+          {labels.callNow} · {nap.phoneDisplay}
+        </Button>
+      </div>
+    </div>
+  </Section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    text-align: center;
+    padding-block: var(--space-10);
+  }
+  .not-found__code {
+    margin: 0;
+    font-family: var(--font-family-heading);
+    font-size: clamp(4rem, 12vw, 7rem);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-border-strong);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .not-found__title {
+    margin: var(--space-4) 0 0 0;
+  }
+  .not-found__brass {
+    margin: var(--space-5) auto 0;
+  }
+  .not-found__lead {
+    margin: var(--space-5) auto 0;
+    max-width: 50ch;
+    color: var(--color-text-muted);
+  }
+  .not-found__actions {
+    margin-top: var(--space-8);
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    justify-content: center;
+  }
+</style>

@@ -1,0 +1,87 @@
+---
+/**
+ * Ripple.astro — Primitive UI.
+ *
+ * Rôle : effet visuel de cercles concentriques qui « pulsent » comme
+ * une goutte qui tombe à la surface de l'eau.
+ *
+ * Inspiré de Magic UI (https://magicui.design/r/ripple.json),
+ * adapté en CSS pur pour Astro. Aucune dépendance React.
+ *
+ * Règles :
+ *   - décor uniquement (pointer-events: none, aria-hidden) ;
+ *   - couleur unique azur (pas de variantes) ;
+ *   - mask en dégradé pour fondre les bords ;
+ *   - respect strict de prefers-reduced-motion (animation désactivée
+ *     globalement par global.css).
+ *
+ * Rendu dans : intérieur du CtaBlock (placé en position absolue),
+ *              et toute zone d'emphase.
+ */
+
+export interface Props {
+  /** Taille du cercle central en pixels. */
+  size?: number;
+  /** Opacité du cercle central. */
+  opacity?: number;
+  /** Nombre d'anneaux. */
+  count?: number;
+  /** Couleur de bord — par défaut azur. */
+  color?: string;
+  class?: string;
+}
+
+const {
+  size = 220,
+  opacity = 0.22,
+  count = 7,
+  color = 'rgba(255, 255, 255, 0.55)',
+  class: className,
+} = Astro.props;
+
+const rings = Array.from({ length: count }, (_, i) => {
+  const ringSize = size + i * 70;
+  const ringOpacity = Math.max(0, opacity - i * 0.025);
+  const delay = `${i * 0.18}s`;
+  return { ringSize, ringOpacity, delay };
+});
+
+const classes = ['ripple', className].filter(Boolean).join(' ');
+---
+
+<div class={classes} aria-hidden="true">
+  {rings.map((r) => (
+    <span
+      class="ripple__ring"
+      style={`
+        width: ${r.ringSize}px;
+        height: ${r.ringSize}px;
+        --ripple-opacity: ${r.ringOpacity};
+        animation-delay: ${r.delay};
+        border-color: ${color};
+      `}
+    />
+  ))}
+</div>
+
+<style>
+  .ripple {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    user-select: none;
+    overflow: hidden;
+    /* Mask : le bord supérieur s'estompe — l'effet ne sature pas la composition. */
+    -webkit-mask-image: linear-gradient(to bottom, white, transparent);
+    mask-image: linear-gradient(to bottom, white, transparent);
+  }
+  .ripple__ring {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(1);
+    border-radius: var(--radius-full);
+    border: 1px solid currentColor;
+    animation: ypp-ripple 3.4s ease-in-out infinite;
+  }
+</style>

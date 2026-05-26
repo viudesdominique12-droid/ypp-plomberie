@@ -1,0 +1,102 @@
+---
+/**
+ * src/pages/index.astro — Route : / (Accueil).
+ *
+ * Page PILIER « Plombier à Nice ». NE PAS créer /zones/nice/ ailleurs.
+ *
+ * Cette page = composition pure. Si une section rend mal, ouvrir
+ * le composant correspondant dans `src/components/sections/`.
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import HomeHero from '@/components/sections/HomeHero.astro';
+import TrustBar from '@/components/ui/TrustBar.astro';
+import ServicesGrid from '@/components/sections/ServicesGrid.astro';
+import ServicesMarquee from '@/components/sections/ServicesMarquee.astro';
+import ReassuranceBlock from '@/components/sections/ReassuranceBlock.astro';
+import ProcessSteps from '@/components/sections/ProcessSteps.astro';
+import RealisationsPreview from '@/components/sections/RealisationsPreview.astro';
+import ReviewsSection from '@/components/sections/ReviewsSection.astro';
+import ZonesSection from '@/components/sections/ZonesSection.astro';
+import FaqSection from '@/components/sections/FaqSection.astro';
+import FinalCta from '@/components/sections/FinalCta.astro';
+import { site } from '@/data/site';
+
+const trustItems = [
+  { icon: 'star', strong: '5,0 / 5', label: 'sur Google' },
+  { icon: 'clock', strong: '24h / 24', label: '7 j / 7' },
+  { icon: 'shield', strong: 'Décennale', label: 'incluse' },
+  { icon: 'doc', strong: 'Devis', label: 'gratuit' },
+  { icon: 'map-pin', strong: 'Nice', label: 'et baie des Anges' },
+];
+
+const homeFaq = [
+  {
+    question: 'Intervenez-vous vraiment 24 heures sur 24 ?',
+    answer:
+      "Oui, sept jours sur sept, y compris les jours fériés. Pour les urgences nocturnes, un seul numéro : 06 03 34 03 05. Le délai moyen d'arrivée sur Nice est inférieur à une heure.",
+  },
+  {
+    question: 'Le devis est-il vraiment gratuit ?',
+    answer:
+      "Le déplacement et le devis sont gratuits pour toute demande de chantier (rénovation, installation, recherche de fuite). Pour un dépannage simple, le tarif d'intervention est annoncé au téléphone avant de venir.",
+  },
+  {
+    question: 'Quelle zone couvrez-vous précisément ?',
+    answer:
+      "Nice et toutes ses collines, Cagnes-sur-Mer, Villeneuve-Loubet, Saint-Laurent-du-Var, Antibes, Beaulieu, Villefranche-sur-Mer, Èze, Cap d'Ail et Saint-Jean-Cap-Ferrat.",
+  },
+  {
+    question: 'Travaillez-vous avec les assurances ?',
+    answer:
+      "Oui. Nous établissons un rapport d'intervention détaillé et collaborons avec les experts de votre assureur en cas de dégât des eaux ou de sinistre.",
+  },
+  {
+    question: 'Quels modes de paiement acceptez-vous ?',
+    answer:
+      'Carte bancaire sur place, virement, chèque. Une facture conforme et détaillée est remise systématiquement.',
+  },
+  {
+    question: 'Et si je ne suis pas satisfait du résultat ?',
+    answer:
+      "Aucun chantier n'est rendu tant que vous ne l'avez pas inspecté avec moi. La garantie décennale couvre toutes les installations effectuées.",
+  },
+];
+
+/* JSON-LD FAQPage propre à l'accueil — reflète les questions
+   affichées dans la section FAQ. Reconnu par Google pour les rich
+   results « Questions fréquentes ». */
+const faqPageLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  '@id': `${site.url}/#faq`,
+  mainEntity: homeFaq.map((it) => ({
+    '@type': 'Question',
+    name: it.question,
+    acceptedAnswer: { '@type': 'Answer', text: it.answer },
+  })),
+};
+---
+
+<BaseLayout
+  title="Plombier à Nice 24h/24 — Ypp Plomberie"
+  description="Plombier à Nice : dépannage 24h/24, recherche de fuite, débouchage, chauffe-eau, rénovation de salle de bain. Devis transparent au 06 03 34 03 05."
+  canonicalPath="/"
+>
+  <script
+    is:inline
+    type="application/ld+json"
+    set:html={JSON.stringify(faqPageLd)}
+  />
+  <HomeHero />
+  <TrustBar items={trustItems} />
+  <ServicesGrid />
+  <ReassuranceBlock />
+  <ServicesMarquee />
+  <ProcessSteps />
+  <RealisationsPreview />
+  <ReviewsSection />
+  <ZonesSection />
+  <FaqSection items={homeFaq} />
+  <FinalCta />
+</BaseLayout>

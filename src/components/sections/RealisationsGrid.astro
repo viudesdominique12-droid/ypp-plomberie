@@ -1,0 +1,170 @@
+---
+/**
+ * RealisationsGrid.astro — Section.
+ *
+ * Rôle : page /realisations/ — pills de filtres en haut, grille 3 cols
+ * desktop / 2 cols mobile, chaque carte = image + tag catégorie + H4
+ * Playfair. Bouton « Charger plus » en pied.
+ *
+ * Phase 1 : pills statiques (filtre actif = "Tous"). L'interactivité
+ * (filtres réels, pagination) sera ajoutée en phase 4 si nécessaire.
+ *
+ * Rendu dans : src/pages/realisations/index.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import Button from '@/components/ui/Button.astro';
+import Placeholder from '@/components/ui/Placeholder.astro';
+
+const cats = [
+  'Tous',
+  'Dépannage',
+  'Recherche de fuite',
+  'Rénovation',
+  'Chaudière',
+  'Salle de bain',
+];
+
+const items = [
+  { cat: 'Rénovation',     title: 'Salle de bain complète, Cimiez',            label: 'Cimiez · 18m²' },
+  { cat: 'Dépannage',      title: 'Réparation de fuite encastrée, Riquier',    label: 'Riquier · 1h30' },
+  { cat: 'Chaudière',      title: 'Remplacement chaudière condensation',       label: 'Mont-Boron' },
+  { cat: 'Salle de bain',  title: 'Douche italienne sur mesure, Villefranche', label: 'Villefranche' },
+  { cat: 'Recherche de fuite', title: 'Fuite chassée au compteur, Cagnes',      label: 'Cagnes · caméra' },
+  { cat: 'Rénovation',     title: 'Cuisine + sanitaires, Saint-Laurent',       label: 'Saint-Laurent' },
+  { cat: 'Dépannage',      title: 'Évacuation bouchée, Vieux-Nice',            label: 'Vieux-Nice' },
+  { cat: 'Salle de bain',  title: 'Sanitaires neufs, Beaulieu-sur-Mer',        label: 'Beaulieu' },
+  { cat: 'Chaudière',      title: "Entretien annuel, immeuble Cap d'Ail",      label: "Cap d'Ail" },
+];
+
+const active = 'Tous';
+---
+
+<Section id="RealisationsGrid" surface="bg" spacing="sm" width="wide">
+  <ul class="realisations-grid__filters" role="list">
+    {cats.map((c) => (
+      <li>
+        <button class={`btn btn--sm ${c === active ? 'btn--primary' : 'btn--ghost'}`} type="button">
+          <span class="btn__label">{c}</span>
+        </button>
+      </li>
+    ))}
+  </ul>
+
+  <ul class="realisations-grid__list" role="list">
+    {items.map((it) => (
+      <li>
+        <article class="realisations-grid__card">
+          <Placeholder variant="photo" class="realisations-grid__media" label={it.label} />
+          <div class="realisations-grid__body">
+            <span class="realisations-grid__tag">{it.cat}</span>
+            <h4 class="realisations-grid__title">{it.title}</h4>
+          </div>
+        </article>
+      </li>
+    ))}
+  </ul>
+
+  <div class="realisations-grid__more">
+    <Button variant="secondary" size="md">Charger plus</Button>
+  </div>
+</Section>
+
+<style>
+  /* Filtres */
+  .realisations-grid__filters {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 12px;
+    margin: 0 calc(-1 * var(--grid-gutter));
+    padding-left: var(--grid-gutter);
+    padding-right: var(--grid-gutter);
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: var(--space-6);
+  }
+  .realisations-grid__filters li { flex-shrink: 0; scroll-snap-align: start; }
+  @media (min-width: 768px) {
+    .realisations-grid__filters {
+      justify-content: center;
+      overflow-x: visible;
+      margin-inline: 0;
+      padding-inline: 0;
+      margin-bottom: var(--space-10);
+    }
+  }
+  .realisations-grid__filters .btn { white-space: nowrap; }
+
+  /* Grille */
+  .realisations-grid__list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  @media (min-width: 768px) {
+    .realisations-grid__list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+  }
+
+  .realisations-grid__card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    height: 100%;
+    transition:
+      border-color var(--transition-fast) var(--ease-out),
+      box-shadow var(--transition-fast) var(--ease-out),
+      transform var(--transition-fast) var(--ease-out);
+  }
+  .realisations-grid__card:hover {
+    border-color: var(--color-azur);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .realisations-grid__media {
+    height: 120px;
+    border-radius: 0;
+    border: none;
+  }
+  @media (min-width: 768px) {
+    .realisations-grid__media { height: 220px; }
+  }
+  .realisations-grid__body {
+    padding: 14px;
+  }
+  @media (min-width: 768px) {
+    .realisations-grid__body { padding: 20px; }
+  }
+  .realisations-grid__tag {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: var(--radius-full);
+    background: var(--color-azur-light);
+    color: var(--color-azur);
+    border: 1px solid rgba(14, 100, 128, 0.18);
+    font-weight: var(--font-weight-semibold);
+    font-size: 0.72rem; /* 11.5px */
+  }
+  .realisations-grid__title {
+    margin: 12px 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.3;
+  }
+  @media (min-width: 768px) {
+    .realisations-grid__title { font-size: 1.125rem; }
+  }
+
+  .realisations-grid__more {
+    margin-top: var(--space-8);
+    display: flex;
+    justify-content: center;
+  }
+  @media (min-width: 768px) {
+    .realisations-grid__more { margin-top: var(--space-12); }
+  }
+</style>

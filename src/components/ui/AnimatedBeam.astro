@@ -1,0 +1,97 @@
+---
+/**
+ * AnimatedBeam.astro — Primitive UI.
+ *
+ * Rôle : ligne SVG horizontale avec un **gradient lumineux qui se
+ * déplace** le long du tracé — exactement comme de l'eau qui coule
+ * dans une canalisation. Inspiré du Magic UI Animated Beam.
+ *
+ * Adapté CSS-only via une animation linear-gradient en
+ * background-position (pas besoin de framer-motion / refs DOM).
+ *
+ * Usage : posé en absolute derrière une rangée de cartes
+ * (`ProcessSteps`, par exemple) pour relier visuellement les étapes.
+ */
+
+export interface Props {
+  /** Couleur de base de la ligne (faible opacité). */
+  baseColor?: string;
+  /** Couleur du « pulse » lumineux. */
+  pulseColor?: string;
+  /** Durée d'un cycle en secondes. */
+  duration?: number;
+  /** Épaisseur du trait. */
+  thickness?: number;
+  /** Direction : 'right' (par défaut) ou 'left'. */
+  direction?: 'right' | 'left';
+  class?: string;
+}
+
+const {
+  baseColor = 'rgba(14, 100, 128, 0.25)',
+  pulseColor = 'rgba(14, 100, 128, 0.95)',
+  duration = 4,
+  thickness = 2,
+  direction = 'right',
+  class: className,
+} = Astro.props;
+
+const classes = [
+  'animated-beam',
+  `animated-beam--${direction}`,
+  className,
+]
+  .filter(Boolean)
+  .join(' ');
+
+const style = `
+  --beam-base: ${baseColor};
+  --beam-pulse: ${pulseColor};
+  --beam-duration: ${duration}s;
+  --beam-thickness: ${thickness}px;
+`;
+---
+
+<div class={classes} style={style} aria-hidden="true">
+  <span class="animated-beam__base"></span>
+  <span class="animated-beam__pulse"></span>
+</div>
+
+<style>
+  .animated-beam {
+    position: relative;
+    width: 100%;
+    height: var(--beam-thickness, 2px);
+    pointer-events: none;
+  }
+  /* Base statique : ligne couleur de fond. */
+  .animated-beam__base {
+    position: absolute;
+    inset: 0;
+    background: var(--beam-base);
+    border-radius: 999px;
+  }
+  /* Pulse : gradient en mouvement (background-position animée). */
+  .animated-beam__pulse {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      var(--beam-pulse) 50%,
+      transparent 100%
+    );
+    background-size: 35% 100%;
+    background-repeat: no-repeat;
+    border-radius: 999px;
+    animation: ypp-beam-flow var(--beam-duration, 4s) linear infinite;
+    filter: drop-shadow(0 0 6px var(--beam-pulse));
+  }
+  .animated-beam--left .animated-beam__pulse {
+    animation-direction: reverse;
+  }
+  @keyframes ypp-beam-flow {
+    0% { background-position: -50% 0; }
+    100% { background-position: 150% 0; }
+  }
+</style>

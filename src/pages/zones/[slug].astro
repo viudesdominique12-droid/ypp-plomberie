@@ -1,0 +1,35 @@
+---
+/**
+ * src/pages/zones/[slug].astro — Routes dynamiques /zones/<slug>/.
+ *
+ * Rôle : génère STATIQUEMENT une page par entrée de la collection
+ * `zones`. Le corps Markdown de l'entrée est rendu DANS le slot du
+ * ZoneLayout (bloc « contenu local »).
+ *
+ * Ajouter une zone : créer un `.md` dans src/content/zones/.
+ *                    Aucune modification à faire ici.
+ */
+
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import ZoneLayout from '@/layouts/ZoneLayout.astro';
+
+export async function getStaticPaths() {
+  const zones = await getCollection('zones');
+  return zones.map((entry) => ({
+    params: { slug: entry.data.slug },
+    props: { entry },
+  }));
+}
+
+interface Props {
+  entry: CollectionEntry<'zones'>;
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<ZoneLayout data={entry.data} chips={entry.data.chips}>
+  <Content />
+</ZoneLayout>

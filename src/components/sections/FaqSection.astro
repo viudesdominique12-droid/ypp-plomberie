@@ -1,0 +1,133 @@
+---
+/**
+ * FaqSection.astro — Section.
+ *
+ * Rôle : bloc FAQ. Reçoit les Q/R par props. Layout :
+ *   - Desktop : 2 colonnes `1fr 1.5fr`. Gauche eyebrow + H2 + filet +
+ *     paragraphe + bouton « Nous appeler ». Droite accordion.
+ *   - Mobile : titre centré au-dessus, accordion en-dessous.
+ *
+ * Rendu dans : src/pages/index.astro, ServiceLayout, ZoneLayout.
+ *
+ * En phase 3, on branchera le JSON-LD FAQPage à partir de ces mêmes
+ * données.
+ */
+
+import Container from '@/components/ui/Container.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import FaqAccordion from '@/components/ui/FaqAccordion.astro';
+import { nap, labels } from '@/data/site';
+
+export interface Props {
+  eyebrow?: string;
+  title?: string;
+  lead?: string;
+  items: { question: string; answer: string }[];
+  surface?: 'default' | 'alt';
+  /** Désactive la colonne gauche (montre uniquement le bloc accordion). */
+  simple?: boolean;
+}
+
+const {
+  eyebrow = 'FAQ',
+  title = "Les questions qu'on nous pose le plus souvent",
+  lead = "Une question qui n'apparaît pas ici ? Décrochez votre téléphone, c'est plus rapide.",
+  items,
+  surface = 'default',
+  simple = false,
+} = Astro.props;
+---
+
+<!-- [Section: FaqSection] -->
+<section
+  id="FaqSection"
+  class={`faq-section faq-section--${surface}`}
+  aria-label={title}
+>
+  <Container width="default" class="faq-section__inner">
+    {!simple && (
+      <div class="faq-section__intro">
+        <p class="eyebrow">{eyebrow}</p>
+        <h2 class="faq-section__title">{title}</h2>
+        <hr class="brass-rule faq-section__brass" />
+        {lead && <p class="faq-section__lead">{lead}</p>}
+        <div class="faq-section__cta">
+          <Button
+            href={`tel:${nap.phoneE164}`}
+            variant="urgence"
+            size="md"
+            ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+          >
+            <Icon slot="icon-leading" name="phone" size={16} />
+            Nous appeler
+          </Button>
+        </div>
+      </div>
+    )}
+    <div class="faq-section__list">
+      <FaqAccordion items={items} defaultOpenFirst={true} />
+    </div>
+  </Container>
+</section>
+
+<style>
+  .faq-section {
+    padding-block: var(--space-12);
+  }
+  @media (min-width: 768px) {
+    .faq-section { padding-block: 88px; }
+  }
+  .faq-section--default { background: var(--color-surface); }
+  .faq-section--alt     { background: var(--color-surface-alt); }
+
+  .faq-section__inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-8);
+    align-items: flex-start;
+  }
+  @media (min-width: 768px) {
+    .faq-section__inner {
+      grid-template-columns: 1fr 1.5fr;
+      gap: 64px;
+    }
+  }
+
+  .faq-section__intro { text-align: center; }
+  @media (min-width: 768px) {
+    .faq-section__intro { text-align: left; }
+  }
+
+  .faq-section__intro .eyebrow {
+    margin: 0 0 14px 0;
+  }
+  .faq-section__title {
+    margin: 0;
+    font-size: clamp(1.625rem, 2.5vw, 2.125rem); /* 26→34 */
+    line-height: 1.2;
+  }
+  .faq-section__brass {
+    margin: 18px auto 0;
+  }
+  @media (min-width: 768px) {
+    .faq-section__brass { margin-left: 0; margin-right: auto; }
+  }
+  .faq-section__lead {
+    margin: 18px auto 0;
+    color: var(--color-text-muted);
+    line-height: 1.7;
+    max-width: 38ch;
+  }
+  @media (min-width: 768px) {
+    .faq-section__lead { margin-left: 0; margin-right: 0; }
+  }
+  .faq-section__cta {
+    margin-top: 22px;
+    display: flex;
+    justify-content: center;
+  }
+  @media (min-width: 768px) {
+    .faq-section__cta { justify-content: flex-start; }
+  }
+</style>

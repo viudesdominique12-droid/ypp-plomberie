@@ -1,0 +1,44 @@
+---
+/**
+ * src/pages/realisations/index.astro — Route : /realisations/.
+ *
+ * Portfolio (gabarit 6) : hero court + filtres pills + grille de
+ * réalisations + bouton « Charger plus » + CTA final.
+ *
+ * Phase 1 : la grille est statique (filtres non-interactifs).
+ * Phase 3 : remplacer les placeholders par les vraies photos, et
+ *           éventuellement câbler les filtres avec un peu de JS.
+ */
+
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Container from '@/components/ui/Container.astro';
+import Breadcrumb from '@/components/layout/Breadcrumb.astro';
+import ShortHero from '@/components/sections/ShortHero.astro';
+import RealisationsGrid from '@/components/sections/RealisationsGrid.astro';
+import FinalCta from '@/components/sections/FinalCta.astro';
+---
+
+<BaseLayout
+  title="Réalisations — Ypp Plomberie, plombier à Nice"
+  description="Découvrez nos derniers chantiers : rénovations de salles de bain, recherches de fuite, installations de chauffe-eau."
+  canonicalPath="/realisations/"
+>
+  <Container width="wide">
+    <Breadcrumb
+      items={[
+        { label: 'Accueil', href: '/' },
+        { label: 'Réalisations' },
+      ]}
+    />
+  </Container>
+
+  <ShortHero
+    eyebrow="Réalisations"
+    h1="Avant / après, chantier par chantier"
+    intro="Un aperçu des dernières interventions sur Nice et la baie des Anges. Chaque chantier est documenté en avant / après."
+  />
+
+  <RealisationsGrid />
+
+  <FinalCta />
+</BaseLayout>

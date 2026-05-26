@@ -1,0 +1,189 @@
+/**
+ * tokens.css — Design tokens (couche 1).
+ *
+ * Rôle : valeurs brutes du design system. C'est la SEULE source de
+ * vérité pour les couleurs, typographies, espacements, ombres, etc.
+ * Aucun composant ne doit jamais coder une valeur en dur ; tout passe
+ * par une variable définie ici.
+ *
+ * Utilisé par : src/styles/global.css + tous les composants
+ * (ui, layout, sections) — c'est-à-dire la totalité du site.
+ *
+ * PHASE 2 — IDENTITÉ « Baie des Anges » :
+ *   - Palette appliquée (azur dominant, urgence ocre brûlé, accent
+ *     laiton uniquement en filet, ink pour le texte).
+ *   - Familles : Playfair Display (titres) + Inter (corps/interface).
+ *     Chargées via @fontsource dans BaseLayout.
+ *
+ *   Les NOMS de variables et leur usage restent inchangés depuis la
+ *   phase 1 : on a juste renseigné les valeurs.
+ */
+
+:root {
+  /* =========================================================================
+   * 1. TYPOGRAPHIE — Playfair Display (titres) + Inter (corps).
+   * Échelle Major Third (~1.25), tailles min cohérentes avec la marque
+   * (Playfair jamais sous 20 px).
+   * ========================================================================= */
+
+  --font-family-base:
+    'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --font-family-heading:
+    'Playfair Display', Georgia, 'Times New Roman', serif;
+  --font-family-mono:
+    ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+    'Courier New', monospace;
+
+  /* Tailles. Le headline du Hero d'accueil dépasse cette échelle —
+     il utilise une valeur ad hoc dans son composant (cf. HomeHero). */
+  --font-size-xs:    0.75rem;   /* 12px — captions, mentions légales */
+  --font-size-sm:    0.875rem;  /* 14px — texte secondaire */
+  --font-size-base:  1rem;      /* 16px — corps de texte par défaut */
+  --font-size-md:    1.125rem;  /* 18px — lead, intro */
+  --font-size-lg:    1.25rem;   /* 20px — h4 / sous-titres */
+  --font-size-xl:    1.5rem;    /* 24px — h3 */
+  --font-size-2xl:   2.25rem;   /* 36px — h2 (clamp en haut de hiérarchie) */
+  --font-size-3xl:   3rem;      /* 48px — h1 hero pages internes */
+
+  /* Interlignes — l'identité demande 1.7 sur le corps. */
+  --line-height-tight:   1.1;
+  --line-height-snug:    1.25;
+  --line-height-normal:  1.7;
+  --line-height-relaxed: 1.75;
+
+  --font-weight-regular:  400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+
+  --letter-spacing-tight:  -0.015em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide:   0.16em;
+
+  /* =========================================================================
+   * 2. ESPACEMENT — base 4 px.
+   * ========================================================================= */
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-7:  1.75rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-14: 3.5rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Sections : 80 px desktop, 48 px mobile (cf. spec). */
+  --section-pad-y:        var(--space-12);
+  --section-pad-y-mobile: var(--space-12); /* 48px */
+
+  /* =========================================================================
+   * 3. LAYOUT — largeurs de conteneur.
+   * Breakpoints (mobile-first) :
+   *   --bp-sm:  480px
+   *   --bp-md:  768px
+   *   --bp-lg:  1024px
+   *   --bp-xl:  1280px
+   * ========================================================================= */
+  --container-narrow:  760px;
+  --container-default: 1180px;
+  --container-wide:    1180px;
+
+  --grid-gutter:    var(--space-5);
+  --grid-gutter-md: var(--space-6);
+  --grid-gutter-lg: var(--space-8);
+
+  /* =========================================================================
+   * 4. RAYONS — identité « Baie des Anges »
+   * ========================================================================= */
+  --radius-sm:   10px;
+  --radius-md:   14px;
+  --radius-lg:   18px;
+  --radius-xl:   24px;
+  --radius-full: 9999px;
+
+  /* =========================================================================
+   * 5. OMBRES — discrètes, au hover principalement.
+   * ========================================================================= */
+  --shadow-sm: 0 1px 2px rgba(22,42,51,.05), 0 1px 3px rgba(22,42,51,.04);
+  --shadow-md: 0 6px 18px rgba(22,42,51,.06), 0 2px 6px rgba(22,42,51,.04);
+  --shadow-lg: 0 20px 60px rgba(22,42,51,.18), 0 6px 22px rgba(22,42,51,.10);
+  --shadow-focus: 0 0 0 3px rgba(14,100,128,.32);
+
+  /* =========================================================================
+   * 6. TRANSITIONS & EASINGS — sobre (150–200 ms).
+   * ========================================================================= */
+  --transition-fast: 150ms;
+  --transition-base: 200ms;
+  --transition-slow: 280ms;
+
+  --ease-out:    cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in:     cubic-bezier(0.4, 0, 1, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* =========================================================================
+   * 7. Z-INDEX
+   * ========================================================================= */
+  --z-base:    0;
+  --z-sticky:  100;
+  --z-overlay: 500;
+  --z-modal:   1000;
+
+  /* =========================================================================
+   * 8. COULEURS — palette « Baie des Anges » (strict).
+   *
+   * Aucune autre couleur. Pas de variantes décoratives, pas d'opacités
+   * exotiques. Les variables conservent les noms sémantiques de la
+   * phase 1 ; certains alias sont ajoutés pour rester fidèle aux
+   * appellations du design system d'identité (`--color-azur`, etc.).
+   * ========================================================================= */
+
+  /* Surfaces et fonds. */
+  --color-bg:           #F8F9F7;
+  --color-surface:      #FFFFFF;
+  --color-surface-alt:  #EDF2F2;
+
+  /* Texte. */
+  --color-text:         #162A33; /* ink */
+  --color-text-muted:   #5A6B72; /* ink-2 */
+  --color-text-inverse: #FFFFFF;
+
+  /* Bordures. */
+  --color-border:        #D8E0E0;
+  --color-border-soft:   #E6ECEC;
+  --color-border-strong: #ABBABE;
+
+  /* Accents identitaires. */
+  --color-azur:         #0E6480;
+  --color-azur-hover:   #0A4F66;
+  --color-azur-light:   #E3EEF1;
+  --color-ocre:         #C9772F;   /* étoiles, accents chauds */
+  --color-laiton:       #B68A3E;   /* filet couture uniquement */
+  --color-urg:          #B05518;   /* CTA appel téléphone */
+  --color-urg-hover:    #964514;
+
+  /* Alias sémantiques (couche 1 → consommation par les composants). */
+  --color-accent:        var(--color-azur);
+  --color-accent-hover:  var(--color-azur-hover);
+  --color-accent-2:      var(--color-laiton); /* utilisé en filet uniquement */
+  --color-urgent:        var(--color-urg);
+  --color-urgent-hover:  var(--color-urg-hover);
+  --color-focus:         rgba(14,100,128,.32);
+
+  /* États sémantiques — la palette dit « pour danger / erreur, utiliser
+     --urg plutôt que d'inventer une couleur ». */
+  --color-success: var(--color-azur);
+  --color-error:   var(--color-urg);
+
+  /* Couleurs "on-*" — utilisées par les composants pour le texte sur
+     un fond donné. */
+  --color-on-accent:    var(--color-text-inverse);
+  --color-on-urgent:    var(--color-text-inverse);
+  --color-on-surface:   var(--color-text);
+}

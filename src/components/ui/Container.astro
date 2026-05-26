@@ -1,0 +1,50 @@
+---
+/**
+ * Container.astro — Primitive UI.
+ *
+ * Rôle : limiter la largeur du contenu (760 / 1180) et appliquer les
+ * gouttières horizontales.
+ *
+ * Rendu dans : la plupart des sections, ainsi que Header / Footer.
+ * Utilisé par : tout composant qui veut centrer son contenu.
+ */
+
+export interface Props {
+  width?: 'narrow' | 'default' | 'wide';
+  /**
+   * Élément HTML rendu. Par défaut `div` (neutre). Choisir un autre
+   * élément (ex. `header`, `nav`) quand le Container EST le landmark.
+   */
+  as?: keyof HTMLElementTagNameMap;
+  class?: string;
+}
+
+const { width = 'default', as: Tag = 'div', class: className } = Astro.props;
+
+const classes = ['container', `container--${width}`, className]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<Tag class={classes}>
+  <slot />
+</Tag>
+
+<style>
+  .container {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: var(--grid-gutter);
+  }
+
+  @media (min-width: 768px) {
+    .container { padding-inline: var(--grid-gutter-md); }
+  }
+  @media (min-width: 1024px) {
+    .container { padding-inline: var(--grid-gutter-lg); }
+  }
+
+  .container--narrow  { max-width: var(--container-narrow); }
+  .container--default { max-width: var(--container-default); }
+  .container--wide    { max-width: var(--container-wide); }
+</style>

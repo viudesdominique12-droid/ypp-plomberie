@@ -1,0 +1,102 @@
+---
+/**
+ * AnimatedWaves.astro — Primitive UI.
+ *
+ * Rôle : surface d'eau animée — plusieurs couches de vagues SVG qui
+ * glissent horizontalement à des vitesses différentes. Crée un effet
+ * de mer calme, parfaite signature « plomberie / baie des Anges ».
+ *
+ * Implémentation : on duplique le motif SVG via `useElement` 2 fois
+ * dans un `<g>`, puis on translate le `<g>` de -50% en boucle.
+ * Comme on a 2 copies juxtaposées, c'est visuellement continu.
+ *
+ * Respect prefers-reduced-motion : règle globale dans global.css
+ * désactive toutes les animations.
+ *
+ * Variantes :
+ *   - "hero" : 3 couches, opacités graduées, palette nuit baie ;
+ *   - "footer" : 3 couches, palette azur clair.
+ */
+
+export interface Props {
+  variant?: 'hero' | 'footer' | 'footer-ink';
+  /** Hauteur en pixels. */
+  height?: number;
+  class?: string;
+}
+
+const { variant = 'hero', height = 200, class: className } = Astro.props;
+
+/* Trois couches superposées. La couche 0 est en fond, la 2 au premier
+   plan. Vitesses différentes (parallax). */
+type Layer = { fill: string; duration: string; amp: string };
+let layers: Layer[];
+
+if (variant === 'hero') {
+  layers = [
+    { fill: 'rgba(255,255,255,0.06)', duration: '24s', amp: 'M0 40 Q300 10 600 40 T1200 40 V100 H0 Z' },
+    { fill: 'rgba(255,255,255,0.12)', duration: '18s', amp: 'M0 55 Q300 25 600 55 T1200 55 V100 H0 Z' },
+    { fill: 'rgba(255,255,255,0.22)', duration: '13s', amp: 'M0 72 Q300 45 600 72 T1200 72 V100 H0 Z' },
+  ];
+} else if (variant === 'footer-ink') {
+  /* Vagues azur lumineuses sur fond ink (sombre). */
+  layers = [
+    { fill: 'rgba(14,100,128,0.55)',  duration: '26s', amp: 'M0 40 Q300 10 600 40 T1200 40 V100 H0 Z' },
+    { fill: 'rgba(14,100,128,0.70)',  duration: '19s', amp: 'M0 55 Q300 25 600 55 T1200 55 V100 H0 Z' },
+    { fill: 'rgba(22,42,51,1)',       duration: '14s', amp: 'M0 72 Q300 45 600 72 T1200 72 V100 H0 Z' },
+  ];
+} else {
+  layers = [
+    { fill: 'rgba(14,100,128,0.06)', duration: '26s', amp: 'M0 40 Q300 10 600 40 T1200 40 V100 H0 Z' },
+    { fill: 'rgba(14,100,128,0.10)', duration: '19s', amp: 'M0 55 Q300 25 600 55 T1200 55 V100 H0 Z' },
+    { fill: 'rgba(14,100,128,0.18)', duration: '14s', amp: 'M0 72 Q300 45 600 72 T1200 72 V100 H0 Z' },
+  ];
+}
+
+const classes = ['animated-waves', `animated-waves--${variant}`, className]
+  .filter(Boolean)
+  .join(' ');
+---
+
+<div class={classes} style={`height: ${height}px;`} aria-hidden="true">
+  <svg
+    class="animated-waves__svg"
+    viewBox="0 0 1200 100"
+    preserveAspectRatio="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
+    {layers.map((layer) => (
+      <g
+        class="animated-waves__layer"
+        style={`animation-duration: ${layer.duration};`}
+      >
+        {/* Deux copies du même chemin, l'une à 0, l'autre décalée de
+            +1200 (largeur du viewBox). Le <g> glisse de -50% à -100%,
+            ce qui équivaut à -1200 sur 2400 → bouclage continu. */}
+        <path d={layer.amp} fill={layer.fill} />
+        <path d={layer.amp} fill={layer.fill} transform="translate(1200,0)" />
+      </g>
+    ))}
+  </svg>
+</div>
+
+<style>
+  .animated-waves {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    line-height: 0;
+    pointer-events: none;
+  }
+  .animated-waves__svg {
+    width: 200%;       /* viewBox 1200 + sa copie = 2400 */
+    height: 100%;
+    display: block;
+  }
+  .animated-waves__layer {
+    animation-name: ypp-wave-glide;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    will-change: transform;
+  }
+</style>

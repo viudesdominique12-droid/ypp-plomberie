@@ -1,0 +1,52 @@
+---
+/**
+ * ServiceProcessSection.astro — Section.
+ *
+ * Rôle : déroulé d'intervention spécifique au service en cours.
+ * Variante du Stepper en 4 étapes.
+ *
+ * Rendu dans : src/layouts/ServiceLayout.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import Stepper from '@/components/ui/Stepper.astro';
+
+export interface Props {
+  title?: string;
+  eyebrow?: string;
+  steps?: { title: string; description: string }[];
+}
+
+const {
+  eyebrow = "Déroulé d'intervention",
+  title = "De l'appel au point d'eau réparé",
+  steps = [
+    {
+      title: 'Appel & écoute',
+      description:
+        "Un échange direct pour comprendre la situation, évaluer l'urgence et fixer un créneau précis.",
+    },
+    {
+      title: 'Diagnostic sur place',
+      description:
+        'Visite, localisation du problème, explication claire des options et du périmètre des travaux.',
+    },
+    {
+      title: 'Devis annoncé',
+      description:
+        'Tarif définitif validé avec vous avant toute intervention. Aucune surprise en facturation.',
+    },
+    {
+      title: 'Intervention & suivi',
+      description:
+        'Travail propre, chantier rendu net, garantie décennale et suivi en cas de doute postérieur.',
+    },
+  ],
+} = Astro.props;
+---
+
+<Section id="ServiceProcessSection" surface="default" spacing="lg">
+  <SectionHeading eyebrow={eyebrow} title={title} />
+  <Stepper steps={steps} headingLevel={3} columns={4} />
+</Section>

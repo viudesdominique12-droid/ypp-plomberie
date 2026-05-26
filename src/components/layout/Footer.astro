@@ -1,0 +1,274 @@
+---
+/**
+ * Footer.astro — Layout chrome (couche 4).
+ *
+ * Rôle : pied de page commun à toutes les pages. Fond `--ink`,
+ * texte clair, 4 colonnes desktop / pile mobile.
+ *
+ * Identité « Baie des Anges » :
+ *   - col 1 : marque (logo light) + tagline + CTA urgence + sociaux
+ *     (icônes stroke, pas de pastille) ;
+ *   - col 2 : services ; col 3 : zones ; col 4 : contact + légal.
+ *
+ * Rendu dans : src/layouts/BaseLayout.astro.
+ */
+
+import Container from '@/components/ui/Container.astro';
+import Button from '@/components/ui/Button.astro';
+import Icon from '@/components/ui/Icon.astro';
+import WaterDropLogo from '@/components/ui/WaterDropLogo.astro';
+import AnimatedWaves from '@/components/ui/AnimatedWaves.astro';
+import { nap, site, labels } from '@/data/site';
+import { getCollection } from 'astro:content';
+
+const services = (await getCollection('services')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+const zones = (await getCollection('zones')).sort((a, b) =>
+  a.data.commune.localeCompare(b.data.commune, 'fr'),
+);
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer" role="contentinfo">
+  {/* Vagues animées au bord supérieur du footer — relie la page au
+       fond ink, comme une ligne de marée. */}
+  <div class="site-footer__waves" aria-hidden="true">
+    <AnimatedWaves variant="footer-ink" height={120} />
+  </div>
+  <Container width="wide" as="div">
+    <div class="site-footer__grid">
+      {/* === Marque === */}
+      <section class="site-footer__brand-col" aria-label="À propos">
+        <a class="site-footer__brand" href="/" aria-label={`Accueil — ${site.name}`}>
+          <WaterDropLogo variant="light" />
+          <span class="site-footer__brand-name">
+            <span class="site-footer__brand-title">{site.name}</span>
+            <span class="site-footer__brand-sub">Nice · Baie des Anges</span>
+          </span>
+        </a>
+        <p class="site-footer__tagline">
+          Artisan plombier à Nice — dépannage {labels.open247}, rénovation
+          salle de bain, recherche de fuite et chauffage. Assurance décennale.
+        </p>
+        <div class="site-footer__cta">
+          <Button
+            href={`tel:${nap.phoneE164}`}
+            variant="urgence"
+            size="sm"
+            ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+          >
+            <Icon slot="icon-leading" name="phone" size={14} />
+            {nap.phoneDisplay}
+          </Button>
+        </div>
+        <div class="site-footer__socials">
+          {[
+            ['Facebook', 'facebook'],
+            ['Instagram', 'instagram'],
+            ['Avis Google', 'google'],
+          ].map(([name, ic]) => (
+            <a href="#" class="site-footer__social" aria-label={name}>
+              <Icon name={ic} size={18} strokeWidth={1.4} />
+            </a>
+          ))}
+        </div>
+      </section>
+
+      {/* === Services === */}
+      <nav class="site-footer__col" aria-label="Services">
+        <p class="site-footer__col-title">Services</p>
+        <ul role="list" class="site-footer__list">
+          {services.map((s) => (
+            <li>
+              <a href={`/services/${s.data.slug}/`}>{s.data.title}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* === Zones === */}
+      <nav class="site-footer__col" aria-label="Zones desservies">
+        <p class="site-footer__col-title">Zones desservies</p>
+        <ul role="list" class="site-footer__list">
+          <li><a href="/">Nice & alentours</a></li>
+          {zones.map((z) => (
+            <li>
+              <a href={`/zones/${z.data.slug}/`}>{z.data.commune}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      {/* === Contact === */}
+      <section class="site-footer__col" aria-label="Contact">
+        <p class="site-footer__col-title">Contact</p>
+        <ul role="list" class="site-footer__list site-footer__list--plain">
+          <li>{nap.phoneDisplay}</li>
+          <li>{nap.email}</li>
+          <li>{nap.address.city} ({nap.address.postalCode}) — {nap.address.region}</li>
+        </ul>
+        <div class="site-footer__legal">
+          <a href="/mentions-legales/">Mentions légales</a>
+          <span aria-hidden="true">·</span>
+          <a href="/politique-de-confidentialite/">Confidentialité</a>
+        </div>
+      </section>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>© {year} {site.legalName} — Tous droits réservés</p>
+      <p>SIRET {nap.identifiers.siret} · Assurance décennale</p>
+    </div>
+  </Container>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--color-text); /* ink */
+    color: #fff;
+    margin-top: 0;
+    position: relative;
+  }
+  /* Vagues au bord supérieur : flot azur clair sur fond ink. */
+  .site-footer__waves {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    overflow: hidden;
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+  .site-footer__waves :global(svg path) {
+    /* Inverse les fills : sur fond ink, on veut un azur clair lumineux. */
+  }
+  .site-footer :global(.container) {
+    padding-block: 0; /* le grid + bottom gèrent leur propre padding */
+  }
+
+  .site-footer__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+    padding-block: 52px;
+  }
+  @media (min-width: 768px) {
+    .site-footer__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px;
+      padding-block: 64px;
+    }
+  }
+  @media (min-width: 1024px) {
+    .site-footer__grid {
+      grid-template-columns: 1.4fr 1fr 1fr 1fr;
+      gap: 56px;
+      padding-block: 72px;
+    }
+  }
+
+  /* Brand col */
+  .site-footer__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #fff;
+  }
+  .site-footer__brand-name { display: flex; flex-direction: column; line-height: 1; }
+  .site-footer__brand-title {
+    font-family: var(--font-family-heading);
+    font-weight: var(--font-weight-semibold);
+    font-size: 1.1875rem;
+    letter-spacing: -0.012em;
+  }
+  .site-footer__brand-sub {
+    margin-top: 3px;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .site-footer__tagline {
+    margin: 18px 0 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.875rem;
+    line-height: 1.7;
+  }
+  .site-footer__cta { margin-top: 22px; }
+  .site-footer__socials {
+    margin-top: 18px;
+    display: flex;
+    gap: 14px;
+  }
+  .site-footer__social {
+    color: rgba(255, 255, 255, 0.55);
+    display: inline-flex;
+    transition: color var(--transition-fast) var(--ease-out);
+  }
+  .site-footer__social:hover { color: #fff; }
+
+  /* Cols */
+  .site-footer__col-title {
+    margin: 0 0 18px 0;
+    font-size: 0.75rem;
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.55);
+  }
+  .site-footer__list {
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+  }
+  .site-footer__list a {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.875rem;
+    text-decoration: none;
+    transition: color var(--transition-fast) var(--ease-out);
+  }
+  .site-footer__list a:hover { color: #fff; }
+  .site-footer__list--plain {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.875rem;
+    line-height: 1.6;
+  }
+  .site-footer__legal {
+    margin-top: 18px;
+    font-size: 0.875rem;
+  }
+  .site-footer__legal a {
+    color: rgba(255, 255, 255, 0.78);
+    text-decoration: none;
+  }
+  .site-footer__legal a:hover { color: #fff; }
+  .site-footer__legal span {
+    color: rgba(255, 255, 255, 0.3);
+    margin: 0 10px;
+  }
+
+  /* Bottom */
+  .site-footer__bottom {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-block: 20px;
+    font-size: 0.78rem;
+    color: rgba(255, 255, 255, 0.5);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  @media (min-width: 768px) {
+    .site-footer__bottom {
+      flex-direction: row;
+      align-items: center;
+      padding-block: 22px;
+    }
+  }
+  .site-footer__bottom p { margin: 0; }
+</style>

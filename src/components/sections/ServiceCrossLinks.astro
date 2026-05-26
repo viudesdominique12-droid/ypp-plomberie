@@ -1,0 +1,62 @@
+---
+/**
+ * ServiceCrossLinks.astro — Section.
+ *
+ * Rôle : maillage interne en bas d'une page service — « Nos autres
+ * services », 3 ServiceCard parmi les autres services (cf. design).
+ *
+ * Rendu dans : src/layouts/ServiceLayout.astro.
+ */
+
+import Section from '@/components/ui/Section.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import ServiceCard from '@/components/ui/ServiceCard.astro';
+import { getCollection } from 'astro:content';
+
+export interface Props {
+  currentServiceId: string;
+  /** Nombre d'autres services affichés (3 par défaut). */
+  limit?: number;
+}
+
+const { currentServiceId, limit = 3 } = Astro.props;
+
+const services = (await getCollection('services'))
+  .filter((entry) => entry.id !== currentServiceId)
+  .sort((a, b) => a.data.order - b.data.order)
+  .slice(0, limit);
+---
+
+<Section id="ServiceCrossLinks" surface="default" spacing="lg" width="wide">
+  <SectionHeading eyebrow="Maillage" title="Nos autres services" />
+  <ul class="cross-links__grid" role="list">
+    {services.map((entry) => (
+      <li>
+        <ServiceCard
+          href={`/services/${entry.data.slug}/`}
+          title={entry.data.title}
+          description={entry.data.shortDescription}
+          icon={entry.data.icon}
+          headingLevel={3}
+        />
+      </li>
+    ))}
+  </ul>
+</Section>
+
+<style>
+  .cross-links__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+  }
+  @media (min-width: 640px) {
+    .cross-links__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (min-width: 1024px) {
+    .cross-links__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-6);
+    }
+  }
+</style>
