@@ -19,6 +19,7 @@ import RealisationsPreview from '@/components/sections/RealisationsPreview.astro
 import ReviewsSection from '@/components/sections/ReviewsSection.astro';
 import FinalCta from '@/components/sections/FinalCta.astro';
 import { site } from '@/data/site';
+import { url } from '@/utils/url';
 
 const homeFaq = [
   {
@@ -71,7 +72,7 @@ const faqPageLd = {
 <BaseLayout
   title="Plombier à Nice — Ypp Plomberie · rénovation, fuites, urgence 24/7"
   description="Plombier à Nice : rénovation de salle de bain, recherche de fuite, débouchage, chauffe-eau, dépannage 24h/24. Devis annoncé avant intervention au 06 03 34 03 05."
-  canonicalPath="/"
+  canonicalPath={url('/')}
 >
   <script
     is:inline

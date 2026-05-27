@@ -16,18 +16,20 @@ import Container from '@/components/ui/Container.astro';
 import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { primaryNav, nap, labels, site } from '@/data/site';
+import { url } from '@/utils/url';
 
 const currentPath = Astro.url.pathname;
+const homeHref = url('/');
 
 function isCurrent(href: string): boolean {
-  if (href === '/') return currentPath === '/';
+  if (href === homeHref) return currentPath === homeHref;
   return currentPath === href || currentPath.startsWith(href);
 }
 ---
 
 <header class="site-header" role="banner">
   <Container width="wide" as="div" class="site-header__inner">
-    <a class="site-header__brand" href="/" aria-label={`Accueil — ${site.name}`}>
+    <a class="site-header__brand" href={homeHref} aria-label={`Accueil — ${site.name}`}>
       <span class="site-header__wordmark">Ypp<span class="site-header__dot">.</span></span>
       <span class="site-header__tag">Plomberie · Nice</span>
     </a>
@@ -35,7 +37,7 @@ function isCurrent(href: string): boolean {
     {/* Desktop nav */}
     <nav class="site-header__nav-desk" aria-label="Navigation principale">
       <ul class="site-header__nav-list" role="list">
-        {primaryNav.filter((n) => n.href !== '/').map((item) => (
+        {primaryNav.filter((n) => n.href !== homeHref).map((item) => (
           <li>
             <a
               href={item.href}
@@ -51,7 +53,7 @@ function isCurrent(href: string): boolean {
 
     {/* CTAs desktop */}
     <div class="site-header__cta-desk">
-      <a href="/contact/" class="site-header__quote">Devis sous 24 h</a>
+      <a href={url('/contact/')} class="site-header__quote">Devis sous 24 h</a>
       <Button
         href={`tel:${nap.phoneE164}`}
         variant="urgence"

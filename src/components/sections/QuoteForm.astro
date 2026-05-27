@@ -22,6 +22,7 @@
 import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { getCollection } from 'astro:content';
+import { url } from '@/utils/url';
 
 const services = (await getCollection('services')).sort(
   (a, b) => a.data.order - b.data.order,
@@ -169,7 +170,7 @@ const accessKey = import.meta.env.PUBLIC_WEB3FORMS_KEY ?? '';
       <span class="quote-form__consent-text">
         J'accepte que mes informations soient utilisées pour me recontacter. Aucune
         transmission à un tiers. Voir la
-        <a href="/politique-de-confidentialite/">politique de confidentialité</a>.
+        <a href={url('/politique-de-confidentialite/')}>politique de confidentialité</a>.
         <span class="quote-form__req" aria-hidden="true">*</span>
       </span>
     </label>

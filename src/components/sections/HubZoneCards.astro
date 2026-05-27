@@ -18,22 +18,23 @@ import Section from '@/components/ui/Section.astro';
 import SectionHeading from '@/components/ui/SectionHeading.astro';
 import Placeholder from '@/components/ui/Placeholder.astro';
 import Icon from '@/components/ui/Icon.astro';
+import { url } from '@/utils/url';
 
 const zones = [
   {
     title: 'Nice & alentours',
     description: 'Centre, Cimiez, Mont-Boron, Saint-Roch, Riquier — intervention en moins d\'une heure.',
-    href: '/',
+    href: url('/'),
   },
   {
     title: 'Cagnes & Villeneuve',
     description: 'Cagnes-sur-Mer, Cros-de-Cagnes, Saint-Laurent-du-Var, Villeneuve-Loubet — bord de mer et arrière-pays.',
-    href: '/zones/cagnes-sur-mer/',
+    href: url('/zones/cagnes-sur-mer/'),
   },
   {
     title: 'Villefranche & Cap-Ferrat',
     description: 'Villefranche-sur-Mer, Beaulieu, Èze, Saint-Jean-Cap-Ferrat, Cap d\'Ail — la corniche et ses villages.',
-    href: '/zones/villefranche-sur-mer/',
+    href: url('/zones/villefranche-sur-mer/'),
   },
 ];
 ---

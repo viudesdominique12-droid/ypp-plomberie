@@ -13,17 +13,18 @@ import ShortHero from '@/components/sections/ShortHero.astro';
 import ServicesGrid from '@/components/sections/ServicesGrid.astro';
 import Reassurance4Cards from '@/components/sections/Reassurance4Cards.astro';
 import FinalCta from '@/components/sections/FinalCta.astro';
+import { url } from '@/utils/url';
 ---
 
 <BaseLayout
   title="Nos services de plomberie à Nice — Ypp Plomberie"
   description="Découvrez nos services : dépannage 24h/24, recherche de fuite, débouchage, chauffe-eau, rénovation de salle de bain, installation sanitaire."
-  canonicalPath="/services/"
+  canonicalPath={url('/services/')}
 >
   <Container width="wide">
     <Breadcrumb
       items={[
-        { label: 'Accueil', href: '/' },
+        { label: 'Accueil', href: url('/') },
         { label: 'Services' },
       ]}
     />

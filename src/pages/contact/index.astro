@@ -16,17 +16,18 @@ import ShortHero from '@/components/sections/ShortHero.astro';
 import ContactDetails from '@/components/sections/ContactDetails.astro';
 import QuoteForm from '@/components/sections/QuoteForm.astro';
 import MapBand from '@/components/sections/MapBand.astro';
+import { url } from '@/utils/url';
 ---
 
 <BaseLayout
   title="Contact — Ypp Plomberie, plombier à Nice"
   description="Contactez Ypp Plomberie pour un dépannage rapide ou un devis : 06 03 34 03 05, formulaire en ligne, 24h/24."
-  canonicalPath="/contact/"
+  canonicalPath={url('/contact/')}
 >
   <Container width="wide">
     <Breadcrumb
       items={[
-        { label: 'Accueil', href: '/' },
+        { label: 'Accueil', href: url('/') },
         { label: 'Contact' },
       ]}
     />

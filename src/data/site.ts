@@ -109,6 +109,8 @@ export const nap = {
 /* =========================================================================
  * Navigation principale
  * ========================================================================= */
+import { url } from '@/utils/url';
+
 export type NavItem = {
   label: string;
   href: string;
@@ -117,29 +119,29 @@ export type NavItem = {
 };
 
 export const primaryNav: readonly NavItem[] = [
-  { label: 'Accueil', href: '/' },
+  { label: 'Accueil', href: url('/') },
   {
     label: 'Services',
-    href: '/services/',
+    href: url('/services/'),
     children: [
-      { label: 'Dépannage 24h/24',       href: '/services/depannage-urgence/' },
-      { label: 'Recherche de fuite',     href: '/services/recherche-de-fuite/' },
-      { label: 'Débouchage',             href: '/services/debouchage-canalisation/' },
-      { label: 'Chaudière & chauffage',  href: '/services/chauffe-eau/' },
-      { label: 'Salle de bain',          href: '/services/renovation-salle-de-bain/' },
-      { label: 'Installation sanitaire', href: '/services/installation-sanitaire/' },
+      { label: 'Dépannage 24h/24',       href: url('/services/depannage-urgence/') },
+      { label: 'Recherche de fuite',     href: url('/services/recherche-de-fuite/') },
+      { label: 'Débouchage',             href: url('/services/debouchage-canalisation/') },
+      { label: 'Chaudière & chauffage',  href: url('/services/chauffe-eau/') },
+      { label: 'Salle de bain',          href: url('/services/renovation-salle-de-bain/') },
+      { label: 'Installation sanitaire', href: url('/services/installation-sanitaire/') },
     ],
   },
-  { label: "Zone",         href: '/zone-intervention/' },
-  { label: 'Réalisations', href: '/realisations/' },
-  { label: 'À propos',     href: '/a-propos/' },
-  { label: 'Contact',      href: '/contact/' },
-] as const;
+  { label: 'Zone',         href: url('/zone-intervention/') },
+  { label: 'Réalisations', href: url('/realisations/') },
+  { label: 'À propos',     href: url('/a-propos/') },
+  { label: 'Contact',      href: url('/contact/') },
+];
 
 export const footerLegalNav: readonly NavItem[] = [
-  { label: 'Mentions légales',           href: '/mentions-legales/' },
-  { label: 'Politique de confidentialité', href: '/politique-de-confidentialite/' },
-] as const;
+  { label: 'Mentions légales',             href: url('/mentions-legales/') },
+  { label: 'Politique de confidentialité', href: url('/politique-de-confidentialite/') },
+];
 
 /* =========================================================================
  * Libellés réutilisés (UI commune)

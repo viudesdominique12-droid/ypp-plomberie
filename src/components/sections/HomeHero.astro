@@ -21,6 +21,7 @@ import Container from '@/components/ui/Container.astro';
 import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { nap, labels, site } from '@/data/site';
+import { url } from '@/utils/url';
 ---
 
 <!-- [Section: HomeHero] -->
@@ -28,7 +29,7 @@ import { nap, labels, site } from '@/data/site';
   {/* === Photo plein cadre === */}
   <div class="home-hero__media" aria-hidden="true">
     <img
-      src="/realisations/01-douche-italienne-pierre-claire.jpg"
+      src={url('/realisations/01-douche-italienne-pierre-claire.jpg')}
       alt=""
       width="1546"
       height="1160"
@@ -70,7 +71,7 @@ import { nap, labels, site } from '@/data/site';
           <Icon slot="icon-leading" name="phone" size={16} />
           {nap.phoneDisplay}
         </Button>
-        <a class="home-hero__quote" href="/contact/">
+        <a class="home-hero__quote" href={url('/contact/')}>
           Demander un devis
           <span aria-hidden="true">→</span>
         </a>

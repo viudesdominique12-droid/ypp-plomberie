@@ -19,6 +19,7 @@ import AproposPresentation from '@/components/sections/AproposPresentation.astro
 import Reassurance4Cards from '@/components/sections/Reassurance4Cards.astro';
 import FinalCta from '@/components/sections/FinalCta.astro';
 import { nap } from '@/data/site';
+import { url } from '@/utils/url';
 
 const garanties = [
   {
@@ -60,12 +61,12 @@ const presentationParagraphs = [
 <BaseLayout
   title="À propos d'Ypp Plomberie — plombier à Nice"
   description="L'artisan derrière Ypp Plomberie : plombier installé à Nice, assurance décennale, devis gratuit. Un seul interlocuteur pour vos dépannages et rénovations."
-  canonicalPath="/a-propos/"
+  canonicalPath={url('/a-propos/')}
 >
   <Container width="wide">
     <Breadcrumb
       items={[
-        { label: 'Accueil', href: '/' },
+        { label: 'Accueil', href: url('/') },
         { label: 'À propos' },
       ]}
     />

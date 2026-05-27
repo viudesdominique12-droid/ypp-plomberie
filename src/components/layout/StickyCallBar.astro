@@ -12,6 +12,7 @@
 
 import Icon from '@/components/ui/Icon.astro';
 import { nap, labels } from '@/data/site';
+import { url } from '@/utils/url';
 ---
 
 <div class="sticky-call-bar" role="region" aria-label="Actions rapides">
@@ -25,7 +26,7 @@ import { nap, labels } from '@/data/site';
   </a>
   <a
     class="sticky-call-bar__btn sticky-call-bar__btn--quote"
-    href="/contact/"
+    href={url('/contact/')}
   >
     <span>Devis</span>
   </a>

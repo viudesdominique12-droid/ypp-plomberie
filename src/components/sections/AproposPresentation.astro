@@ -14,6 +14,7 @@ import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
 import Placeholder from '@/components/ui/Placeholder.astro';
 import { nap, labels } from '@/data/site';
+import { url } from '@/utils/url';
 
 export interface Props {
   /** Titre principal de la section. */
@@ -54,7 +55,7 @@ const {
           <Icon slot="icon-leading" name="phone" size={16} />
           {labels.callNow} · {nap.phoneDisplay}
         </Button>
-        <Button href="/contact/" variant="primary" size="md">
+        <Button href={url('/contact/')} variant="primary" size="md">
           {labels.requestQuote}
         </Button>
       </div>

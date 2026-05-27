@@ -19,6 +19,7 @@
 
 import Section from '@/components/ui/Section.astro';
 import Button from '@/components/ui/Button.astro';
+import { url } from '@/utils/url';
 
 const cats = [
   'Tous',
@@ -83,7 +84,7 @@ const active = 'Tous';
             <a href="#" class="rg-card__link" aria-label={`${it.title} — ${it.place}`}>
               <div class="rg-card__media">
                 {it.image ? (
-                  <img src={it.image} alt="" class="photo" loading="lazy" decoding="async" />
+                  <img src={url(it.image)} alt="" class="photo" loading="lazy" decoding="async" />
                 ) : (
                   <span class="rg-card__placeholder" aria-hidden="true">
                     <span class="rg-card__placeholder-num">{it.num}</span>

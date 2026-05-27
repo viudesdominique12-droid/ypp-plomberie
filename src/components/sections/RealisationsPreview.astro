@@ -14,6 +14,7 @@
 
 import Section from '@/components/ui/Section.astro';
 import Button from '@/components/ui/Button.astro';
+import { url } from '@/utils/url';
 
 interface Case {
   num: string;
@@ -88,7 +89,7 @@ const cases: Case[] = [
       <li class={`realisations-preview__item realisations-preview__item--${i % 2 === 0 ? 'left' : 'right'}`}>
         <figure class="realisations-preview__figure" data-anim="mask">
           <img
-            src={c.image}
+            src={url(c.image)}
             alt={c.alt}
             class="photo"
             loading={i < 2 ? 'eager' : 'lazy'}
@@ -127,7 +128,7 @@ const cases: Case[] = [
   </ol>
 
   <div class="realisations-preview__cta">
-    <Button href="/realisations/" variant="secondary" size="lg">
+    <Button href={url('/realisations/')} variant="secondary" size="lg">
       Voir toutes les réalisations
     </Button>
   </div>

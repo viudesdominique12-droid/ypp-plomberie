@@ -31,6 +31,7 @@ import ServicePricingSection from '@/components/sections/ServicePricingSection.a
 import Reassurance4Cards from '@/components/sections/Reassurance4Cards.astro';
 import FaqSection from '@/components/sections/FaqSection.astro';
 import ServiceCrossLinks from '@/components/sections/ServiceCrossLinks.astro';
+import { url } from '@/utils/url';
 import FinalCta from '@/components/sections/FinalCta.astro';
 import { site, nap } from '@/data/site';
 
@@ -143,7 +144,7 @@ const faqPageLd = {
 <BaseLayout
   title={data.metaTitle}
   description={data.metaDescription}
-  canonicalPath={`/services/${data.slug}/`}
+  canonicalPath={url(`/services/${data.slug}/`)}
 >
   {/* JSON-LD spécifique à cette page service. Les script tags
        application/ld+json sont valides dans le <body> et reconnus par
@@ -162,8 +163,8 @@ const faqPageLd = {
   <Container width="wide">
     <Breadcrumb
       items={[
-        { label: 'Accueil', href: '/' },
-        { label: 'Services', href: '/services/' },
+        { label: 'Accueil', href: url('/') },
+        { label: 'Services', href: url('/services/') },
         { label: data.title },
       ]}
     />

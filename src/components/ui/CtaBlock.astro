@@ -10,6 +10,7 @@
 
 import Button from './Button.astro';
 import { nap, labels } from '@/data/site';
+import { url } from '@/utils/url';
 
 export interface Props {
   title?: string;
@@ -53,7 +54,7 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
       Appeler maintenant
     </Button>
     {showQuoteButton && (
-      <Button href="/contact/" variant="secondary" size="lg" class="cta-band__secondary">
+      <Button href={url('/contact/')} variant="secondary" size="lg" class="cta-band__secondary">
         Demander un devis
       </Button>
     )}

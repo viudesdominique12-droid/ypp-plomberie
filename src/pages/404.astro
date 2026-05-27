@@ -11,13 +11,14 @@ import Section from '@/components/ui/Section.astro';
 import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { nap, labels } from '@/data/site';
+import { url } from '@/utils/url';
 ---
 
 <BaseLayout
   title="Page introuvable — Ypp Plomberie"
   description="La page que vous cherchez n'existe pas ou a été déplacée."
   noindex={true}
-  canonicalPath="/404"
+  canonicalPath={url('/404')}
 >
   <Section id="NotFound" surface="bg" spacing="lg" width="narrow">
     <div class="not-found">
@@ -29,7 +30,7 @@ import { nap, labels } from '@/data/site';
         Reprenons depuis le début.
       </p>
       <div class="not-found__actions">
-        <Button href="/" variant="primary" size="lg">
+        <Button href={url('/')} variant="primary" size="lg">
           Retour à l'accueil
         </Button>
         <Button

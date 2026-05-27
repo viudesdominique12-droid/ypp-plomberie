@@ -15,6 +15,7 @@
 import Section from '@/components/ui/Section.astro';
 import Globe3D from '@/components/ui/Globe3D.astro';
 import { getCollection } from 'astro:content';
+import { url } from '@/utils/url';
 
 const collectionZones = await getCollection('zones');
 const collectionSlugs = new Set(collectionZones.map((z) => z.data.slug));
@@ -42,7 +43,7 @@ const tiles: Tile[] = [
 ];
 
 function tileHref(slug: string | null) {
-  if (slug && collectionSlugs.has(slug)) return `/zones/${slug}/`;
+  if (slug && collectionSlugs.has(slug)) return url(`/zones/${slug}/`);
   return '#';
 }
 ---

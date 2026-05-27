@@ -16,17 +16,18 @@ import Breadcrumb from '@/components/layout/Breadcrumb.astro';
 import ShortHero from '@/components/sections/ShortHero.astro';
 import RealisationsGrid from '@/components/sections/RealisationsGrid.astro';
 import FinalCta from '@/components/sections/FinalCta.astro';
+import { url } from '@/utils/url';
 ---
 
 <BaseLayout
   title="Réalisations — Ypp Plomberie, plombier à Nice"
   description="Découvrez nos derniers chantiers : rénovations de salles de bain, recherches de fuite, installations de chauffe-eau."
-  canonicalPath="/realisations/"
+  canonicalPath={url('/realisations/')}
 >
   <Container width="wide">
     <Breadcrumb
       items={[
-        { label: 'Accueil', href: '/' },
+        { label: 'Accueil', href: url('/') },
         { label: 'Réalisations' },
       ]}
     />

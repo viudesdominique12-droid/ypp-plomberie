@@ -19,6 +19,7 @@ import ZoneCard from '@/components/ui/ZoneCard.astro';
 import Placeholder from '@/components/ui/Placeholder.astro';
 import AnimatedGridPattern from '@/components/ui/AnimatedGridPattern.astro';
 import { getCollection } from 'astro:content';
+import { url } from '@/utils/url';
 
 export interface Props {
   eyebrow?: string;
@@ -56,8 +57,8 @@ const tiles = [
 ];
 
 function tileHref(slug: string | null) {
-  if (slug && collectionSlugs.has(slug)) return `/zones/${slug}/`;
-  return '/zone-intervention/';
+  if (slug && collectionSlugs.has(slug)) return url(`/zones/${slug}/`);
+  return url('/zone-intervention/');
 }
 ---
 

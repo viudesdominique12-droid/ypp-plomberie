@@ -13,17 +13,18 @@ import ShortHero from '@/components/sections/ShortHero.astro';
 import HubZoneSection from '@/components/sections/HubZoneSection.astro';
 import HubZoneCards from '@/components/sections/HubZoneCards.astro';
 import FinalCta from '@/components/sections/FinalCta.astro';
+import { url } from '@/utils/url';
 ---
 
 <BaseLayout
   title="Zone d'intervention du plombier à Nice — Ypp Plomberie"
   description="Plombier intervenant à Nice et toutes les communes alentours : Saint-Laurent-du-Var, Cagnes-sur-Mer, Villefranche-sur-Mer. Devis au 06 03 34 03 05."
-  canonicalPath="/zone-intervention/"
+  canonicalPath={url('/zone-intervention/')}
 >
   <Container width="wide">
     <Breadcrumb
       items={[
-        { label: 'Accueil', href: '/' },
+        { label: 'Accueil', href: url('/') },
         { label: "Zone d'intervention" },
       ]}
     />

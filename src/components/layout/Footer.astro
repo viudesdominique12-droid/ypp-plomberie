@@ -14,6 +14,7 @@ import Container from '@/components/ui/Container.astro';
 import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { nap, site, labels } from '@/data/site';
+import { url } from '@/utils/url';
 import { getCollection } from 'astro:content';
 
 const services = (await getCollection('services')).sort(
@@ -30,7 +31,7 @@ const year = new Date().getFullYear();
   <Container width="wide" as="div">
     <div class="site-footer__grid">
       <section class="site-footer__brand-col" aria-label="À propos">
-        <a class="site-footer__brand" href="/" aria-label={`Accueil — ${site.name}`}>
+        <a class="site-footer__brand" href={url('/')} aria-label={`Accueil — ${site.name}`}>
           <span class="site-footer__wordmark">Ypp<span class="site-footer__dot">.</span></span>
           <span class="site-footer__tag">Plomberie · Nice</span>
         </a>
@@ -56,7 +57,7 @@ const year = new Date().getFullYear();
         <ul role="list" class="site-footer__list">
           {services.map((s) => (
             <li>
-              <a href={`/services/${s.data.slug}/`}>{s.data.title}</a>
+              <a href={url(`/services/${s.data.slug}/`)}>{s.data.title}</a>
             </li>
           ))}
         </ul>
@@ -65,10 +66,10 @@ const year = new Date().getFullYear();
       <nav class="site-footer__col" aria-label="Zones desservies">
         <p class="site-footer__col-title">Zones</p>
         <ul role="list" class="site-footer__list">
-          <li><a href="/">Nice & alentours</a></li>
+          <li><a href={url('/')}>Nice & alentours</a></li>
           {zones.map((z) => (
             <li>
-              <a href={`/zones/${z.data.slug}/`}>{z.data.commune}</a>
+              <a href={url(`/zones/${z.data.slug}/`)}>{z.data.commune}</a>
             </li>
           ))}
         </ul>
@@ -82,9 +83,9 @@ const year = new Date().getFullYear();
           <li>{nap.address.city} ({nap.address.postalCode})</li>
         </ul>
         <div class="site-footer__legal">
-          <a href="/mentions-legales/">Mentions légales</a>
+          <a href={url('/mentions-legales/')}>Mentions légales</a>
           <span aria-hidden="true">·</span>
-          <a href="/politique-de-confidentialite/">Confidentialité</a>
+          <a href={url('/politique-de-confidentialite/')}>Confidentialité</a>
         </div>
       </section>
     </div>

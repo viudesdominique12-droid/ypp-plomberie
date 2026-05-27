@@ -21,6 +21,7 @@ import ZoneHero from '@/components/sections/ZoneHero.astro';
 import InterventionLocaleSection from '@/components/sections/InterventionLocaleSection.astro';
 import ZoneServicesSection from '@/components/sections/ZoneServicesSection.astro';
 import FinalCta from '@/components/sections/FinalCta.astro';
+import { url } from '@/utils/url';
 
 export interface ZoneData {
   commune: string;
@@ -44,13 +45,13 @@ const { data, chips } = Astro.props;
 <BaseLayout
   title={data.metaTitle}
   description={data.metaDescription}
-  canonicalPath={`/zones/${data.slug}/`}
+  canonicalPath={url(`/zones/${data.slug}/`)}
 >
   <Container width="wide">
     <Breadcrumb
       items={[
-        { label: 'Accueil', href: '/' },
-        { label: "Zone d'intervention", href: '/zone-intervention/' },
+        { label: 'Accueil', href: url('/') },
+        { label: "Zone d'intervention", href: url('/zone-intervention/') },
         { label: data.commune },
       ]}
     />

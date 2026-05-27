@@ -18,6 +18,7 @@
 
 import Icon from '@/components/ui/Icon.astro';
 import { nap, labels } from '@/data/site';
+import { url } from '@/utils/url';
 
 const currentPath = Astro.url.pathname;
 function isCurrent(href: string): boolean {
@@ -32,18 +33,18 @@ interface NavIcon {
 }
 
 const sideItems: NavIcon[] = [
-  { label: 'Accueil',      href: '/',                     icon: 'home' },
-  { label: 'Services',     href: '/services/',            icon: 'wrench' },
-  { label: 'Zone',         href: '/zone-intervention/',   icon: 'map-pin' },
-  { label: 'Réalisations', href: '/realisations/',        icon: 'image' },
-  { label: 'À propos',     href: '/a-propos/',            icon: 'user' },
-  { label: 'Contact',      href: '/contact/',             icon: 'mail' },
+  { label: 'Accueil',      href: url('/'),                     icon: 'home' },
+  { label: 'Services',     href: url('/services/'),            icon: 'wrench' },
+  { label: 'Zone',         href: url('/zone-intervention/'),   icon: 'map-pin' },
+  { label: 'Réalisations', href: url('/realisations/'),        icon: 'image' },
+  { label: 'À propos',     href: url('/a-propos/'),            icon: 'user' },
+  { label: 'Contact',      href: url('/contact/'),             icon: 'mail' },
 ];
 ---
 
 <aside class="side-nav" aria-label="Navigation principale">
   <div class="side-nav__pill">
-    <a href="/" class="side-nav__brand" aria-label="Accueil — Ypp Plomberie">
+    <a href={url('/')} class="side-nav__brand" aria-label="Accueil — Ypp Plomberie">
       <span class="side-nav__brand-mark">Y</span>
       <span class="side-nav__brand-dot" aria-hidden="true"></span>
     </a>

@@ -12,6 +12,7 @@
 
 import ContentLayout from '@/layouts/ContentLayout.astro';
 import { nap, site } from '@/data/site';
+import { url } from '@/utils/url';
 ---
 
 <ContentLayout
@@ -19,8 +20,8 @@ import { nap, site } from '@/data/site';
   description="Politique de confidentialité d'Ypp Plomberie : données collectées, finalité, durée de conservation, droits RGPD."
   h1="Politique de confidentialité"
   eyebrow="Informations légales"
-  breadcrumb={[{ label: 'Accueil', href: '/' }]}
-  canonicalPath="/politique-de-confidentialite/"
+  breadcrumb={[{ label: 'Accueil', href: url('/') }]}
+  canonicalPath={url('/politique-de-confidentialite/')}
   updatedAt="Dernière mise à jour — à compléter à la mise en ligne"
   noStickyCallBar={true}
 >
