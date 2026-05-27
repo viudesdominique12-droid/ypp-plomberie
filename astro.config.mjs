@@ -1,19 +1,23 @@
 // @ts-check
 /**
- * Astro configuration — Ypp Plomberie (Phase 1).
+ * Astro configuration — Ypp Plomberie.
  *
- * Rôle : configurer Astro pour un site 100 % statique (SSG) avec sitemap.
- * Utilisé par : Astro CLI (`astro dev`, `astro build`, `astro check`).
- *
- * `site` est requis pour générer des URLs absolues correctes dans le sitemap,
- * le canonical et les balises Open Graph. La valeur définitive sera ajustée
- * en phase 2/4 ; pour l'instant, on pointe sur le domaine cible présumé.
+ * Site statique avec sitemap. Déploiement actuel sur GitHub Pages
+ * sous /ypp-plomberie/. À l'achat du domaine custom (ypp-plomberie.fr),
+ * retirer `base` et changer `site` vers le domaine final.
  */
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
+const isProd = process.env.NODE_ENV === 'production';
+
 export default defineConfig({
-  site: 'https://www.ypp-plomberie.fr',
+  // Domaine final (ou GitHub Pages tant qu'on n'a pas branché le domaine).
+  site: isProd
+    ? 'https://viudesdominique12-droid.github.io'
+    : 'https://www.ypp-plomberie.fr',
+  // Sous-chemin GitHub Pages — sera retiré quand le domaine custom sera en place.
+  base: isProd ? '/ypp-plomberie/' : '/',
   trailingSlash: 'always',
   build: {
     format: 'directory',
