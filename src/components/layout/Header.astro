@@ -2,17 +2,21 @@
 /**
  * Header.astro — Layout chrome (couche 4).
  *
- * Registre "Éditorial Architecture" :
- *   - Fond crème pierre (transparent au-dessus du hero, opaque ailleurs).
- *   - Wordmark "Ypp." Fraunces 700 ferme + petit caractère mono "Plomberie · Nice".
- *   - Nav inline en mono uppercase, mini-tracking, séparée par fines barres.
- *   - CTAs : "Devis" texte ghost + "Appeler" terracotta plein.
+ * Comportement :
+ *   - Desktop (≥ 1024 px) : caché — SideNav prend le relais.
+ *   - Mobile/tablette (< 1024 px) : top bar fixe charbon + bouton appel
+ *     terracotta + burger qui ouvre un overlay fullscreen.
+ *
+ * L'overlay est un vrai panneau plein écran (pas <details>) avec :
+ *   - Animation slide + fade
+ *   - Body scroll lock
+ *   - Bouton X de fermeture
+ *   - Items nav en grandes lettres Fraunces
+ *   - CTA appel en bas
  *
  * Rendu dans : src/layouts/BaseLayout.astro.
- * Données lues : src/data/site.ts.
  */
 
-import Container from '@/components/ui/Container.astro';
 import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
 import { primaryNav, nap, labels, site } from '@/data/site';
@@ -28,45 +32,13 @@ function isCurrent(href: string): boolean {
 ---
 
 <header class="site-header" role="banner">
-  <Container width="wide" as="div" class="site-header__inner">
+  <div class="site-header__inner">
     <a class="site-header__brand" href={homeHref} aria-label={`Accueil — ${site.name}`}>
       <span class="site-header__wordmark">Ypp<span class="site-header__dot">.</span></span>
       <span class="site-header__tag">Plomberie · Nice</span>
     </a>
 
-    {/* Desktop nav */}
-    <nav class="site-header__nav-desk" aria-label="Navigation principale">
-      <ul class="site-header__nav-list" role="list">
-        {primaryNav.filter((n) => n.href !== homeHref).map((item) => (
-          <li>
-            <a
-              href={item.href}
-              class={`site-header__nav-link${isCurrent(item.href) ? ' is-current' : ''}`}
-              aria-current={isCurrent(item.href) ? 'page' : undefined}
-            >
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-
-    {/* CTAs desktop */}
-    <div class="site-header__cta-desk">
-      <a href={url('/contact/')} class="site-header__quote">Devis sous 24 h</a>
-      <Button
-        href={`tel:${nap.phoneE164}`}
-        variant="urgence"
-        size="sm"
-        ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
-      >
-        <Icon slot="icon-leading" name="phone" size={14} />
-        {nap.phoneDisplay}
-      </Button>
-    </div>
-
-    {/* Mobile actions */}
-    <div class="site-header__cta-mob">
+    <div class="site-header__actions">
       <Button
         href={`tel:${nap.phoneE164}`}
         variant="urgence"
@@ -75,47 +47,129 @@ function isCurrent(href: string): boolean {
       >
         <Icon name="phone" size={14} />
       </Button>
-      <details class="site-header__menu">
-        <summary class="site-header__burger" aria-label="Ouvrir le menu">
-          <Icon name="menu" size={20} />
-          <span class="visually-hidden">Menu</span>
-        </summary>
-        <nav class="site-header__panel" aria-label="Navigation mobile">
-          <ul role="list">
-            {primaryNav.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  class={`site-header__panel-link${isCurrent(item.href) ? ' is-current' : ''}`}
-                  aria-current={isCurrent(item.href) ? 'page' : undefined}
-                >
-                  {item.label}
-                </a>
-                {item.children && (
-                  <ul role="list" class="site-header__panel-sub">
-                    {item.children.map((c) => (
-                      <li>
-                        <a
-                          href={c.href}
-                          class={`site-header__panel-sublink${isCurrent(c.href) ? ' is-current' : ''}`}
-                          aria-current={isCurrent(c.href) ? 'page' : undefined}
-                        >
-                          {c.label}
-                        </a>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </li>
-            ))}
-          </ul>
-        </nav>
-      </details>
+      <button
+        type="button"
+        class="site-header__burger"
+        aria-label="Ouvrir le menu"
+        aria-expanded="false"
+        aria-controls="mobileMenu"
+        data-menu-toggle
+      >
+        <span class="site-header__burger-bars" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      </button>
     </div>
-  </Container>
+  </div>
 </header>
 
+{/* === Overlay menu mobile fullscreen === */}
+<div
+  class="mobile-menu"
+  id="mobileMenu"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Menu de navigation"
+  aria-hidden="true"
+  data-menu-panel
+>
+  <div class="mobile-menu__top">
+    <a href={homeHref} class="mobile-menu__brand" data-menu-link aria-label={`Accueil — ${site.name}`}>
+      <span class="mobile-menu__wordmark">Ypp<span class="mobile-menu__dot">.</span></span>
+    </a>
+    <button
+      type="button"
+      class="mobile-menu__close"
+      aria-label="Fermer le menu"
+      data-menu-toggle
+    >
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" aria-hidden="true">
+        <path d="M6 6l12 12M6 18L18 6" />
+      </svg>
+    </button>
+  </div>
+
+  <nav class="mobile-menu__nav" aria-label="Navigation principale">
+    <ul class="mobile-menu__list" role="list">
+      {primaryNav.map((item, i) => (
+        <li class="mobile-menu__item" style={`--i: ${i};`}>
+          <a
+            href={item.href}
+            class={`mobile-menu__link${isCurrent(item.href) ? ' is-current' : ''}`}
+            data-menu-link
+            aria-current={isCurrent(item.href) ? 'page' : undefined}
+          >
+            <span class="mobile-menu__index">{String(i + 1).padStart(2, '0')}</span>
+            <span class="mobile-menu__label">{item.label}</span>
+            <span class="mobile-menu__arrow" aria-hidden="true">→</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+
+  <div class="mobile-menu__footer">
+    <a
+      href={`tel:${nap.phoneE164}`}
+      class="mobile-menu__call"
+      data-menu-link
+      aria-label={`${labels.callNow} — ${nap.phoneDisplay}`}
+    >
+      <Icon name="phone" size={18} />
+      <span>{nap.phoneDisplay}</span>
+    </a>
+    <p class="mobile-menu__hours">{nap.hours.label}</p>
+  </div>
+</div>
+
+<script>
+  function initMobileMenu() {
+    const toggles = document.querySelectorAll<HTMLElement>('[data-menu-toggle]');
+    const panel = document.querySelector<HTMLElement>('[data-menu-panel]');
+    const links = document.querySelectorAll<HTMLElement>('[data-menu-link]');
+    if (!panel) return;
+
+    const open = () => {
+      panel.setAttribute('data-open', 'true');
+      panel.setAttribute('aria-hidden', 'false');
+      document.documentElement.classList.add('menu-open');
+      document.body.classList.add('menu-open');
+      toggles.forEach((t) => t.setAttribute('aria-expanded', 'true'));
+    };
+    const close = () => {
+      panel.removeAttribute('data-open');
+      panel.setAttribute('aria-hidden', 'true');
+      document.documentElement.classList.remove('menu-open');
+      document.body.classList.remove('menu-open');
+      toggles.forEach((t) => t.setAttribute('aria-expanded', 'false'));
+    };
+    const toggle = () => {
+      if (panel.hasAttribute('data-open')) close();
+      else open();
+    };
+
+    toggles.forEach((t) => t.addEventListener('click', toggle));
+    links.forEach((l) => l.addEventListener('click', close));
+    // ESC ferme le menu
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && panel.hasAttribute('data-open')) close();
+    });
+    // Astro view-transitions : ferme le menu sur navigation
+    document.addEventListener('astro:before-swap', close);
+  }
+  initMobileMenu();
+  document.addEventListener('astro:after-swap', initMobileMenu);
+</script>
+
 <style>
+  /* === En desktop, le Header est remplacé par le SideNav === */
+  @media (min-width: 1024px) {
+    .site-header { display: none; }
+  }
+
+  /* === Top bar mobile === */
   .site-header {
     position: sticky;
     top: 0;
@@ -125,190 +179,266 @@ function isCurrent(href: string): boolean {
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--color-border-soft);
   }
-  /* En desktop, le SideNav prend le relais. Le header reste pour mobile. */
-  @media (min-width: 1024px) {
-    .site-header { display: none; }
-  }
   .site-header__inner {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--space-4);
-    padding-block: 18px;
+    gap: var(--space-3);
+    padding: 12px 16px;
+    max-width: 100%;
   }
 
-  /* === Brand wordmark === */
+  /* Brand */
   .site-header__brand {
     display: inline-flex;
     align-items: baseline;
-    gap: 10px;
+    gap: 8px;
     text-decoration: none;
     color: inherit;
-    flex-shrink: 0;
+    flex: 0 1 auto;
+    min-width: 0;
   }
   .site-header__wordmark {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    font-size: 1.375rem;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--color-text);
+  }
+  .site-header__dot { color: var(--color-terra); }
+  .site-header__tag {
+    font-family: var(--font-family-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+    white-space: nowrap;
+  }
+  @media (max-width: 420px) {
+    .site-header__tag { display: none; }
+  }
+
+  /* Actions mobiles */
+  .site-header__actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  /* Bouton burger (custom — pas d'icône, 3 traits animés) */
+  .site-header__burger {
+    width: 42px;
+    height: 42px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border-strong);
+    background: var(--color-surface);
+    color: var(--color-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color var(--transition-fast) var(--ease-out);
+  }
+  .site-header__burger:hover {
+    background: var(--color-surface-alt);
+  }
+  .site-header__burger-bars {
+    position: relative;
+    width: 18px;
+    height: 12px;
+    display: inline-block;
+  }
+  .site-header__burger-bars span {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1.5px;
+    background: currentColor;
+    border-radius: 1px;
+    transition: transform var(--transition-base) var(--ease-out), opacity var(--transition-fast) var(--ease-out);
+  }
+  .site-header__burger-bars span:nth-child(1) { top: 0; }
+  .site-header__burger-bars span:nth-child(2) { top: 50%; transform: translateY(-50%); }
+  .site-header__burger-bars span:nth-child(3) { bottom: 0; }
+
+  /* === Overlay menu fullscreen === */
+  .mobile-menu {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-modal);
+    background: var(--color-surface-dark);
+    color: var(--color-on-dark);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-12px);
+    transition:
+      opacity var(--transition-base) var(--ease-out),
+      transform var(--transition-base) var(--ease-out),
+      visibility 0s linear var(--transition-base);
+    overflow-y: auto;
+  }
+  .mobile-menu[data-open] {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition:
+      opacity var(--transition-base) var(--ease-out),
+      transform var(--transition-base) var(--ease-out),
+      visibility 0s linear 0s;
+  }
+  @media (min-width: 1024px) {
+    .mobile-menu { display: none; }
+  }
+  :global(html.menu-open),
+  :global(body.menu-open) {
+    overflow: hidden;
+  }
+
+  /* Top du menu : brand + close */
+  .mobile-menu__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid rgba(238, 243, 246, 0.08);
+  }
+  .mobile-menu__brand {
+    text-decoration: none;
+    color: inherit;
+  }
+  .mobile-menu__wordmark {
     font-family: var(--font-family-display);
     font-weight: var(--font-weight-bold);
     font-size: 1.5rem;
     letter-spacing: -0.04em;
     line-height: 1;
-    color: var(--color-text);
+    color: var(--color-on-dark);
   }
-  .site-header__dot {
+  .mobile-menu__dot { color: var(--color-terra); }
+  .mobile-menu__close {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-on-dark);
+    border: 1px solid rgba(238, 243, 246, 0.2);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color var(--transition-fast) var(--ease-out);
+  }
+  .mobile-menu__close:hover {
+    background: rgba(238, 243, 246, 0.08);
+  }
+
+  /* Liste de navigation */
+  .mobile-menu__nav {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: clamp(1.5rem, 6vw, 3rem) clamp(1.25rem, 4vw, 2rem);
+  }
+  .mobile-menu__list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .mobile-menu__item {
+    border-bottom: 1px solid rgba(238, 243, 246, 0.1);
+    /* Stagger d'entrée des items */
+    opacity: 0;
+    transform: translateY(8px);
+    transition:
+      opacity 400ms var(--ease-out),
+      transform 400ms var(--ease-out);
+    transition-delay: calc(var(--i, 0) * 50ms + 100ms);
+  }
+  .mobile-menu[data-open] .mobile-menu__item {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .mobile-menu__link {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: var(--space-4);
+    padding: 18px 4px;
+    text-decoration: none;
+    color: var(--color-on-dark);
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(1.625rem, 6vw, 2.25rem);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    transition: color var(--transition-fast) var(--ease-out);
+  }
+  .mobile-menu__link:hover { color: var(--color-terra); }
+  .mobile-menu__link.is-current {
     color: var(--color-terra);
   }
-  .site-header__tag {
+  .mobile-menu__index {
+    font-family: var(--font-family-mono);
+    font-weight: var(--font-weight-regular);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    color: rgba(238, 243, 246, 0.5);
+    align-self: center;
+  }
+  .mobile-menu__label { display: inline-block; }
+  .mobile-menu__arrow {
+    font-size: 1rem;
+    color: rgba(238, 243, 246, 0.5);
+    align-self: center;
+    transition: transform var(--transition-base) var(--ease-out), color var(--transition-base) var(--ease-out);
+  }
+  .mobile-menu__link:hover .mobile-menu__arrow,
+  .mobile-menu__link.is-current .mobile-menu__arrow {
+    transform: translateX(4px);
+    color: var(--color-terra);
+  }
+
+  /* Footer du menu : CTA appel en gros */
+  .mobile-menu__footer {
+    padding: clamp(1.5rem, 4vw, 2.5rem) clamp(1.25rem, 4vw, 2rem);
+    border-top: 1px solid rgba(238, 243, 246, 0.1);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .mobile-menu__call {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 18px 24px;
+    border-radius: var(--radius-sm);
+    background: var(--color-terra);
+    color: var(--color-on-urgent);
+    text-decoration: none;
+    font-family: var(--font-family-mono);
+    font-size: 1.0625rem;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.04em;
+    font-variant-numeric: tabular-nums;
+    transition: background-color var(--transition-fast) var(--ease-out);
+  }
+  .mobile-menu__call:hover {
+    background: var(--color-terra-hover);
+  }
+  .mobile-menu__hours {
+    margin: 0;
     font-family: var(--font-family-mono);
     font-size: 0.65rem;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--color-text-soft);
-    display: none;
-  }
-  @media (min-width: 640px) {
-    .site-header__tag { display: inline; }
-  }
-
-  /* === Desktop nav (cachés par défaut, révélés en >=1024px) === */
-  .site-header__nav-desk { display: none; }
-  .site-header__cta-desk { display: none; }
-
-  /* === Mobile actions (visibles par défaut, cachées en >=1024px) === */
-  .site-header__cta-mob {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  @media (min-width: 1024px) {
-    .site-header__inner {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      align-items: center;
-      gap: var(--space-8);
-    }
-    .site-header__nav-desk { display: block; }
-    .site-header__cta-desk {
-      display: flex;
-      gap: var(--space-5);
-      align-items: center;
-      justify-content: flex-end;
-    }
-    .site-header__cta-mob { display: none; }
-  }
-
-  .site-header__nav-list {
-    display: flex;
-    align-items: center;
-    gap: 28px;
-  }
-  .site-header__nav-link {
-    position: relative;
-    padding: 4px 0;
-    font-family: var(--font-family-mono);
-    font-size: 0.7rem;
-    font-weight: var(--font-weight-medium);
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--color-text);
-    text-decoration: none;
-    transition: color var(--transition-fast) var(--ease-out);
-  }
-  .site-header__nav-link::after {
-    content: '';
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -2px;
-    height: 1px;
-    background: var(--color-text);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform var(--transition-base) var(--ease-out);
-  }
-  .site-header__nav-link:hover { color: var(--color-text); }
-  .site-header__nav-link:hover::after,
-  .site-header__nav-link.is-current::after {
-    transform: scaleX(1);
-  }
-  .site-header__nav-link.is-current {
-    color: var(--color-text);
-  }
-
-  /* Lien "Devis sous 24 h" — pas un bouton, lien éditorial souligné. */
-  .site-header__quote {
-    font-family: var(--font-family-mono);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.14em;
-    color: var(--color-text);
-    text-decoration: none;
-    border-bottom: 1px solid var(--color-text);
-    padding-bottom: 4px;
-    transition: color var(--transition-fast) var(--ease-out);
-  }
-  .site-header__quote:hover {
-    color: var(--color-terra);
-    border-color: var(--color-terra);
-  }
-
-  /* === Mobile menu panel === */
-  .site-header__menu { position: relative; }
-  .site-header__burger {
-    width: 44px;
-    height: 44px;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-border-strong);
-    background: transparent;
-    color: var(--color-text);
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    list-style: none;
-    cursor: pointer;
-  }
-  .site-header__burger::-webkit-details-marker { display: none; }
-  .site-header__panel {
-    position: absolute;
-    top: calc(100% + 12px);
-    right: 0;
-    min-width: 260px;
-    background: var(--color-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    box-shadow: var(--shadow-md);
-    padding: var(--space-3);
-    z-index: var(--z-overlay);
-  }
-  .site-header__panel ul { display: flex; flex-direction: column; gap: 2px; }
-  .site-header__panel-link,
-  .site-header__panel-sublink {
-    display: block;
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-    text-decoration: none;
-    color: var(--color-text);
-    font-family: var(--font-family-base);
-    font-size: 0.95rem;
-    font-weight: var(--font-weight-medium);
-  }
-  .site-header__panel-sublink {
-    font-size: 0.8125rem;
-    color: var(--color-text-muted);
-    padding: 6px 12px;
-  }
-  .site-header__panel-link:hover,
-  .site-header__panel-sublink:hover {
-    background: var(--color-surface-alt);
-  }
-  .site-header__panel-link.is-current,
-  .site-header__panel-sublink.is-current {
-    color: var(--color-terra);
-    font-weight: var(--font-weight-semibold);
-  }
-  .site-header__panel-sub {
-    padding-left: 14px;
-    border-left: 1px solid var(--color-border-soft);
-    margin: 4px 0 8px 14px;
+    color: rgba(238, 243, 246, 0.55);
   }
 </style>
