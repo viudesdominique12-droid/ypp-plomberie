@@ -2,33 +2,26 @@
 /**
  * ProcessSteps.astro — Section.
  *
- * Rôle : process en 4 étapes via `Stepper`. Sur l'accueil et les
- * pages services, communique la prévisibilité de la prestation.
- *
- * Rendu dans : src/pages/index.astro, ServiceProcessSection (qui
- * réutilise Stepper directement avec contenu spécifique).
+ * Direction "Éditorial Architecture" :
+ *   - 4 grands chiffres mono ("01 → 04") à gauche, titre + description
+ *     à droite. Disposition liste éditoriale.
+ *   - Pas de Stepper round avec ronds bleus — on traite ça en plan
+ *     éditorial avec lignes horizontales fines.
  */
 
 import Section from '@/components/ui/Section.astro';
-import SectionHeading from '@/components/ui/SectionHeading.astro';
-import Stepper from '@/components/ui/Stepper.astro';
 
 export interface Props {
   eyebrow?: string;
   title?: string;
-  lead?: string;
   surface?: 'default' | 'alt';
-  steps?: {
-    title: string;
-    description: string;
-  }[];
+  steps?: { title: string; description: string }[];
 }
 
 const {
-  eyebrow = 'Méthode',
+  eyebrow = 'Notre méthode',
   title = 'Quatre étapes, zéro mauvaise surprise',
-  lead,
-  surface = 'default',
+  surface = 'alt',
   steps = [
     {
       title: 'Appel & écoute',
@@ -54,7 +47,139 @@ const {
 } = Astro.props;
 ---
 
-<Section id="ProcessSteps" surface={surface} spacing="lg">
-  <SectionHeading eyebrow={eyebrow} title={title} lead={lead} />
-  <Stepper steps={steps} headingLevel={3} columns={4} />
+<Section id="ProcessSteps" surface={surface} spacing="lg" width="wide">
+  <header class="process-steps__head">
+    <p class="process-steps__eyebrow" data-anim="rise">
+      <span>04</span>
+      <span class="process-steps__rule"></span>
+      <span>{eyebrow}</span>
+    </p>
+    <h2 class="process-steps__title" data-anim="rise">{title}</h2>
+  </header>
+
+  <ol class="process-steps__list" role="list">
+    {steps.map((s, i) => (
+      <li class="process-steps__item" data-anim="rise">
+        <span class="process-steps__num">{String(i + 1).padStart(2, '0')}</span>
+        <h3 class="process-steps__step-title">{s.title}</h3>
+        <p class="process-steps__step-desc">{s.description}</p>
+      </li>
+    ))}
+  </ol>
 </Section>
+
+<style>
+  .process-steps__head {
+    margin-bottom: clamp(3rem, 5vw, 4.5rem);
+    max-width: 900px;
+  }
+  .process-steps__eyebrow {
+    margin: 0 0 clamp(1.5rem, 3vw, 2rem);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-family: var(--font-family-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+  .process-steps__rule {
+    display: inline-block;
+    width: 48px;
+    height: 1px;
+    background: var(--color-text-soft);
+  }
+  .process-steps__title {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    line-height: 1.02;
+    letter-spacing: var(--letter-spacing-tighter);
+    color: var(--color-text);
+  }
+
+  .process-steps__list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--color-border);
+  }
+  @media (min-width: 768px) {
+    .process-steps__list {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .process-steps__list {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  .process-steps__item {
+    padding: clamp(2rem, 3.5vw, 3rem) clamp(1.25rem, 2vw, 2rem) clamp(2rem, 3.5vw, 3rem) 0;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+  }
+  @media (min-width: 768px) {
+    .process-steps__item {
+      border-right: 1px solid var(--color-border);
+      padding-right: clamp(1.5rem, 2.5vw, 2.5rem);
+      padding-left: 0;
+    }
+    .process-steps__item:nth-child(2n) {
+      border-right: 0;
+      padding-right: 0;
+      padding-left: clamp(1.5rem, 2.5vw, 2.5rem);
+    }
+  }
+  @media (min-width: 1024px) {
+    .process-steps__item {
+      border-right: 1px solid var(--color-border);
+      border-bottom: 0;
+      padding: 0 clamp(1.5rem, 2.5vw, 2.5rem) 0 0;
+    }
+    .process-steps__item:nth-child(2n) {
+      border-right: 1px solid var(--color-border);
+      padding-right: clamp(1.5rem, 2.5vw, 2.5rem);
+      padding-left: 0;
+    }
+    .process-steps__item:nth-child(4n) {
+      border-right: 0;
+      padding-right: 0;
+    }
+    .process-steps__item:not(:nth-child(4n)) {
+      padding-right: clamp(1.5rem, 2.5vw, 2.5rem);
+    }
+    .process-steps__item:not(:nth-child(4n + 1)) {
+      padding-left: clamp(1.5rem, 2.5vw, 2.5rem);
+    }
+  }
+
+  .process-steps__num {
+    font-family: var(--font-family-mono);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: var(--font-weight-regular);
+    letter-spacing: -0.05em;
+    line-height: 1;
+    color: var(--color-text);
+    display: inline-block;
+  }
+  .process-steps__step-title {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(1.25rem, 1.6vw, 1.5rem);
+    line-height: 1.15;
+    color: var(--color-text);
+  }
+  .process-steps__step-desc {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+</style>

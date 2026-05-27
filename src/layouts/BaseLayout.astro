@@ -14,19 +14,25 @@
  * Données lues : src/data/site.ts (NAP pour JSON-LD).
  */
 
-/* Polices d'identité — chargées en local via @fontsource pour
-   éviter la dépendance à Google Fonts en production. */
-import '@fontsource/playfair-display/500.css';
-import '@fontsource/playfair-display/600.css';
-import '@fontsource/playfair-display/500-italic.css';
-import '@fontsource/playfair-display/600-italic.css';
+/* Polices d'identité — direction "Éditorial Architecture" :
+   Fraunces (display serif moderne) + Inter (corps) + JetBrains Mono
+   (chiffres/meta). Chargées en local via @fontsource. */
+import '@fontsource/fraunces/400.css';
+import '@fontsource/fraunces/500.css';
+import '@fontsource/fraunces/600.css';
+import '@fontsource/fraunces/700.css';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
 import '@fontsource/inter/600.css';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/500.css';
 
 import '@/styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import Seo from '@/components/layout/Seo.astro';
+import SiteBackground from '@/components/layout/SiteBackground.astro';
 import Header from '@/components/layout/Header.astro';
+import SideNav from '@/components/layout/SideNav.astro';
 import Footer from '@/components/layout/Footer.astro';
 import StickyCallBar from '@/components/layout/StickyCallBar.astro';
 import { site, nap, labels } from '@/data/site';
@@ -119,7 +125,7 @@ const jsonLdBusiness = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#0E6480" />
+    <meta name="theme-color" content="#1F3D4E" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="alternate icon" href="/favicon.ico" />
 
@@ -133,11 +139,27 @@ const jsonLdBusiness = {
     />
 
     <script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLdBusiness)} />
+
+    <ClientRouter />
   </head>
   <body>
     <a class="skip-link" href="#main">{labels.skipToContent}</a>
 
+    {/* SVG filters globaux — sharpening pour les photos basse résolution. */}
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+      <defs>
+        <filter id="img-sharpen">
+          <feConvolveMatrix
+            order="3"
+            preserveAlpha="true"
+            kernelMatrix="0 -0.4 0  -0.4 2.6 -0.4  0 -0.4 0" />
+        </filter>
+      </defs>
+    </svg>
+
+    <SiteBackground />
     <Header />
+    <SideNav />
 
     <main id="main" class={hideStickyCallBar ? '' : 'has-sticky-cta'}>
       <slot />
@@ -147,35 +169,10 @@ const jsonLdBusiness = {
 
     {!hideStickyCallBar && <StickyCallBar />}
 
-    {/* Petit runtime global : spotlight cursor-following pour les cartes
-        portant l'attribut [data-spotlight]. Inspiré de Magic UI Magic Card
-        / 21st.dev Spotlight Card, adapté CSS-only sans React. */}
+    {/* Motion runtime — Lenis + GSAP + ScrollTrigger.
+        Charge en module (différé), respecte prefers-reduced-motion. */}
     <script>
-      function bindSpotlight(card: HTMLElement) {
-        if (card.dataset.spotlightBound) return;
-        card.dataset.spotlightBound = '1';
-        const onMove = (e: MouseEvent) => {
-          const rect = card.getBoundingClientRect();
-          card.style.setProperty('--spot-x', e.clientX - rect.left + 'px');
-          card.style.setProperty('--spot-y', e.clientY - rect.top + 'px');
-        };
-        const onEnter = () => card.style.setProperty('--spot-opacity', '1');
-        const onLeave = () => card.style.setProperty('--spot-opacity', '0');
-        card.addEventListener('mousemove', onMove);
-        card.addEventListener('mouseenter', onEnter);
-        card.addEventListener('mouseleave', onLeave);
-      }
-      function bindAll() {
-        document
-          .querySelectorAll<HTMLElement>('[data-spotlight]')
-          .forEach(bindSpotlight);
-      }
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', bindAll);
-      } else {
-        bindAll();
-      }
-      document.addEventListener('astro:page-load', bindAll);
+      import '@/scripts/motion';
     </script>
   </body>
 </html>

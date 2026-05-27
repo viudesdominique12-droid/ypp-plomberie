@@ -1,0 +1,141 @@
+---
+/**
+ * PlacesBand.astro — Section.
+ *
+ * Bandeau "où on intervient" — défilement marquee continu lent sur fond
+ * charbon. Quartiers en mono uppercase séparés par point terracotta.
+ * Marquee CSS pur, dédoublé pour bouclage seamless. Pause au hover.
+ */
+
+const places = [
+  'Cimiez',
+  'Vieux-Nice',
+  'Riquier',
+  'Mont-Boron',
+  'Saint-Roch',
+  'Libération',
+  'Cagnes-sur-Mer',
+  'Saint-Laurent-du-Var',
+  'Villefranche',
+  'Beaulieu',
+  'Èze',
+  'Saint-Jean-Cap-Ferrat',
+  "Cap d'Ail",
+];
+---
+
+<!-- [Section: PlacesBand] -->
+<section id="PlacesBand" class="places-band" aria-label="Zones d'intervention">
+  <div class="places-band__inner">
+    <p class="places-band__label">
+      <span>Intervention</span>
+      <span class="places-band__rule"></span>
+    </p>
+    <div class="places-band__track" aria-hidden="true">
+      <ul class="places-band__list" role="list">
+        {places.map((p) => (
+          <li>
+            <span>{p}</span>
+            <span class="places-band__sep">·</span>
+          </li>
+        ))}
+      </ul>
+      <ul class="places-band__list" role="list" aria-hidden="true">
+        {places.map((p) => (
+          <li>
+            <span>{p}</span>
+            <span class="places-band__sep">·</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+    <ul class="visually-hidden" role="list">
+      {places.map((p) => <li>{p}</li>)}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .places-band {
+    background: var(--color-surface-dark);
+    color: var(--color-on-dark);
+    border-block: 1px solid rgba(244, 241, 235, 0.08);
+    overflow: hidden;
+  }
+  .places-band__inner {
+    padding-block: clamp(1.5rem, 2vw, 2rem);
+    padding-left: clamp(1.25rem, 4vw, 3rem);
+    display: flex;
+    align-items: center;
+    gap: clamp(1.5rem, 3vw, 3rem);
+  }
+  .places-band__label {
+    margin: 0;
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-family-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(244, 241, 235, 0.55);
+  }
+  .places-band__rule {
+    display: inline-block;
+    width: 28px;
+    height: 1px;
+    background: rgba(244, 241, 235, 0.35);
+  }
+
+  /* Track : 2x la liste, animation translate -50% (boucle seamless). */
+  .places-band__track {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  }
+  .places-band__list {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+    padding-right: 18px;
+    white-space: nowrap;
+    font-family: var(--font-family-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-on-dark);
+    animation: places-band-scroll 38s linear infinite;
+  }
+  .places-band__list li {
+    display: inline-flex;
+    align-items: center;
+    gap: 18px;
+  }
+  .places-band__sep {
+    color: var(--color-terra);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .places-band__track:hover .places-band__list,
+  .places-band__track:focus-within .places-band__list {
+    animation-play-state: paused;
+  }
+
+  @keyframes places-band-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-100%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .places-band__list {
+      animation: none;
+    }
+    .places-band__track {
+      overflow-x: auto;
+    }
+  }
+</style>

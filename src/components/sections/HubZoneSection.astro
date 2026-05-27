@@ -2,38 +2,43 @@
 /**
  * HubZoneSection.astro — Section.
  *
- * Rôle : grille `carte + 12 communes` du hub d'intervention.
- *   - Gauche : placeholder.map 440 px ;
- *   - Droite : eyebrow + H3 « Douze communes, un seul artisan » +
- *     filet + grille 2 colonnes de tiles de communes cliquables
- *     (variante `tile` du ZoneCard avec chevron à droite).
+ * Direction "Éditorial cartographique" :
+ *   - Layout 2 colonnes : globe 3D wireframe à gauche, manifeste éditorial +
+ *     grille de communes à droite.
+ *   - Au-dessus du globe : annotations type carte technique (coordonnées,
+ *     périmètre, distance max).
+ *   - Le globe est animé (rotation Y continue) avec dots ville pulsants.
  *
  * Rendu dans : src/pages/zone-intervention/index.astro.
  */
 
 import Section from '@/components/ui/Section.astro';
-import Placeholder from '@/components/ui/Placeholder.astro';
-import ZoneCard from '@/components/ui/ZoneCard.astro';
+import Globe3D from '@/components/ui/Globe3D.astro';
 import { getCollection } from 'astro:content';
 
 const collectionZones = await getCollection('zones');
 const collectionSlugs = new Set(collectionZones.map((z) => z.data.slug));
 
-/* Même liste que ZonesSection — la carte et les 12 communes sont
-   l'angle d'attaque géographique du hub. */
-const tiles = [
-  { commune: 'Nice', slug: null },
-  { commune: 'Cagnes-sur-Mer', slug: 'cagnes-sur-mer' },
-  { commune: 'Saint-Laurent-du-Var', slug: 'saint-laurent-du-var' },
-  { commune: 'Villeneuve-Loubet', slug: null },
-  { commune: 'Antibes', slug: null },
-  { commune: 'Cap d\'Ail', slug: null },
-  { commune: 'Beaulieu-sur-Mer', slug: null },
-  { commune: 'Villefranche-sur-Mer', slug: 'villefranche-sur-mer' },
-  { commune: 'La Trinité', slug: null },
-  { commune: 'Èze', slug: null },
-  { commune: 'Saint-Jean-Cap-Ferrat', slug: null },
-  { commune: 'Roquebrune', slug: null },
+interface Tile {
+  commune: string;
+  slug: string | null;
+  distance: string;
+}
+
+/* 12 communes desservies, avec distance approximative depuis Nice centre. */
+const tiles: Tile[] = [
+  { commune: 'Nice',                   slug: null,                       distance: 'Centre' },
+  { commune: 'Cagnes-sur-Mer',         slug: 'cagnes-sur-mer',           distance: '14 km' },
+  { commune: 'Saint-Laurent-du-Var',   slug: 'saint-laurent-du-var',     distance: '8 km' },
+  { commune: 'Villeneuve-Loubet',      slug: null,                       distance: '18 km' },
+  { commune: 'Antibes',                slug: null,                       distance: '23 km' },
+  { commune: "Cap d'Ail",              slug: null,                       distance: '15 km' },
+  { commune: 'Beaulieu-sur-Mer',       slug: null,                       distance: '10 km' },
+  { commune: 'Villefranche-sur-Mer',   slug: 'villefranche-sur-mer',     distance: '6 km' },
+  { commune: 'La Trinité',             slug: null,                       distance: '7 km' },
+  { commune: 'Èze',                    slug: null,                       distance: '13 km' },
+  { commune: 'Saint-Jean-Cap-Ferrat',  slug: null,                       distance: '11 km' },
+  { commune: 'Roquebrune',             slug: null,                       distance: '22 km' },
 ];
 
 function tileHref(slug: string | null) {
@@ -42,23 +47,70 @@ function tileHref(slug: string | null) {
 }
 ---
 
-<Section id="HubZoneSection" surface="alt" spacing="lg" width="default">
+<Section id="HubZoneSection" surface="default" spacing="lg" width="wide">
   <div class="hub-zone__grid">
-    <Placeholder variant="map" class="hub-zone__map" />
-    <div class="hub-zone__list">
-      <p class="eyebrow">Communes desservies</p>
-      <h3 class="hub-zone__title">Douze communes, un seul artisan</h3>
-      <hr class="brass-rule hub-zone__brass" />
+
+    {/* === Colonne gauche : Globe 3D + annotations === */}
+    <aside class="hub-zone__globe-col" aria-label="Carte des zones d'intervention">
+      <p class="hub-zone__coord">
+        <span>43° 42' N</span>
+        <span class="hub-zone__coord-sep"></span>
+        <span>07° 16' E</span>
+      </p>
+
+      <Globe3D size={360} spinSeconds={32} />
+
+      <dl class="hub-zone__meta">
+        <div>
+          <dt>Périmètre</dt>
+          <dd>~ 30 km autour de Nice</dd>
+        </div>
+        <div>
+          <dt>Distance max</dt>
+          <dd>Roquebrune · 22 km</dd>
+        </div>
+        <div>
+          <dt>Délai centre Nice</dt>
+          <dd>&lt; 1 h en moyenne</dd>
+        </div>
+      </dl>
+    </aside>
+
+    {/* === Colonne droite : Manifeste + grille communes === */}
+    <div class="hub-zone__content">
+      <p class="hub-zone__eyebrow" data-anim="rise">
+        <span>02</span>
+        <span class="hub-zone__rule"></span>
+        <span>Communes desservies</span>
+      </p>
+      <h2 class="hub-zone__title" data-anim="rise">
+        Douze communes,<br /><em>un seul artisan.</em>
+      </h2>
+      <p class="hub-zone__lead" data-anim="rise">
+        De la rade de Villefranche aux collines de Cagnes, en passant par les
+        villas du Cap-Ferrat : un territoire que je connais quartier par
+        quartier, immeuble par immeuble.
+      </p>
+
       <ul class="hub-zone__tiles" role="list">
-        {tiles.map((t) => (
-          <li>
-            <ZoneCard
-              href={tileHref(t.slug)}
-              commune={t.commune}
-              variant="tile"
-            />
-          </li>
-        ))}
+        {tiles.map((t, i) => {
+          const href = tileHref(t.slug);
+          const isLink = href !== '#';
+          const Tag = isLink ? 'a' : 'span';
+          return (
+            <li data-anim="rise">
+              <Tag
+                class={`hub-zone__tile ${isLink ? 'is-link' : 'is-static'}`}
+                {...(isLink ? { href } : {})}
+              >
+                <span class="hub-zone__tile-num">{String(i + 1).padStart(2, '0')}</span>
+                <span class="hub-zone__tile-commune">{t.commune}</span>
+                <span class="hub-zone__tile-distance">{t.distance}</span>
+                {isLink && <span class="hub-zone__tile-arrow" aria-hidden="true">→</span>}
+              </Tag>
+            </li>
+          );
+        })}
       </ul>
     </div>
   </div>
@@ -68,33 +120,182 @@ function tileHref(slug: string | null) {
   .hub-zone__grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: var(--space-8);
+    gap: clamp(3rem, 6vw, 5rem);
     align-items: flex-start;
   }
-  @media (min-width: 768px) {
+  @media (min-width: 1024px) {
     .hub-zone__grid {
-      grid-template-columns: 1.25fr 1fr;
-      gap: 56px;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+      gap: clamp(4rem, 6vw, 6rem);
     }
   }
-  .hub-zone__map {
-    height: 220px;
+
+  /* === Globe colonne === */
+  .hub-zone__globe-col {
+    position: sticky;
+    top: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-block: clamp(1.5rem, 3vw, 2.5rem);
   }
-  @media (min-width: 768px) {
-    .hub-zone__map { height: 440px; }
+  @media (max-width: 1023px) {
+    .hub-zone__globe-col { position: relative; top: auto; }
+  }
+
+  .hub-zone__coord {
+    margin: 0 0 clamp(1.25rem, 2vw, 2rem);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-family-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+  .hub-zone__coord-sep {
+    display: inline-block;
+    width: 24px;
+    height: 1px;
+    background: var(--color-text-soft);
+  }
+
+  .hub-zone__meta {
+    margin: clamp(1.5rem, 3vw, 2.25rem) 0 0;
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    gap: var(--space-3) var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+    text-align: center;
+  }
+  .hub-zone__meta > div {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .hub-zone__meta dt {
+    font-family: var(--font-family-mono);
+    font-size: 0.6rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+  .hub-zone__meta dd {
+    margin: 0;
+    font-family: var(--font-family-base);
+    font-size: 0.875rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
+  }
+
+  /* === Contenu colonne === */
+  .hub-zone__eyebrow {
+    margin: 0 0 clamp(1.25rem, 2vw, 1.75rem);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-3);
+    font-family: var(--font-family-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+  .hub-zone__rule {
+    display: inline-block;
+    width: 36px;
+    height: 1px;
+    background: var(--color-text-soft);
   }
   .hub-zone__title {
-    margin: 14px 0 0 0;
-    font-size: var(--font-size-xl);
-    line-height: 1.25;
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(2rem, 4.5vw, 3.25rem);
+    line-height: 1.02;
+    letter-spacing: var(--letter-spacing-tighter);
+    color: var(--color-text);
   }
-  .hub-zone__brass {
-    margin: 18px 0 0 0;
+  .hub-zone__title em {
+    font-style: italic;
+    color: var(--color-terra);
   }
+  .hub-zone__lead {
+    margin: clamp(1rem, 2vw, 1.5rem) 0 clamp(2rem, 4vw, 3rem);
+    max-width: 540px;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: var(--color-text-muted);
+  }
+
+  /* === Grille tiles communes === */
   .hub-zone__tiles {
-    margin-top: 26px;
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--color-border);
+  }
+  @media (min-width: 640px) {
+    .hub-zone__tiles { grid-template-columns: repeat(2, 1fr); }
+  }
+  .hub-zone__tiles > li {
+    border-bottom: 1px solid var(--color-border);
+  }
+  @media (min-width: 640px) {
+    .hub-zone__tiles > li:nth-child(odd) {
+      border-right: 1px solid var(--color-border);
+    }
+  }
+
+  .hub-zone__tile {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: var(--space-3);
+    padding: clamp(0.875rem, 1.5vw, 1.125rem) clamp(0.5rem, 1.5vw, 1rem);
+    text-decoration: none;
+    color: var(--color-text);
+    transition: background-color var(--transition-fast) var(--ease-out);
+  }
+  .hub-zone__tile.is-link:hover {
+    background-color: rgba(15, 20, 23, 0.04);
+  }
+  .hub-zone__tile.is-link:hover .hub-zone__tile-arrow {
+    transform: translateX(4px);
+    color: var(--color-terra);
+  }
+
+  .hub-zone__tile-num {
+    font-family: var(--font-family-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    color: var(--color-text-soft);
+    min-width: 24px;
+  }
+  .hub-zone__tile-commune {
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(1rem, 1.4vw, 1.125rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .hub-zone__tile-distance {
+    font-family: var(--font-family-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+  .hub-zone__tile-arrow {
+    position: absolute;
+    right: var(--space-3);
+    bottom: var(--space-3);
+    font-size: 0.75rem;
+    color: var(--color-text-soft);
+    transition:
+      transform var(--transition-base) var(--ease-out),
+      color var(--transition-base) var(--ease-out);
   }
 </style>

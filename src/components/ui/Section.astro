@@ -85,12 +85,15 @@ const classes = [
     .section--spacing-lg { padding-block: 96px; }
   }
 
-  .section--default { background-color: var(--color-surface); }
-  .section--alt     { background-color: var(--color-surface-alt); }
-  .section--bg      { background-color: var(--color-bg); }
+  /* default & bg → transparent : laissent voir le SiteBackground
+     (mesh + cercles + blueprint + grain) qui sert de toile pour tout le site. */
+  .section--default { background-color: transparent; }
+  .section--bg      { background-color: transparent; }
+  /* alt → moment de contraste warm, semi-opaque pour densifier */
+  .section--alt     { background-color: rgba(235, 230, 220, 0.7); }
   .section--inverse {
-    background-color: var(--color-azur);
-    color: var(--color-on-accent);
+    background-color: var(--color-text);
+    color: var(--color-on-dark);
   }
 
   .section--inverse :global(h1),

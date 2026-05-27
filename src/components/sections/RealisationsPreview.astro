@@ -2,99 +2,263 @@
 /**
  * RealisationsPreview.astro — Section.
  *
- * Rôle : aperçu visuel des dernières réalisations sur l'accueil.
- *
- * Identité « Baie des Anges » :
- *   - Desktop : mosaïque 3 colonnes × 2 lignes, premier visuel sur
- *     deux lignes (rendu via grid-area).
- *   - Mobile : carousel horizontal scroll-snap, 5 cartes 240 px.
- *   - Visuels : placeholder.photo (lavage tonal, ligne d'horizon).
+ * Direction "Éditorial Architecture" :
+ *   - Cas d'études magazine. Photo grand format à gauche, métadonnées
+ *     (numéro, quartier, surface, type) en mono à droite, légende
+ *     Fraunces italic.
+ *   - Alternance gauche/droite — registre éditorial.
+ *   - 4 cas (les 4 photos disponibles).
  *
  * Rendu dans : src/pages/index.astro.
  */
 
 import Section from '@/components/ui/Section.astro';
-import SectionHeading from '@/components/ui/SectionHeading.astro';
 import Button from '@/components/ui/Button.astro';
-import Icon from '@/components/ui/Icon.astro';
-import Placeholder from '@/components/ui/Placeholder.astro';
+
+interface Case {
+  num: string;
+  title: string;
+  place: string;
+  type: string;
+  surface?: string;
+  duration?: string;
+  image: string;
+  alt: string;
+}
+
+const cases: Case[] = [
+  {
+    num: '01',
+    title: 'Douche italienne, pierre claire et miroirs LED',
+    place: 'Nice Cimiez',
+    type: 'Rénovation complète',
+    surface: '6 m²',
+    duration: '12 jours',
+    image: '/realisations/01-douche-italienne-pierre-claire.jpg',
+    alt: 'Salle de bain rénovée à Nice Cimiez : douche italienne pierre, vasque bois, miroirs LED ronds.',
+  },
+  {
+    num: '02',
+    title: 'Vasque ronde et carrelage anthracite, lumière sculptée',
+    place: 'Mont-Boron',
+    type: 'Rénovation complète',
+    surface: '5 m²',
+    duration: '10 jours',
+    image: '/realisations/02-salle-bain-blanc-anthracite.jpg',
+    alt: 'Salle de bain blanche et anthracite, vasque ronde, miroir LED rectangulaire, douche italienne sombre.',
+  },
+  {
+    num: '03',
+    title: 'Salle d’eau buanderie, carrelage tons clairs',
+    place: 'Saint-Laurent-du-Var',
+    type: 'Salle d’eau + buanderie',
+    surface: '4 m²',
+    duration: '8 jours',
+    image: '/realisations/03-salle-bain-bleu-lave-linge.jpg',
+    alt: 'Salle d’eau compacte avec lave-linge intégré, carrelage bleu pastel, douche italienne.',
+  },
+  {
+    num: '04',
+    title: 'Douche pomme ronde, carrelage anthracite mat',
+    place: 'Villefranche-sur-Mer',
+    type: 'Rénovation douche',
+    surface: '3 m²',
+    duration: '6 jours',
+    image: '/realisations/04-douche-pomme-ronde-anthracite.jpg',
+    alt: 'Douche italienne anthracite avec pomme ronde, mitigeur chromé, étagère intégrée.',
+  },
+];
 ---
 
-<Section id="RealisationsPreview" surface="alt" spacing="lg" width="wide">
-  <SectionHeading
-    eyebrow="Chantiers récents"
-    title="Du dépannage discret à la rénovation pleine page"
-  />
+<Section id="RealisationsPreview" surface="default" spacing="lg" width="wide">
+  <header class="realisations-preview__head">
+    <p class="realisations-preview__eyebrow" data-anim="rise">
+      <span>03</span>
+      <span class="realisations-preview__rule"></span>
+      <span>Chantiers livrés</span>
+    </p>
+    <h2 class="realisations-preview__title" data-anim="rise">
+      Quatre <em>histoires de salles d'eau,</em><br />
+      racontées en pierre, bois et lumière.
+    </h2>
+  </header>
 
-  {/* Mosaïque desktop */}
-  <div class="realisations-preview__grid">
-    <Placeholder variant="photo" class="realisations-preview__hero" radius="14px" />
-    <Placeholder variant="photo" class="realisations-preview__cell" radius="14px" />
-    <Placeholder variant="photo" class="realisations-preview__cell" radius="14px" />
-    <Placeholder variant="photo" class="realisations-preview__cell" radius="14px" />
-    <Placeholder variant="photo" class="realisations-preview__cell" radius="14px" />
-  </div>
-
-  {/* Carousel mobile */}
-  <ul class="realisations-preview__rail" role="list">
-    {Array.from({ length: 5 }).map(() => (
-      <li class="realisations-preview__rail-item">
-        <Placeholder variant="photo" height="180px" radius="14px" />
+  <ol class="realisations-preview__list" role="list">
+    {cases.map((c, i) => (
+      <li class={`realisations-preview__item realisations-preview__item--${i % 2 === 0 ? 'left' : 'right'}`}>
+        <figure class="realisations-preview__figure" data-anim="mask">
+          <img
+            src={c.image}
+            alt={c.alt}
+            class="photo"
+            loading={i < 2 ? 'eager' : 'lazy'}
+            decoding="async"
+            data-parallax="0.18"
+          />
+        </figure>
+        <div class="realisations-preview__meta" data-anim="rise">
+          <span class="realisations-preview__num">{c.num}</span>
+          <h3 class="realisations-preview__case-title">{c.title}</h3>
+          <dl class="realisations-preview__data">
+            <div>
+              <dt>Lieu</dt>
+              <dd>{c.place}</dd>
+            </div>
+            <div>
+              <dt>Type</dt>
+              <dd>{c.type}</dd>
+            </div>
+            {c.surface && (
+              <div>
+                <dt>Surface</dt>
+                <dd>{c.surface}</dd>
+              </div>
+            )}
+            {c.duration && (
+              <div>
+                <dt>Durée</dt>
+                <dd>{c.duration}</dd>
+              </div>
+            )}
+          </dl>
+        </div>
       </li>
     ))}
-  </ul>
+  </ol>
 
   <div class="realisations-preview__cta">
-    <Button href="/realisations/" variant="secondary" size="md">
+    <Button href="/realisations/" variant="secondary" size="lg">
       Voir toutes les réalisations
-      <Icon slot="icon-trailing" name="arrow-right" size={16} />
     </Button>
   </div>
 </Section>
 
 <style>
-  /* Desktop : mosaïque 3 cols × 2 lignes. */
-  .realisations-preview__grid {
-    display: none;
+  .realisations-preview__head {
+    margin-bottom: clamp(3rem, 6vw, 5rem);
+    max-width: 1000px;
   }
-  @media (min-width: 768px) {
-    .realisations-preview__grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(2, 200px);
-      gap: var(--space-4);
+  .realisations-preview__eyebrow {
+    margin: 0 0 clamp(1.5rem, 3vw, 2rem);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-family: var(--font-family-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+  .realisations-preview__rule {
+    display: inline-block;
+    width: 48px;
+    height: 1px;
+    background: var(--color-text-soft);
+  }
+  .realisations-preview__title {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    line-height: 1.02;
+    letter-spacing: var(--letter-spacing-tighter);
+    color: var(--color-text);
+  }
+  .realisations-preview__title em {
+    font-style: italic;
+    color: var(--color-terra);
+  }
+
+  .realisations-preview__list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(4rem, 8vw, 7rem);
+  }
+
+  .realisations-preview__item {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(1.5rem, 4vw, 3rem);
+    align-items: center;
+  }
+  @media (min-width: 900px) {
+    .realisations-preview__item {
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+      gap: clamp(3rem, 6vw, 5rem);
     }
-    .realisations-preview__hero {
-      grid-column: 1;
-      grid-row: 1 / 3;
+    .realisations-preview__item--right {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
     }
-    .realisations-preview__cell {
-      height: 200px;
+    .realisations-preview__item--right .realisations-preview__figure {
+      order: 2;
     }
   }
 
-  /* Mobile : carousel horizontal scroll-snap. */
-  .realisations-preview__rail {
+  .realisations-preview__figure {
+    margin: 0;
+    aspect-ratio: 4 / 3;
+    overflow: hidden;
+    background: var(--color-surface-alt);
+  }
+  .realisations-preview__figure img {
+    width: 100%;
+    /* Hauteur élargie pour ménager le parallax sans découvrir le fond. */
+    height: 115%;
+    object-fit: cover;
+    will-change: transform;
+  }
+
+  .realisations-preview__meta {
+    max-width: 480px;
+  }
+  .realisations-preview__num {
+    display: block;
+    margin-bottom: var(--space-4);
+    font-family: var(--font-family-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-terra);
+  }
+  .realisations-preview__case-title {
+    margin: 0 0 clamp(1.5rem, 3vw, 2.5rem);
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(1.5rem, 2.6vw, 2.125rem);
+    line-height: 1.1;
+    letter-spacing: var(--letter-spacing-tight);
+    color: var(--color-text);
+  }
+  .realisations-preview__data {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4) var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+  }
+  .realisations-preview__data > div {
     display: flex;
-    gap: 12px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding: 4px 0 8px;
-    margin: 0 calc(-1 * var(--grid-gutter));
-    padding-left: var(--grid-gutter);
-    padding-right: var(--grid-gutter);
-    -webkit-overflow-scrolling: touch;
+    flex-direction: column;
+    gap: 4px;
   }
-  @media (min-width: 768px) {
-    .realisations-preview__rail { display: none; }
+  .realisations-preview__data dt {
+    font-family: var(--font-family-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
   }
-  .realisations-preview__rail-item {
-    flex: 0 0 240px;
-    scroll-snap-align: start;
+  .realisations-preview__data dd {
+    margin: 0;
+    font-family: var(--font-family-base);
+    font-size: 0.95rem;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text);
   }
 
   .realisations-preview__cta {
-    margin-top: var(--space-8);
+    margin-top: clamp(4rem, 6vw, 6rem);
     display: flex;
     justify-content: center;
   }

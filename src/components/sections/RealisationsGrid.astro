@@ -1,170 +1,356 @@
 ---
 /**
- * RealisationsGrid.astro — Section.
+ * RealisationsGrid.astro — Section /realisations/.
  *
- * Rôle : page /realisations/ — pills de filtres en haut, grille 3 cols
- * desktop / 2 cols mobile, chaque carte = image + tag catégorie + H4
- * Playfair. Bouton « Charger plus » en pied.
+ * Direction "Papiers d'archives" :
+ *   - Masonry magazine 3 colonnes desktop (cartes hauteurs variables).
+ *   - Chaque carte = placeholder gradient + tag mono + titre Fraunces +
+ *     ligne meta (quartier · type · durée).
+ *   - Microsignature "papiers" : chaque carte porte une rotation
+ *     aléatoire ±1.5° en repos. Au hover : se redresse + élève (-6px) +
+ *     ombre. À l'apparition : descend en clip-path mask, légère rotation
+ *     supplémentaire (effet feuille qui se pose).
+ *   - Filtres pills mono uppercase (purement statiques en phase 1).
  *
- * Phase 1 : pills statiques (filtre actif = "Tous"). L'interactivité
- * (filtres réels, pagination) sera ajoutée en phase 4 si nécessaire.
- *
- * Rendu dans : src/pages/realisations/index.astro.
+ * Quand on aura les vraies images : on remplace simplement le
+ * `<div class="rg-card__media">` par un `<img>` — la structure et les
+ * animations restent identiques.
  */
 
 import Section from '@/components/ui/Section.astro';
 import Button from '@/components/ui/Button.astro';
-import Placeholder from '@/components/ui/Placeholder.astro';
 
 const cats = [
   'Tous',
+  'Rénovation',
+  'Salle de bain',
   'Dépannage',
   'Recherche de fuite',
-  'Rénovation',
-  'Chaudière',
-  'Salle de bain',
+  'Chauffage',
 ];
 
-const items = [
-  { cat: 'Rénovation',     title: 'Salle de bain complète, Cimiez',            label: 'Cimiez · 18m²' },
-  { cat: 'Dépannage',      title: 'Réparation de fuite encastrée, Riquier',    label: 'Riquier · 1h30' },
-  { cat: 'Chaudière',      title: 'Remplacement chaudière condensation',       label: 'Mont-Boron' },
-  { cat: 'Salle de bain',  title: 'Douche italienne sur mesure, Villefranche', label: 'Villefranche' },
-  { cat: 'Recherche de fuite', title: 'Fuite chassée au compteur, Cagnes',      label: 'Cagnes · caméra' },
-  { cat: 'Rénovation',     title: 'Cuisine + sanitaires, Saint-Laurent',       label: 'Saint-Laurent' },
-  { cat: 'Dépannage',      title: 'Évacuation bouchée, Vieux-Nice',            label: 'Vieux-Nice' },
-  { cat: 'Salle de bain',  title: 'Sanitaires neufs, Beaulieu-sur-Mer',        label: 'Beaulieu' },
-  { cat: 'Chaudière',      title: "Entretien annuel, immeuble Cap d'Ail",      label: "Cap d'Ail" },
+interface CaseItem {
+  num: string;
+  cat: string;
+  title: string;
+  place: string;
+  duration?: string;
+  tint: 'a' | 'b' | 'c' | 'd';
+  span?: 1 | 2; // hauteur en multiples de la rangée
+  /** Optionnel : photo réelle (à câbler plus tard). */
+  image?: string;
+}
+
+const items: CaseItem[] = [
+  { num: '01', cat: 'Rénovation', title: 'Salle de bain complète, pierre claire', place: 'Nice Cimiez', duration: '12 j', tint: 'a', span: 2, image: '/realisations/01-douche-italienne-pierre-claire.jpg' },
+  { num: '02', cat: 'Salle de bain', title: 'Vasque ronde et carrelage anthracite', place: 'Mont-Boron', duration: '10 j', tint: 'b', image: '/realisations/02-salle-bain-blanc-anthracite.jpg' },
+  { num: '03', cat: 'Dépannage', title: 'Réparation de fuite encastrée', place: 'Nice Riquier', duration: '1 h 30', tint: 'c' },
+  { num: '04', cat: 'Salle de bain', title: 'Douche italienne, anthracite mat', place: 'Villefranche-sur-Mer', duration: '6 j', tint: 'd', image: '/realisations/04-douche-pomme-ronde-anthracite.jpg' },
+  { num: '05', cat: 'Chauffage', title: 'Chaudière condensation remplacée', place: 'Nice Mont-Boron', duration: '4 h', tint: 'a' },
+  { num: '06', cat: 'Salle de bain', title: 'Salle d’eau buanderie compacte', place: 'Saint-Laurent-du-Var', duration: '8 j', tint: 'b', span: 2, image: '/realisations/03-salle-bain-bleu-lave-linge.jpg' },
+  { num: '07', cat: 'Recherche de fuite', title: 'Fuite chassée au compteur, gaz traceur', place: 'Cagnes-sur-Mer', duration: '2 h', tint: 'c' },
+  { num: '08', cat: 'Dépannage', title: 'Évacuation bouchée, vieille bâtisse', place: 'Vieux-Nice', duration: '45 min', tint: 'd' },
+  { num: '09', cat: 'Rénovation', title: 'Cuisine + sanitaires, refonte plomberie', place: 'Saint-Laurent-du-Var', duration: '16 j', tint: 'a' },
 ];
 
 const active = 'Tous';
 ---
 
-<Section id="RealisationsGrid" surface="bg" spacing="sm" width="wide">
-  <ul class="realisations-grid__filters" role="list">
+<Section id="RealisationsGrid" surface="default" spacing="lg" width="wide">
+  {/* === Filtres === */}
+  <ul class="rg-filters" role="list" data-anim="rise">
     {cats.map((c) => (
       <li>
-        <button class={`btn btn--sm ${c === active ? 'btn--primary' : 'btn--ghost'}`} type="button">
-          <span class="btn__label">{c}</span>
+        <button class={`rg-filter${c === active ? ' is-active' : ''}`} type="button">
+          {c}
         </button>
       </li>
     ))}
   </ul>
 
-  <ul class="realisations-grid__list" role="list">
-    {items.map((it) => (
-      <li>
-        <article class="realisations-grid__card">
-          <Placeholder variant="photo" class="realisations-grid__media" label={it.label} />
-          <div class="realisations-grid__body">
-            <span class="realisations-grid__tag">{it.cat}</span>
-            <h4 class="realisations-grid__title">{it.title}</h4>
-          </div>
-        </article>
-      </li>
-    ))}
+  {/* === Grille "papiers d'archives" === */}
+  <ul class="rg-grid" role="list">
+    {items.map((it, i) => {
+      const rot = ((i * 53) % 100) / 100 - 0.5; // pseudo-aléatoire stable
+      const tilt = (rot * 3).toFixed(2);
+      return (
+        <li
+          class={`rg-card rg-card--span-${it.span ?? 1} rg-card--tint-${it.tint}`}
+          style={`--tilt: ${tilt}deg;`}
+          data-anim="rise"
+        >
+          <article class="rg-card__inner">
+            <a href="#" class="rg-card__link" aria-label={`${it.title} — ${it.place}`}>
+              <div class="rg-card__media">
+                {it.image ? (
+                  <img src={it.image} alt="" class="photo" loading="lazy" decoding="async" />
+                ) : (
+                  <span class="rg-card__placeholder" aria-hidden="true">
+                    <span class="rg-card__placeholder-num">{it.num}</span>
+                    <span class="rg-card__placeholder-label">Photo à venir</span>
+                  </span>
+                )}
+                <span class="rg-card__tag">{it.cat}</span>
+              </div>
+              <div class="rg-card__body">
+                <span class="rg-card__num">{it.num}</span>
+                <h3 class="rg-card__title">{it.title}</h3>
+                <p class="rg-card__meta">
+                  <span>{it.place}</span>
+                  {it.duration && <span class="rg-card__sep">·</span>}
+                  {it.duration && <span>{it.duration}</span>}
+                </p>
+              </div>
+            </a>
+          </article>
+        </li>
+      );
+    })}
   </ul>
 
-  <div class="realisations-grid__more">
-    <Button variant="secondary" size="md">Charger plus</Button>
+  <div class="rg-more" data-anim="rise">
+    <Button variant="secondary" size="lg">Voir tous les chantiers</Button>
   </div>
 </Section>
 
 <style>
-  /* Filtres */
-  .realisations-grid__filters {
+  /* === Filtres pills mono uppercase === */
+  .rg-filters {
     display: flex;
-    gap: 8px;
-    justify-content: flex-start;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 12px;
-    margin: 0 calc(-1 * var(--grid-gutter));
-    padding-left: var(--grid-gutter);
-    padding-right: var(--grid-gutter);
-    -webkit-overflow-scrolling: touch;
-    margin-bottom: var(--space-6);
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: clamp(3rem, 5vw, 4.5rem);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: clamp(1.5rem, 3vw, 2.25rem);
   }
-  .realisations-grid__filters li { flex-shrink: 0; scroll-snap-align: start; }
-  @media (min-width: 768px) {
-    .realisations-grid__filters {
-      justify-content: center;
-      overflow-x: visible;
-      margin-inline: 0;
-      padding-inline: 0;
-      margin-bottom: var(--space-10);
-    }
+  .rg-filter {
+    appearance: none;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-full);
+    padding: 8px 16px;
+    font-family: var(--font-family-mono);
+    font-size: 0.7rem;
+    font-weight: var(--font-weight-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-text);
+    cursor: pointer;
+    transition:
+      background-color var(--transition-fast) var(--ease-out),
+      border-color var(--transition-fast) var(--ease-out),
+      color var(--transition-fast) var(--ease-out);
   }
-  .realisations-grid__filters .btn { white-space: nowrap; }
+  .rg-filter:hover {
+    border-color: var(--color-text);
+  }
+  .rg-filter.is-active {
+    background: var(--color-text);
+    border-color: var(--color-text);
+    color: var(--color-on-dark);
+  }
 
-  /* Grille */
-  .realisations-grid__list {
+  /* === Grille — gabarit "papiers posés" === */
+  .rg-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 3vw, 3rem);
   }
-  @media (min-width: 768px) {
-    .realisations-grid__list {
-      grid-template-columns: repeat(3, 1fr);
-      gap: var(--space-6);
+  @media (min-width: 640px) {
+    .rg-grid {
+      grid-template-columns: repeat(2, 1fr);
+      grid-auto-rows: 360px;
     }
   }
+  @media (min-width: 1024px) {
+    .rg-grid {
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 320px;
+    }
+  }
+  .rg-card--span-2 { grid-row: span 1; }
+  @media (min-width: 640px) {
+    .rg-card--span-2 { grid-row: span 2; }
+  }
 
-  .realisations-grid__card {
+  /* === Carte ("feuille de papier") === */
+  .rg-card {
+    list-style: none;
+    /* Rotation initiale (calculée inline via --tilt) — donne le côté
+       "scattered papers". */
+    transform: rotate(var(--tilt, 0deg));
+    transition:
+      transform var(--transition-base) var(--ease-out);
+    perspective: 1200px;
+  }
+  .rg-card__inner {
+    height: 100%;
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-lg);
     overflow: hidden;
-    height: 100%;
     transition:
-      border-color var(--transition-fast) var(--ease-out),
-      box-shadow var(--transition-fast) var(--ease-out),
-      transform var(--transition-fast) var(--ease-out);
+      transform var(--transition-base) var(--ease-out),
+      box-shadow var(--transition-base) var(--ease-out),
+      border-color var(--transition-base) var(--ease-out);
+    transform-style: preserve-3d;
+    box-shadow:
+      0 1px 0 rgba(15, 20, 23, 0.04),
+      0 1px 3px rgba(15, 20, 23, 0.05);
   }
-  .realisations-grid__card:hover {
-    border-color: var(--color-azur);
-    box-shadow: var(--shadow-md);
-    transform: translateY(-2px);
-  }
-  .realisations-grid__media {
-    height: 120px;
-    border-radius: 0;
-    border: none;
-  }
-  @media (min-width: 768px) {
-    .realisations-grid__media { height: 220px; }
-  }
-  .realisations-grid__body {
-    padding: 14px;
-  }
-  @media (min-width: 768px) {
-    .realisations-grid__body { padding: 20px; }
-  }
-  .realisations-grid__tag {
-    display: inline-block;
-    padding: 5px 10px;
-    border-radius: var(--radius-full);
-    background: var(--color-azur-light);
-    color: var(--color-azur);
-    border: 1px solid rgba(14, 100, 128, 0.18);
-    font-weight: var(--font-weight-semibold);
-    font-size: 0.72rem; /* 11.5px */
-  }
-  .realisations-grid__title {
-    margin: 12px 0 0;
-    font-size: 0.9375rem;
-    line-height: 1.3;
-  }
-  @media (min-width: 768px) {
-    .realisations-grid__title { font-size: 1.125rem; }
+  .rg-card__link {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    color: inherit;
+    text-decoration: none;
   }
 
-  .realisations-grid__more {
-    margin-top: var(--space-8);
+  /* Hover : redresse + élève + ombre marquée. */
+  .rg-card:hover {
+    transform: rotate(0deg);
+    z-index: 5;
+  }
+  .rg-card:hover .rg-card__inner {
+    transform: translateY(-8px);
+    border-color: var(--color-text);
+    box-shadow:
+      0 20px 60px -10px rgba(15, 20, 23, 0.18),
+      0 8px 18px -8px rgba(15, 20, 23, 0.12);
+  }
+  .rg-card:hover .rg-card__media img,
+  .rg-card:hover .rg-card__media .rg-card__placeholder {
+    transform: scale(1.04);
+  }
+  .rg-card:hover .rg-card__tag {
+    background: var(--color-terra);
+    color: var(--color-on-urgent);
+    border-color: var(--color-terra);
+  }
+
+  /* Média */
+  .rg-card__media {
+    position: relative;
+    flex: 1;
+    overflow: hidden;
+    background: var(--color-surface-alt);
+    min-height: 180px;
+  }
+  .rg-card__media img,
+  .rg-card__media .rg-card__placeholder {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
+  }
+  /* Placeholder élégant : gradient en 4 tons selon la carte. */
+  .rg-card__placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    color: rgba(244, 241, 235, 0.65);
+    font-family: var(--font-family-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    font-size: 0.65rem;
+  }
+  .rg-card__placeholder-num {
+    font-family: var(--font-family-display);
+    font-style: italic;
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(2.5rem, 4vw, 4rem);
+    color: rgba(244, 241, 235, 0.85);
+    text-transform: none;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+  .rg-card--tint-a .rg-card__placeholder { background: linear-gradient(135deg, #1F3D4E 0%, #0F1417 100%); }
+  .rg-card--tint-b .rg-card__placeholder { background: linear-gradient(135deg, #3B4D52 0%, #1F3D4E 100%); }
+  .rg-card--tint-c .rg-card__placeholder { background: linear-gradient(135deg, #C8631F 0%, #8A3F0E 100%); }
+  .rg-card--tint-d .rg-card__placeholder { background: linear-gradient(135deg, #1F3D4E 0%, #C8631F 130%); }
+
+  /* Tag */
+  .rg-card__tag {
+    position: absolute;
+    top: 14px;
+    left: 14px;
+    padding: 6px 12px;
+    border-radius: var(--radius-full);
+    background: rgba(244, 241, 235, 0.95);
+    color: var(--color-text);
+    border: 1px solid rgba(15, 20, 23, 0.1);
+    font-family: var(--font-family-mono);
+    font-size: 0.6rem;
+    font-weight: var(--font-weight-medium);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    transition:
+      background-color var(--transition-base) var(--ease-out),
+      color var(--transition-base) var(--ease-out),
+      border-color var(--transition-base) var(--ease-out);
+  }
+
+  /* Corps */
+  .rg-card__body {
+    padding: clamp(1.25rem, 1.6vw, 1.5rem) clamp(1.25rem, 1.8vw, 1.5rem) clamp(1.25rem, 1.8vw, 1.5rem);
+    background: var(--color-surface);
+    border-top: 1px solid var(--color-border-soft);
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .rg-card__num {
+    font-family: var(--font-family-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-terra);
+  }
+  .rg-card__title {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(1.0625rem, 1.4vw, 1.25rem);
+    line-height: 1.15;
+    color: var(--color-text);
+  }
+  .rg-card__meta {
+    margin: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-family-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+  .rg-card__sep {
+    color: var(--color-text-soft);
+    opacity: 0.6;
+  }
+
+  /* Effet "floating" : oscillation très lente du tilt initial.
+     Désactivé en reduced-motion. */
+  @media (prefers-reduced-motion: no-preference) {
+    .rg-card {
+      animation: rg-float 9s ease-in-out infinite;
+      animation-delay: calc(var(--tilt) * -2s);
+    }
+    .rg-card:hover { animation-play-state: paused; }
+  }
+  @keyframes rg-float {
+    0%, 100% { transform: rotate(var(--tilt, 0deg)) translateY(0); }
+    50%      { transform: rotate(calc(var(--tilt, 0deg) * -0.6)) translateY(-4px); }
+  }
+
+  .rg-more {
+    margin-top: clamp(4rem, 6vw, 6rem);
     display: flex;
     justify-content: center;
-  }
-  @media (min-width: 768px) {
-    .realisations-grid__more { margin-top: var(--space-12); }
   }
 </style>

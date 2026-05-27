@@ -1,0 +1,205 @@
+---
+/**
+ * SiteBackground.astro — Layout chrome (couche 4).
+ *
+ * Rôle : poser un grand fond éditorial impressionnant qui couvre tout
+ * le site. Composé d'un système graphique multi-couches :
+ *
+ *   1. Mesh gradient (radial multi-stops) — profondeur, lumière chaude.
+ *   2. Wordmark "Ypp." géant en filigrane bas-droite — signature.
+ *   3. Cercles concentriques type plan/compas — haut-gauche.
+ *   4. Blueprint architectural (plan de SDB stylisé) — bas-gauche.
+ *   5. Grand "01" mono en filigrane bord droit — numéro de couverture.
+ *   6. Lignes architecturales fines.
+ *   7. Grain SVG en blend overlay — texture filmique.
+ *
+ * Position fixed, z-index -1, pointer-events none.
+ */
+---
+
+<div class="site-bg" aria-hidden="true">
+  <!-- 1. Mesh gradient -->
+  <div class="site-bg__mesh"></div>
+
+  <!-- 2. Wordmark Ypp. géant filigrane (signature) -->
+  <div class="site-bg__wordmark">
+    Ypp<span class="site-bg__wordmark-dot">.</span>
+  </div>
+
+  <!-- 3. Cercles concentriques haut gauche (compas / plan) -->
+  <svg class="site-bg__rings" viewBox="0 0 800 800" preserveAspectRatio="xMinYMin slice">
+    <g fill="none" stroke="currentColor" stroke-width="0.8">
+      <circle cx="0" cy="0" r="180" />
+      <circle cx="0" cy="0" r="260" />
+      <circle cx="0" cy="0" r="360" />
+      <circle cx="0" cy="0" r="480" />
+      <circle cx="0" cy="0" r="620" />
+      <circle cx="0" cy="0" r="780" />
+      <!-- Rayons de compas -->
+      <line x1="0" y1="0" x2="800" y2="0" stroke-dasharray="2 6" />
+      <line x1="0" y1="0" x2="566" y2="566" stroke-dasharray="2 6" />
+      <line x1="0" y1="0" x2="0" y2="800" stroke-dasharray="2 6" />
+      <line x1="0" y1="0" x2="277" y2="745" stroke-dasharray="2 6" />
+      <!-- Annotations -->
+      <text x="180" y="-8" font-family="JetBrains Mono, monospace" font-size="12" fill="currentColor" stroke="none">R 180</text>
+      <text x="360" y="-8" font-family="JetBrains Mono, monospace" font-size="12" fill="currentColor" stroke="none">R 360</text>
+      <text x="620" y="-8" font-family="JetBrains Mono, monospace" font-size="12" fill="currentColor" stroke="none">R 620</text>
+    </g>
+  </svg>
+
+  <!-- 4. Blueprint SDB bas-gauche -->
+  <svg class="site-bg__blueprint" viewBox="0 0 600 500" preserveAspectRatio="xMinYMax slice">
+    <defs>
+      <pattern id="bp-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="currentColor" stroke-width="0.4" opacity="0.5"/>
+      </pattern>
+    </defs>
+    <rect x="60" y="80" width="500" height="380" fill="url(#bp-grid)" />
+    <g stroke="currentColor" stroke-width="1.1" fill="none">
+      <!-- Murs extérieurs SDB -->
+      <path d="M 80 100 L 540 100 L 540 440 L 80 440 Z" />
+      <!-- Cloison intérieure -->
+      <path d="M 280 100 L 280 280 L 540 280" />
+      <!-- Douche italienne (rectangle + drain) -->
+      <path d="M 100 320 L 250 320 L 250 420 L 100 420 Z" />
+      <circle cx="175" cy="370" r="6" />
+      <path d="M 170 365 L 180 375 M 180 365 L 170 375" />
+      <!-- Vasque -->
+      <ellipse cx="200" cy="170" rx="60" ry="36" />
+      <circle cx="200" cy="170" r="6" />
+      <!-- WC -->
+      <ellipse cx="400" cy="180" rx="34" ry="50" />
+      <rect x="380" y="130" width="40" height="20" />
+      <!-- Baignoire -->
+      <path d="M 320 320 L 520 320 L 520 420 L 320 420 Z" rx="20" />
+      <circle cx="500" cy="370" r="6" />
+      <!-- Cotes -->
+      <path d="M 80 470 L 540 470" stroke-dasharray="2 5" />
+      <path d="M 80 465 L 80 475 M 540 465 L 540 475" />
+      <text x="310" y="486" font-family="JetBrains Mono, monospace" font-size="11" text-anchor="middle" fill="currentColor" stroke="none">460 cm</text>
+      <text x="100" y="92" font-family="JetBrains Mono, monospace" font-size="10" fill="currentColor" stroke="none">SDB · NICE CIMIEZ — PLAN N°01</text>
+    </g>
+  </svg>
+
+  <!-- 5. Grand "01" mono droite -->
+  <div class="site-bg__number">01</div>
+
+  <!-- 6. Lignes architecturales -->
+  <svg class="site-bg__lines" viewBox="0 0 1440 1080" preserveAspectRatio="none">
+    <g stroke="currentColor" stroke-width="0.6" fill="none" opacity="0.5">
+      <!-- Croix de marquage bord gauche -->
+      <line x1="40" y1="200" x2="80" y2="200" />
+      <line x1="60" y1="180" x2="60" y2="220" />
+      <!-- Croix de marquage bord droit -->
+      <line x1="1360" y1="700" x2="1400" y2="700" />
+      <line x1="1380" y1="680" x2="1380" y2="720" />
+      <!-- Ligne fine horizontale (ruban éditorial) -->
+      <line x1="220" y1="540" x2="1380" y2="540" stroke-dasharray="1 8" />
+    </g>
+  </svg>
+
+  <!-- 7. Grain filmique -->
+  <div class="site-bg__grain"></div>
+</div>
+
+<style>
+  .site-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+    background-color: var(--color-bg);
+  }
+
+  /* 1. Mesh gradient — plus prononcé qu'avant */
+  .site-bg__mesh {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(70% 60% at 95% 5%, rgba(200, 99, 31, 0.18), transparent 60%),
+      radial-gradient(60% 60% at 5% 95%, rgba(31, 61, 78, 0.14), transparent 65%),
+      radial-gradient(80% 80% at 50% 50%, rgba(235, 224, 209, 0.5), transparent 70%),
+      linear-gradient(135deg, rgba(244, 241, 235, 1) 0%, rgba(232, 222, 207, 1) 100%);
+  }
+
+  /* 2. Wordmark Ypp. géant filigrane — bas droite, signature */
+  .site-bg__wordmark {
+    position: absolute;
+    right: -2vw;
+    bottom: -3vw;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    font-size: clamp(20rem, 36vw, 38rem);
+    line-height: 0.78;
+    letter-spacing: -0.06em;
+    color: var(--color-text);
+    opacity: 0.045;
+    user-select: none;
+    pointer-events: none;
+  }
+  .site-bg__wordmark-dot {
+    color: var(--color-terra);
+    opacity: 0.5;
+  }
+
+  /* 3. Cercles concentriques */
+  .site-bg__rings {
+    position: absolute;
+    top: -120px;
+    left: -80px;
+    width: clamp(640px, 70vw, 1000px);
+    height: auto;
+    color: var(--color-terra);
+    opacity: 0.18;
+    mix-blend-mode: multiply;
+  }
+
+  /* 4. Blueprint SDB plan */
+  .site-bg__blueprint {
+    position: absolute;
+    bottom: -40px;
+    left: -60px;
+    width: clamp(420px, 45vw, 720px);
+    height: auto;
+    color: var(--color-petrol);
+    opacity: 0.14;
+    mix-blend-mode: multiply;
+  }
+
+  /* 5. Grand "01" mono — bord droit */
+  .site-bg__number {
+    position: absolute;
+    top: 8vh;
+    right: 4vw;
+    font-family: var(--font-family-mono);
+    font-weight: var(--font-weight-regular);
+    font-size: clamp(10rem, 16vw, 22rem);
+    line-height: 0.85;
+    letter-spacing: -0.06em;
+    color: var(--color-text);
+    opacity: 0.05;
+    user-select: none;
+    transform: rotate(-90deg);
+    transform-origin: top right;
+  }
+
+  /* 6. Lignes architecturales fines */
+  .site-bg__lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    color: var(--color-text);
+    opacity: 0.5;
+  }
+
+  /* 7. Grain */
+  .site-bg__grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.09 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.55;
+    mix-blend-mode: overlay;
+  }
+</style>

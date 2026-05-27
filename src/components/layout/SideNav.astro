@@ -1,0 +1,285 @@
+---
+/**
+ * SideNav.astro — Layout chrome (couche 4).
+ *
+ * "Dynamic Island" — pill HORIZONTALE flottante en haut centrée.
+ * Charbon translucide + blur, icônes nav + tooltips sous chaque item.
+ *
+ * Composition (de gauche à droite) :
+ *   - Monogramme Y avec point terracotta
+ *   - Divider vertical
+ *   - 6 icônes nav (Accueil · Services · Zone · Réalisations · À propos · Contact)
+ *   - Divider vertical
+ *   - CTA téléphone urgence (rond terracotta pulsant)
+ *
+ * Visible UNIQUEMENT en desktop (≥ 1024 px). En mobile, le Header
+ * classique + StickyCallBar restent.
+ */
+
+import Icon from '@/components/ui/Icon.astro';
+import { nap, labels } from '@/data/site';
+
+const currentPath = Astro.url.pathname;
+function isCurrent(href: string): boolean {
+  if (href === '/') return currentPath === '/';
+  return currentPath === href || currentPath.startsWith(href);
+}
+
+interface NavIcon {
+  label: string;
+  href: string;
+  icon: string;
+}
+
+const sideItems: NavIcon[] = [
+  { label: 'Accueil',      href: '/',                     icon: 'home' },
+  { label: 'Services',     href: '/services/',            icon: 'wrench' },
+  { label: 'Zone',         href: '/zone-intervention/',   icon: 'map-pin' },
+  { label: 'Réalisations', href: '/realisations/',        icon: 'image' },
+  { label: 'À propos',     href: '/a-propos/',            icon: 'user' },
+  { label: 'Contact',      href: '/contact/',             icon: 'mail' },
+];
+---
+
+<aside class="side-nav" aria-label="Navigation principale">
+  <div class="side-nav__pill">
+    <a href="/" class="side-nav__brand" aria-label="Accueil — Ypp Plomberie">
+      <span class="side-nav__brand-mark">Y</span>
+      <span class="side-nav__brand-dot" aria-hidden="true"></span>
+    </a>
+
+    <span class="side-nav__divider" aria-hidden="true"></span>
+
+    <ul class="side-nav__list" role="list">
+      {sideItems.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class={`side-nav__link${isCurrent(item.href) ? ' is-current' : ''}`}
+            aria-current={isCurrent(item.href) ? 'page' : undefined}
+          >
+            <Icon name={item.icon} size={18} strokeWidth={1.5} />
+            <span class="side-nav__tooltip">{item.label}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <span class="side-nav__divider" aria-hidden="true"></span>
+
+    <a
+      href={`tel:${nap.phoneE164}`}
+      class="side-nav__call"
+      aria-label={`${labels.callNow} — ${nap.phoneDisplay}`}
+    >
+      <Icon name="phone" size={18} strokeWidth={1.6} />
+      <span class="side-nav__tooltip side-nav__tooltip--call">
+        {nap.phoneDisplay}
+      </span>
+    </a>
+  </div>
+</aside>
+
+<style>
+  .side-nav {
+    display: none;
+  }
+
+  @media (min-width: 1024px) {
+    .side-nav {
+      display: block;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: var(--z-sticky);
+    }
+  }
+
+  .side-nav__pill {
+    background: rgba(15, 20, 23, 0.78);
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+    border: 1px solid rgba(244, 241, 235, 0.08);
+    border-radius: 999px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    box-shadow:
+      0 24px 60px rgba(15, 20, 23, 0.25),
+      0 8px 24px rgba(15, 20, 23, 0.18),
+      0 0 0 1px rgba(244, 241, 235, 0.04) inset;
+  }
+
+  /* === Monogramme === */
+  .side-nav__brand {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--color-on-dark);
+    color: var(--color-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-bold);
+    font-size: 1rem;
+    letter-spacing: -0.04em;
+    text-decoration: none;
+    transition: transform var(--transition-base) var(--ease-out);
+    flex-shrink: 0;
+  }
+  .side-nav__brand:hover { transform: scale(1.05); }
+  .side-nav__brand-mark { line-height: 1; }
+  .side-nav__brand-dot {
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-terra);
+  }
+
+  /* === Divider vertical === */
+  .side-nav__divider {
+    width: 1px;
+    height: 22px;
+    background: rgba(244, 241, 235, 0.15);
+    margin: 0 4px;
+    flex-shrink: 0;
+  }
+
+  /* === Nav list — horizontal === */
+  .side-nav__list {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+  }
+
+  .side-nav__link {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(244, 241, 235, 0.65);
+    text-decoration: none;
+    transition:
+      background-color var(--transition-fast) var(--ease-out),
+      color var(--transition-fast) var(--ease-out);
+  }
+  .side-nav__link:hover {
+    background: rgba(244, 241, 235, 0.08);
+    color: var(--color-on-dark);
+  }
+  .side-nav__link.is-current {
+    background: rgba(200, 99, 31, 0.18);
+    color: var(--color-terra);
+  }
+  /* Indicateur "current" : barre HORIZONTALE sous l'icône */
+  .side-nav__link.is-current::before {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 18px;
+    height: 3px;
+    border-radius: 2px;
+    background: var(--color-terra);
+  }
+
+  /* === Tooltip — apparaît EN DESSOUS de l'icône === */
+  .side-nav__tooltip {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%) translateY(-4px);
+    padding: 7px 12px;
+    background: var(--color-text);
+    color: var(--color-on-dark);
+    font-family: var(--font-family-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    pointer-events: none;
+    transition:
+      opacity var(--transition-fast) var(--ease-out),
+      transform var(--transition-base) var(--ease-out);
+    box-shadow: 0 8px 24px rgba(15, 20, 23, 0.25);
+  }
+  /* Petite flèche pointant vers le haut */
+  .side-nav__tooltip::before {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: 50%;
+    transform: translateX(-50%) rotate(45deg);
+    width: 8px;
+    height: 8px;
+    background: var(--color-text);
+    border-radius: 1px;
+  }
+  .side-nav__link:hover .side-nav__tooltip,
+  .side-nav__call:hover .side-nav__tooltip,
+  .side-nav__link:focus-visible .side-nav__tooltip,
+  .side-nav__call:focus-visible .side-nav__tooltip {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* === CTA téléphone — rond terracotta === */
+  .side-nav__call {
+    position: relative;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--color-terra);
+    color: var(--color-on-urgent);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition:
+      background-color var(--transition-fast) var(--ease-out),
+      transform var(--transition-base) var(--ease-out);
+    flex-shrink: 0;
+  }
+  .side-nav__call:hover {
+    background: var(--color-terra-hover);
+    transform: scale(1.08);
+  }
+  .side-nav__call::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid var(--color-terra);
+    opacity: 0;
+    pointer-events: none;
+    animation: sidenav-pulse 2.4s var(--ease-out) infinite;
+  }
+  @keyframes sidenav-pulse {
+    0%   { opacity: 0; transform: scale(0.95); }
+    40%  { opacity: 0.6; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.25); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .side-nav__call::after { display: none; }
+  }
+  .side-nav__tooltip--call {
+    background: var(--color-terra);
+  }
+  .side-nav__tooltip--call::before {
+    background: var(--color-terra);
+  }
+</style>

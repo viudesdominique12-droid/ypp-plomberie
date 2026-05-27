@@ -4,31 +4,21 @@
  *
  * Page PILIER « Plombier à Nice ». NE PAS créer /zones/nice/ ailleurs.
  *
- * Cette page = composition pure. Si une section rend mal, ouvrir
- * le composant correspondant dans `src/components/sections/`.
+ * Composition "Éditorial Architecture" — 5 sections :
+ *   1. HomeHero — photo + typo sculpturale + preuves alignées
+ *   2. ServicesGrid — table des matières des 6 métiers
+ *   3. RealisationsPreview — 4 cas d'études magazine
+ *   4. ReviewsSection — avis Google sélectionnés
+ *   5. FinalCta — bloc charbon + téléphone géant
  */
 
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import HomeHero from '@/components/sections/HomeHero.astro';
-import TrustBar from '@/components/ui/TrustBar.astro';
 import ServicesGrid from '@/components/sections/ServicesGrid.astro';
-import ServicesMarquee from '@/components/sections/ServicesMarquee.astro';
-import ReassuranceBlock from '@/components/sections/ReassuranceBlock.astro';
-import ProcessSteps from '@/components/sections/ProcessSteps.astro';
 import RealisationsPreview from '@/components/sections/RealisationsPreview.astro';
 import ReviewsSection from '@/components/sections/ReviewsSection.astro';
-import ZonesSection from '@/components/sections/ZonesSection.astro';
-import FaqSection from '@/components/sections/FaqSection.astro';
 import FinalCta from '@/components/sections/FinalCta.astro';
 import { site } from '@/data/site';
-
-const trustItems = [
-  { icon: 'star', strong: '5,0 / 5', label: 'sur Google' },
-  { icon: 'clock', strong: '24h / 24', label: '7 j / 7' },
-  { icon: 'shield', strong: 'Décennale', label: 'incluse' },
-  { icon: 'doc', strong: 'Devis', label: 'gratuit' },
-  { icon: 'map-pin', strong: 'Nice', label: 'et baie des Anges' },
-];
 
 const homeFaq = [
   {
@@ -63,9 +53,9 @@ const homeFaq = [
   },
 ];
 
-/* JSON-LD FAQPage propre à l'accueil — reflète les questions
-   affichées dans la section FAQ. Reconnu par Google pour les rich
-   results « Questions fréquentes ». */
+/* JSON-LD FAQPage propre à l'accueil — conservé pour le SEO même si la
+   section FAQ n'est plus rendue visuellement (FAQ migrée en bas de page
+   /a-propos/ ou /contact/ lors d'un prochain run). */
 const faqPageLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -79,8 +69,8 @@ const faqPageLd = {
 ---
 
 <BaseLayout
-  title="Plombier à Nice 24h/24 — Ypp Plomberie"
-  description="Plombier à Nice : dépannage 24h/24, recherche de fuite, débouchage, chauffe-eau, rénovation de salle de bain. Devis transparent au 06 03 34 03 05."
+  title="Plombier à Nice — Ypp Plomberie · rénovation, fuites, urgence 24/7"
+  description="Plombier à Nice : rénovation de salle de bain, recherche de fuite, débouchage, chauffe-eau, dépannage 24h/24. Devis annoncé avant intervention au 06 03 34 03 05."
   canonicalPath="/"
 >
   <script
@@ -89,14 +79,8 @@ const faqPageLd = {
     set:html={JSON.stringify(faqPageLd)}
   />
   <HomeHero />
-  <TrustBar items={trustItems} />
   <ServicesGrid />
-  <ReassuranceBlock />
-  <ServicesMarquee />
-  <ProcessSteps />
   <RealisationsPreview />
   <ReviewsSection />
-  <ZonesSection />
-  <FaqSection items={homeFaq} />
   <FinalCta />
 </BaseLayout>

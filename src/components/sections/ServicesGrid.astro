@@ -2,21 +2,14 @@
 /**
  * ServicesGrid.astro — Section.
  *
- * Rôle : grille des services proposés. Lit la collection `services`,
- * ordonne par `order`. Identité « Baie des Anges » respectée via
- * `ServiceCard`.
- *
- * Rendu dans : src/pages/index.astro,
- *              src/pages/services/index.astro,
- *              src/layouts/ZoneLayout.astro,
- *              src/pages/zones/[slug].astro.
- *
- * NB : ne JAMAIS coder en dur la liste des services ici. Ajouter
- *      un service = créer un `.md` dans `src/content/services/`.
+ * Direction "Éditorial Architecture" :
+ *   - Pas de grille de cartes flottantes — une vraie "table des matières"
+ *     éditoriale : cartes côte à côte sans gap (lignes partagées).
+ *   - Chaque carte = numéro chapitre + titre Fraunces + lead + flèche.
+ *   - Hover = inversion charbon.
  */
 
 import Section from '@/components/ui/Section.astro';
-import SectionHeading from '@/components/ui/SectionHeading.astro';
 import ServiceCard from '@/components/ui/ServiceCard.astro';
 import { getCollection } from 'astro:content';
 
@@ -24,22 +17,17 @@ export interface Props {
   eyebrow?: string;
   title?: string;
   lead?: string;
-  /** ID du service à exclure (ex. on n'affiche pas le service courant). */
   excludeId?: string;
-  /** Surface du bloc (par défaut surface blanche). */
   surface?: 'default' | 'alt' | 'bg';
-  /** Nombre de colonnes max à partir de 1024px. */
   columns?: 2 | 3;
-  /** Limite le nombre d'entrées affichées. */
   limit?: number;
-  /** Cacher le bloc de titre (utilisé sur le hub services). */
   hideHeading?: boolean;
 }
 
 const {
-  eyebrow = 'Nos services',
-  title = 'Une expertise complète, un seul interlocuteur',
-  lead = "Du dépannage urgent à la rénovation complète, six métiers maîtrisés par un seul artisan.",
+  eyebrow = 'Six métiers, un artisan',
+  title = 'Tout ce qu’un plombier doit savoir faire, vraiment.',
+  lead,
   excludeId,
   surface = 'default',
   columns = 3,
@@ -56,16 +44,26 @@ const services = typeof limit === 'number' ? all.slice(0, limit) : all;
 
 <Section id="ServicesGrid" surface={surface} spacing="lg" width="wide">
   {!hideHeading && (
-    <SectionHeading eyebrow={eyebrow} title={title} lead={lead} />
+    <header class="services-grid__head">
+      <p class="services-grid__eyebrow" data-anim="rise">
+        <span>02</span>
+        <span class="services-grid__rule"></span>
+        <span>{eyebrow}</span>
+      </p>
+      <h2 class="services-grid__title" data-anim="rise" set:html={title} />
+      {lead && <p class="services-grid__lead" data-anim="rise">{lead}</p>}
+    </header>
   )}
+
   <ul class={`services-grid services-grid--cols-${columns}`} role="list">
-    {services.map((entry) => (
-      <li>
+    {services.map((entry, i) => (
+      <li data-anim="rise">
         <ServiceCard
           href={`/services/${entry.data.slug}/`}
           title={entry.data.title}
           description={entry.data.shortDescription}
           icon={entry.data.icon}
+          number={String(i + 1).padStart(2, '0')}
         />
       </li>
     ))}
@@ -73,15 +71,71 @@ const services = typeof limit === 'number' ? all.slice(0, limit) : all;
 </Section>
 
 <style>
+  .services-grid__head {
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    max-width: 920px;
+  }
+  .services-grid__eyebrow {
+    margin: 0 0 clamp(1.5rem, 3vw, 2rem);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-family: var(--font-family-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+  .services-grid__rule {
+    display: inline-block;
+    width: 48px;
+    height: 1px;
+    background: var(--color-text-soft);
+  }
+  .services-grid__title {
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(2rem, 5vw, 3.75rem);
+    line-height: 1.02;
+    letter-spacing: var(--letter-spacing-tighter);
+    color: var(--color-text);
+  }
+  .services-grid__lead {
+    margin: var(--space-6) 0 0;
+    max-width: 620px;
+    font-size: 1.0625rem;
+    line-height: 1.55;
+    color: var(--color-text-muted);
+  }
+
+  /* Grille : cartes côte à côte avec partage de bords (border-top sur chaque). */
   .services-grid {
     display: grid;
-    gap: var(--space-4);
+    gap: 0;
+    border-bottom: 1px solid var(--color-border);
   }
-  @media (min-width: 640px) {
-    .services-grid { grid-template-columns: repeat(2, 1fr); }
+  .services-grid > li {
+    border-right: 1px solid var(--color-border);
+  }
+  .services-grid > li:last-child { border-right: 0; }
+
+  @media (max-width: 767px) {
+    .services-grid { grid-template-columns: 1fr; }
+    .services-grid > li { border-right: 0; }
+  }
+  @media (min-width: 768px) {
+    .services-grid--cols-2 { grid-template-columns: repeat(2, 1fr); }
+    .services-grid--cols-3 { grid-template-columns: repeat(2, 1fr); }
+    .services-grid--cols-3 > li:nth-child(2n) { border-right: 0; }
+    .services-grid--cols-3 > li:nth-child(n + 3) { border-top: 0; }
   }
   @media (min-width: 1024px) {
-    .services-grid--cols-2 { grid-template-columns: repeat(2, 1fr); gap: var(--space-6); }
-    .services-grid--cols-3 { grid-template-columns: repeat(3, 1fr); gap: var(--space-6); }
+    .services-grid--cols-3 { grid-template-columns: repeat(3, 1fr); }
+    .services-grid--cols-3 > li { border-right: 1px solid var(--color-border); }
+    .services-grid--cols-3 > li:nth-child(2n) { border-right: 1px solid var(--color-border); }
+    .services-grid--cols-3 > li:nth-child(3n) { border-right: 0; }
+    .services-grid--cols-3 > li:nth-child(n + 3) { border-top: 0; }
+    .services-grid--cols-3 > li:nth-child(n + 4) { border-top: 0; }
   }
 </style>

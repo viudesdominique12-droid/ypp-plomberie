@@ -26,6 +26,7 @@
 html {
   margin: 0;
   padding: 0;
+  background-color: var(--color-bg);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-size-adjust: 100%;
@@ -46,32 +47,34 @@ html {
 
 body {
   margin: 0;
-  background-color: var(--color-bg);
+  background-color: transparent; /* SiteBackground (fixed) prend le relais */
   color: var(--color-text);
   font-family: var(--font-family-base);
   font-size: var(--font-size-base);
-  line-height: var(--line-height-normal); /* 1.7 — identité */
+  line-height: var(--line-height-normal);
   font-weight: var(--font-weight-regular);
+  font-feature-settings: 'ss01', 'cv11';
 }
 
 /* =========================================================================
- * Hiérarchie de titres — Playfair Display, 500/600
+ * Hiérarchie de titres — Fraunces, weights 500/600/700
  * ========================================================================= */
 h1, h2, h3, h4, h5, h6 {
   margin: 0;
-  font-family: var(--font-family-heading);
+  font-family: var(--font-family-display);
   font-weight: var(--font-weight-semibold);
   letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-tight);
+  line-height: var(--line-height-snug);
   color: var(--color-text);
+  font-feature-settings: 'ss01';
 }
 
-h1 { font-size: clamp(2.125rem, 4.2vw, 3rem); line-height: 1.1; }      /* 34→48 */
-h2 { font-size: clamp(1.625rem, 3vw, 2.25rem); line-height: 1.15; }    /* 26→36 */
-h3 { font-size: var(--font-size-xl); line-height: 1.25; }              /* 24 */
-h4 { font-size: var(--font-size-lg); line-height: 1.3; }               /* 20 */
-h5 { font-size: var(--font-size-md); line-height: 1.35; }              /* 18 */
-h6 { font-size: var(--font-size-base); line-height: 1.4; }             /* 16 */
+h1 { font-size: var(--font-size-3xl); line-height: 1.02; letter-spacing: var(--letter-spacing-tighter); }
+h2 { font-size: var(--font-size-2xl); line-height: 1.05; letter-spacing: var(--letter-spacing-tighter); }
+h3 { font-size: var(--font-size-xl); line-height: 1.2; }
+h4 { font-size: var(--font-size-lg); line-height: 1.3; }
+h5 { font-size: var(--font-size-md); line-height: 1.35; }
+h6 { font-size: var(--font-size-base); line-height: 1.4; }
 
 p { margin: 0; line-height: var(--line-height-normal); }
 
@@ -98,6 +101,16 @@ li + li { margin: 0; }
  * Médias et formulaires — défauts modernes
  * ========================================================================= */
 img, svg, video, picture { display: block; max-width: 100%; height: auto; }
+
+/* Sharpening global pour les photos — convolution matrix qui renforce
+   les contours. Compensé par une petite saturation pour ne pas désaturer.
+   Applicable via classe .img-sharp ou directement sur les <img class="photo"]. */
+.img-sharp,
+img.photo {
+  filter: url(#img-sharpen) saturate(1.08) contrast(1.04);
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: high-quality;
+}
 
 button, input, select, textarea {
   font: inherit;
@@ -162,15 +175,33 @@ button {
   border: 0;
 }
 
-/* Eyebrow — Inter 12px uppercase letter-spacing .16em couleur azur. */
+/* Eyebrow — Mono uppercase letter-spacing wide, ton chaud sobre. */
 .eyebrow {
-  font-family: var(--font-family-base);
+  font-family: var(--font-family-mono);
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-medium);
   text-transform: uppercase;
   letter-spacing: var(--letter-spacing-wide);
-  color: var(--color-azur);
+  color: var(--color-text-soft);
   line-height: 1;
+}
+
+/* Meta — mono petite, pour métadonnées éditoriales (quartier, surface). */
+.meta {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--color-text-soft);
+}
+
+/* Number — grands chiffres en mono pour preuve sociale. */
+.number {
+  font-family: var(--font-family-mono);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: -0.02em;
+  color: var(--color-text);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Brass-rule — filet de laiton 56×1.5, employé avec parcimonie. */

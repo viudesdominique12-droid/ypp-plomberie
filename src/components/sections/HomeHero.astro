@@ -1,297 +1,288 @@
 ---
 /**
- * HomeHero.astro — Section.
+ * HomeHero.astro — Section d'accueil.
  *
- * Rôle : hero d'accueil avec une **scène d'eau immersive en
- * arrière-plan** qui couvre tout le bloc. Le texte (eyebrow + H1
- * massif + lead + duo CTAs + note Google) vient PAR-DESSUS, en
- * couleur claire pour rester lisible.
- *
- * Couches d'arrière-plan (du fond vers l'avant) :
- *   1. Sky — dégradé baie des Anges (bleu nuit → azur).
- *   2. Glow — lueur diagonale subtile (ray of light).
- *   3. Ripple — anneaux concentriques qui pulsent en surface.
- *   4. FallingDrops — gouttes qui tombent en continu.
- *   5. AnimatedWaves — 3 couches de vagues qui glissent en pied.
- *   6. Vignette — atténuation pour booster la lisibilité du texte.
- *
- * Au-dessus :
- *   7. Container avec le contenu éditorial centré.
- *
- * Toutes les animations sont désactivées par `prefers-reduced-motion`
- * (règle globale dans global.css).
- *
- * Rendu dans : src/pages/index.astro.
- * Données : src/data/site.ts (téléphone, note, libellés).
+ * Direction "Cinéma éditorial" v2 :
+ *   - Photo plein cadre (full-bleed) en arrière-plan, hauteur ~100vh
+ *     desktop / 88vh mobile.
+ *   - Dégradé charbon (bas) + radial (gauche) pour la lisibilité du
+ *     texte sans dénaturer la photo.
+ *   - Typographie monumentale en bas à gauche : H1 Fraunces blanc,
+ *     italique terracotta, posé en colonne.
+ *   - Métadonnées en mono : "01 — RÉALISATION No 01 / NICE CIMIEZ"
+ *     en haut + caption en bas droit ("Photo prise sur chantier").
+ *   - Une seule fine ligne terracotta au-dessus du titre = signature
+ *     éditoriale (type couverture magazine).
+ *   - Preuves sociales (compteurs mono) en bandeau bas, fond crème,
+ *     hors de la photo.
  */
 
 import Container from '@/components/ui/Container.astro';
 import Button from '@/components/ui/Button.astro';
 import Icon from '@/components/ui/Icon.astro';
-import Ripple from '@/components/ui/Ripple.astro';
-import AnimatedWaves from '@/components/ui/AnimatedWaves.astro';
-import FallingDrops from '@/components/ui/FallingDrops.astro';
-import NumberTicker from '@/components/ui/NumberTicker.astro';
 import { nap, labels, site } from '@/data/site';
 ---
 
 <!-- [Section: HomeHero] -->
 <section id="HomeHero" class="home-hero">
-  {/* ── ARRIÈRE-PLAN D'EAU (couvre la totalité de la section) ── */}
-  <div class="home-hero__bg" aria-hidden="true">
-    <div class="home-hero__sky"></div>
-    <div class="home-hero__glow"></div>
-    <Ripple class="home-hero__ripple" size={320} opacity={0.32} count={8} color="rgba(255, 255, 255, 0.5)" />
-    <FallingDrops count={18} distance={780} class="home-hero__drops" color="rgba(255, 255, 255, 0.55)" />
-    <AnimatedWaves variant="hero" height={220} class="home-hero__waves" />
+  {/* === Photo plein cadre === */}
+  <div class="home-hero__media" aria-hidden="true">
+    <img
+      src="/realisations/01-douche-italienne-pierre-claire.jpg"
+      alt=""
+      width="1546"
+      height="1160"
+      loading="eager"
+      decoding="async"
+      fetchpriority="high"
+      data-parallax="0.12"
+    />
+    <div class="home-hero__veil"></div>
     <div class="home-hero__vignette"></div>
   </div>
 
-  {/* ── CONTENU ── */}
-  <Container width="default" class="home-hero__content">
-    <p class="home-hero__eyebrow">Plombier de confiance, à Nice.</p>
-    <h1 class="home-hero__title">
-      Du dépannage<br />
-      à la <em>rénovation.</em>
-    </h1>
-    <p class="home-hero__lead">
-      Diagnostic clair, devis annoncé avant intervention, garantie
-      décennale. Un seul interlocuteur, du premier appel à la dernière
-      finition.
+  {/* === Contenu === */}
+  <Container width="wide" class="home-hero__inner">
+    <p class="home-hero__meta" data-anim="rise">
+      <span>Réalisation N°01</span>
+      <span class="home-hero__meta-rule"></span>
+      <span>Nice — Cimiez</span>
     </p>
 
-    <div class="home-hero__actions">
-      <Button
-        href={`tel:${nap.phoneE164}`}
-        variant="urgence"
-        size="md"
-        ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
-      >
-        <Icon slot="icon-leading" name="phone" size={16} />
-        Appeler le {nap.phoneDisplay}
-        <Icon slot="icon-trailing" name="arrow-right" size={14} />
-      </Button>
-      <Button href="/contact/" variant="ghost" size="md" class="home-hero__ghost">
-        {labels.requestQuote}
-      </Button>
+    <div class="home-hero__text">
+      <span class="home-hero__brass-rule" aria-hidden="true"></span>
+      <h1 class="home-hero__title" data-anim="hero-words">
+        L'art du <em>geste juste,</em><br />
+        jusqu'à la dernière finition.
+      </h1>
+      <p class="home-hero__lead" data-anim="rise">
+        Plomberie et rénovation de salle de bain à Nice — diagnostic
+        clair, devis annoncé, garantie décennale.
+      </p>
+
+      <div class="home-hero__actions" data-anim="rise">
+        <Button
+          href={`tel:${nap.phoneE164}`}
+          variant="urgence"
+          size="lg"
+          ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
+        >
+          <Icon slot="icon-leading" name="phone" size={16} />
+          {nap.phoneDisplay}
+        </Button>
+        <a class="home-hero__quote" href="/contact/">
+          Demander un devis
+          <span aria-hidden="true">→</span>
+        </a>
+      </div>
     </div>
 
-    <div class="home-hero__rating">
-      <span class="stars" aria-label={`Note : ${site.rating.value} sur 5`}>
-        {Array.from({ length: 5 }).map(() => (
-          <Icon name="star" size={16} />
-        ))}
-      </span>
-      <span class="home-hero__rating-text">
-        <strong>
-          <NumberTicker value={site.rating.value} decimals={1} duration={1600} />
-          {' / 5'}
-        </strong>
-        <span>
-          {' · '}
-          <NumberTicker value={site.rating.count} duration={1400} delay={200} />
-          {' avis Google'}
-        </span>
-      </span>
+    {/* Scroll hint en bas — minuscule, mono */}
+    <div class="home-hero__hint" aria-hidden="true">
+      <span class="home-hero__hint-line"></span>
+      <span>Faire défiler</span>
     </div>
   </Container>
 </section>
 
+
 <style>
-  /* ── La section entière : grande, en relief sur fond foncé. ── */
   .home-hero {
     position: relative;
-    isolation: isolate;
+    height: clamp(620px, 92vh, 920px);
+    color: var(--color-on-dark);
     overflow: hidden;
-    min-height: 640px;
-    display: flex;
-    align-items: center;
-    padding-block: var(--space-16) var(--space-12);
-    color: #fff;
-  }
-  @media (min-width: 768px) {
-    .home-hero {
-      min-height: 780px;
-      padding-block: 120px 96px;
-    }
-  }
-  @media (min-width: 1024px) {
-    .home-hero {
-      min-height: 860px;
-    }
+    isolation: isolate;
   }
 
-  /* ── Arrière-plan (toutes les couches d'eau) ── */
-  .home-hero__bg {
+  /* === Photo plein cadre === */
+  .home-hero__media {
     position: absolute;
     inset: 0;
     z-index: 0;
     overflow: hidden;
   }
-
-  .home-hero__sky {
+  .home-hero__media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 115%;
+    object-fit: cover;
+    object-position: center 35%;
+    display: block;
+    will-change: transform;
+    /* Rendu : on retire le blur, on pousse contraste + saturation pour
+       densifier la photo, image-rendering en mode high-quality. */
+    filter: saturate(1.15) contrast(1.08) brightness(0.96);
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: high-quality;
+    transform: scale(1.05);
+    animation: hero-zoom 18s var(--ease-out) forwards;
+  }
+  @keyframes hero-zoom {
+    from { transform: scale(1.12); }
+    to   { transform: scale(1.05); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .home-hero__media img { animation: none; transform: scale(1.05); }
+  }
+  /* Voile : équilibre lisibilité du texte (gauche) et présence photo (droite). */
+  .home-hero__veil {
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(120% 80% at 50% 25%, rgba(255, 255, 255, 0.18), transparent 60%),
-      linear-gradient(170deg, #1d4757 0%, #0E6480 35%, #0c3f52 70%, #0a2b38 100%);
+      linear-gradient(180deg, rgba(15, 20, 23, 0.0) 35%, rgba(15, 20, 23, 0.65) 100%),
+      linear-gradient(90deg, rgba(15, 20, 23, 0.7) 0%, rgba(15, 20, 23, 0.25) 50%, rgba(15, 20, 23, 0.0) 100%);
   }
-
-  .home-hero__glow {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      110deg,
-      transparent 30%,
-      rgba(255, 255, 255, 0.08) 50%,
-      transparent 70%
-    );
-    mix-blend-mode: screen;
-  }
-
-  /* Ripple central — au-dessus du dégradé, plus visible. */
-  .home-hero__bg :global(.home-hero__ripple) {
-    top: 50%;
-    -webkit-mask-image: radial-gradient(closest-side, black 30%, transparent 100%);
-    mask-image: radial-gradient(closest-side, black 30%, transparent 100%);
-  }
-
-  /* Drops sur toute la hauteur. */
-  .home-hero__bg :global(.home-hero__drops) {
-    position: absolute;
-    inset: 0;
-  }
-
-  /* Vagues animées en pied — débordent légèrement vers le bas. */
-  .home-hero__bg :global(.home-hero__waves) {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -10px;
-    height: 220px;
-  }
-
-  /* Vignette discrète pour densifier les coins et améliorer le contraste. */
   .home-hero__vignette {
     position: absolute;
     inset: 0;
-    background: radial-gradient(80% 70% at 50% 50%, transparent 55%, rgba(10, 30, 45, 0.45) 100%);
+    background: radial-gradient(120% 80% at 50% 30%, transparent 40%, rgba(15, 20, 23, 0.3) 100%);
     pointer-events: none;
   }
+  /* Grain subtil pour densifier la photo et masquer la perte de résolution. */
+  .home-hero__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+  }
 
-  /* ── Contenu — par-dessus l'eau, texte clair. ── */
-  .home-hero__content {
+  /* === Contenu === */
+  .home-hero__inner {
     position: relative;
     z-index: 1;
-    text-align: center;
-    max-width: 960px;
+    height: 100%;
+    padding-block: clamp(5rem, 9vw, 7rem) clamp(2rem, 4vw, 3.5rem);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: clamp(2rem, 4vw, 3rem);
   }
 
-  .home-hero__eyebrow {
+  /* Meta haut */
+  .home-hero__meta {
     margin: 0;
-    font-family: var(--font-family-heading);
-    font-style: italic;
-    font-weight: var(--font-weight-medium);
-    font-size: 1.0625rem; /* 17px mobile */
-    color: rgba(255, 255, 255, 0.78);
-    letter-spacing: 0.005em;
-    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.25);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-family: var(--font-family-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(244, 241, 235, 0.7);
   }
-  @media (min-width: 768px) {
-    .home-hero__eyebrow { font-size: 1.3125rem; /* 21px */ }
+  .home-hero__meta-rule {
+    display: inline-block;
+    width: 32px;
+    height: 1px;
+    background: rgba(244, 241, 235, 0.6);
   }
 
+  /* Bloc titre — bas, gauche */
+  .home-hero__text {
+    max-width: 920px;
+  }
+  .home-hero__brass-rule {
+    display: block;
+    width: 64px;
+    height: 2px;
+    background: var(--color-terra);
+    margin-bottom: clamp(1.25rem, 2vw, 1.75rem);
+  }
   .home-hero__title {
-    margin: 14px 0 0 0;
-    font-family: var(--font-family-heading);
-    font-weight: var(--font-weight-semibold);
-    font-size: 2.875rem; /* 46px mobile */
-    line-height: 1.02;
-    letter-spacing: -0.022em;
-    color: #fff;
-    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.35);
-  }
-  @media (min-width: 768px) {
-    .home-hero__title { font-size: 4.5rem; }
-  }
-  @media (min-width: 1024px) {
-    .home-hero__title {
-      font-size: 5.75rem;
-      margin-top: 18px;
-    }
+    margin: 0;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(2.5rem, 7vw, 5.5rem);
+    line-height: 0.98;
+    letter-spacing: var(--letter-spacing-tighter);
+    color: var(--color-on-dark);
+    opacity: 0;
   }
   .home-hero__title em {
     font-style: italic;
     font-weight: var(--font-weight-medium);
-    color: #fff;
+    color: var(--color-terra);
+  }
+  :global(.home-hero__title .word) {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+    line-height: inherit;
+  }
+  :global(.home-hero__title .word-inner) {
+    display: inline-block;
+    will-change: transform, opacity;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .home-hero__title { opacity: 1; }
   }
 
   .home-hero__lead {
-    margin: var(--space-6) auto 0;
-    max-width: 560px;
-    color: rgba(255, 255, 255, 0.82);
-    font-size: 0.9375rem;
-    line-height: 1.7;
-    text-shadow: 0 1px 12px rgba(0, 0, 0, 0.25);
-  }
-  @media (min-width: 768px) {
-    .home-hero__lead {
-      margin-top: var(--space-8);
-      font-size: 1.03rem;
-    }
+    margin: clamp(1.25rem, 2.5vw, 2rem) 0 0;
+    max-width: 460px;
+    font-size: clamp(0.95rem, 1.2vw, 1.0625rem);
+    line-height: 1.55;
+    color: rgba(244, 241, 235, 0.85);
   }
 
   .home-hero__actions {
-    margin-top: var(--space-6);
+    margin-top: clamp(1.75rem, 3.5vw, 2.5rem);
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    justify-content: center;
-    align-items: stretch;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: clamp(1rem, 2vw, 2rem);
   }
-  .home-hero__actions :global(.btn) { width: 100%; }
-  @media (min-width: 640px) {
-    .home-hero__actions {
-      margin-top: 36px;
-      flex-direction: row;
-      align-items: center;
-    }
-    .home-hero__actions :global(.btn) { width: auto; }
-  }
-
-  /* Bouton ghost (devis) sur fond sombre : devient verre dépoli clair. */
-  .home-hero__content :global(.home-hero__ghost) {
-    background: rgba(255, 255, 255, 0.08);
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.45);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-  .home-hero__content :global(.home-hero__ghost:hover) {
-    background: rgba(255, 255, 255, 0.16);
-    border-color: #fff;
-    color: #fff;
-  }
-
-  .home-hero__rating {
-    margin-top: var(--space-5);
+  .home-hero__quote {
+    font-family: var(--font-family-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-on-dark);
+    text-decoration: none;
     display: inline-flex;
     align-items: center;
     gap: 10px;
-    justify-content: center;
-    width: 100%;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--color-on-dark);
+    transition: color var(--transition-fast) var(--ease-out), gap var(--transition-base) var(--ease-out), border-color var(--transition-fast) var(--ease-out);
   }
-  @media (min-width: 768px) {
-    .home-hero__rating { margin-top: 28px; }
+  .home-hero__quote:hover {
+    color: var(--color-terra);
+    border-color: var(--color-terra);
+    gap: 14px;
   }
-  /* Les étoiles ocre restent visibles sur fond bleu (contrast élevé). */
-  .home-hero__rating .stars { color: var(--color-ocre); }
-  .home-hero__rating-text {
-    font-size: 0.84rem;
-    color: rgba(255, 255, 255, 0.78);
+
+  /* Hint scroll en bas */
+  .home-hero__hint {
+    align-self: flex-end;
+    margin-top: clamp(2rem, 4vw, 3rem);
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+    font-family: var(--font-family-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(244, 241, 235, 0.6);
   }
-  .home-hero__rating-text strong {
-    color: #fff;
-    font-weight: var(--font-weight-semibold);
+  .home-hero__hint-line {
+    display: inline-block;
+    width: 48px;
+    height: 1px;
+    background: rgba(244, 241, 235, 0.5);
+    animation: hint-line 2.4s var(--ease-out) infinite;
   }
+  @keyframes hint-line {
+    0%, 100% { transform: scaleX(1); opacity: 0.4; }
+    50% { transform: scaleX(1.4); opacity: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .home-hero__hint-line { animation: none; }
+  }
+
 </style>

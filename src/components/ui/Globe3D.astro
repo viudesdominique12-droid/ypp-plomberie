@@ -1,0 +1,302 @@
+---
+/**
+ * Globe3D.astro — Primitive UI.
+ *
+ * Globe wireframe stylisé en CSS 3D (preserve-3d + rotateY animé).
+ *
+ * Composition :
+ *   - 12 méridiens (cercles verticaux, rotation décalée chaque 15°).
+ *   - 5 parallèles (cercles horizontaux, posés à plat, échelle dégressive
+ *     vers les pôles).
+ *   - Halo terracotta subtil derrière.
+ *   - Ombre douce au sol.
+ *   - Points "villes" en orbite (fixes par rapport au globe → ils
+ *     tournent avec lui).
+ *
+ * Pas de Three.js : CSS pur, ~3KB, parfaitement net sur retina.
+ * Désactivé en `prefers-reduced-motion`.
+ *
+ * Rendu dans : HubZoneSection (page /zone-intervention/).
+ */
+
+export interface Props {
+  /** Diamètre en px du globe. */
+  size?: number;
+  /** Durée d'une rotation complète en secondes. */
+  spinSeconds?: number;
+  /** Étiquettes de villes sur l'orbite (max 6). */
+  cities?: { name: string; lng: number }[];
+  class?: string;
+}
+
+const {
+  size = 360,
+  spinSeconds = 28,
+  cities = [
+    { name: 'Cagnes',         lng: -45 },
+    { name: 'Saint-Laurent',  lng: -25 },
+    { name: 'Nice',           lng: 0 },
+    { name: 'Villefranche',   lng: 18 },
+    { name: 'Beaulieu',       lng: 36 },
+    { name: 'Cap-Ferrat',     lng: 52 },
+  ],
+  class: className,
+} = Astro.props;
+
+const meridianAngles = Array.from({ length: 12 }, (_, i) => (i * 180) / 12);
+/* Parallèles : positions Y normalisées et leur rayon relatif. */
+const parallels = [
+  { y: -0.78, scale: 0.62 },
+  { y: -0.42, scale: 0.91 },
+  { y: 0,     scale: 1.00 },
+  { y: 0.42,  scale: 0.91 },
+  { y: 0.78,  scale: 0.62 },
+];
+---
+
+<div class={`globe ${className ?? ''}`} style={`--globe-size: ${size}px; --spin: ${spinSeconds}s;`}>
+  {/* Halo derrière */}
+  <span class="globe__halo" aria-hidden="true"></span>
+
+  {/* Scène 3D */}
+  <div class="globe__scene" aria-hidden="true">
+    <div class="globe__sphere">
+      {/* Méridiens — cercles verticaux à différentes rotations Y */}
+      {meridianAngles.map((deg) => (
+        <span class="globe__meridian" style={`transform: rotateY(${deg}deg);`}></span>
+      ))}
+
+      {/* Parallèles — cercles horizontaux à différents Y, taille décroissante */}
+      {parallels.map((p) => (
+        <span
+          class="globe__parallel"
+          style={`transform: translateY(calc(var(--globe-size) * ${p.y} / 2)) rotateX(90deg); width: calc(var(--globe-size) * ${p.scale}); height: calc(var(--globe-size) * ${p.scale});`}
+        ></span>
+      ))}
+
+      {/* Pôles : 2 dots aux extrémités */}
+      <span class="globe__pole globe__pole--top"></span>
+      <span class="globe__pole globe__pole--bot"></span>
+
+      {/* Points de villes — à l'équateur, longitudes variables */}
+      {cities.map((c, i) => (
+        <span
+          class={`globe__city ${c.name === 'Nice' ? 'globe__city--primary' : ''}`}
+          style={`transform: rotateY(${c.lng}deg) translateZ(calc(var(--globe-size) / 2)); --delay: ${i * 0.25}s;`}
+        >
+          <span class="globe__city-dot"></span>
+        </span>
+      ))}
+    </div>
+  </div>
+
+  {/* Ombre douce au sol */}
+  <span class="globe__floor" aria-hidden="true"></span>
+
+  {/* Légendes hors-globe (mono uppercase) */}
+  <ul class="globe__legend" role="list">
+    {cities.map((c) => (
+      <li class={c.name === 'Nice' ? 'is-primary' : ''}>
+        <span class="globe__legend-dot"></span>
+        {c.name}
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .globe {
+    --globe-size: 360px;
+    --spin: 28s;
+    position: relative;
+    width: var(--globe-size);
+    height: calc(var(--globe-size) * 1.15);
+    margin-inline: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* Halo radial terracotta derrière le globe */
+  .globe__halo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc(var(--globe-size) * 1.4);
+    height: calc(var(--globe-size) * 1.4);
+    transform: translate(-50%, -55%);
+    background: radial-gradient(closest-side, rgba(200, 99, 31, 0.18), transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Scène 3D */
+  .globe__scene {
+    position: relative;
+    width: var(--globe-size);
+    height: var(--globe-size);
+    perspective: 1400px;
+    z-index: 1;
+  }
+
+  .globe__sphere {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+    animation: globe-spin var(--spin) linear infinite;
+    /* Léger tilt pour donner de la perspective. */
+    transform: rotateX(-12deg);
+  }
+
+  @keyframes globe-spin {
+    from { transform: rotateX(-12deg) rotateY(0deg); }
+    to   { transform: rotateX(-12deg) rotateY(360deg); }
+  }
+
+  /* Méridien : cercle dans le plan Y-Z (rotateY le pivote). */
+  .globe__meridian {
+    position: absolute;
+    inset: 0;
+    border: 1px solid currentColor;
+    color: var(--color-text);
+    border-radius: 50%;
+    opacity: 0.18;
+    backface-visibility: visible;
+  }
+
+  /* Parallèle : cercle dans le plan X-Z (rotateX 90° le pose à plat). */
+  .globe__parallel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: 0;
+    margin-top: 0;
+    transform-origin: center;
+    border: 1px solid currentColor;
+    color: var(--color-text);
+    border-radius: 50%;
+    opacity: 0.14;
+    /* width/height/transform overrides set inline */
+    translate: -50% -50%;
+  }
+
+  /* Pôles */
+  .globe__pole {
+    position: absolute;
+    left: 50%;
+    width: 8px;
+    height: 8px;
+    margin-left: -4px;
+    border-radius: 50%;
+    background: var(--color-terra);
+    box-shadow: 0 0 14px rgba(200, 99, 31, 0.65);
+    transform-style: preserve-3d;
+  }
+  .globe__pole--top { top: 0; }
+  .globe__pole--bot { bottom: 0; }
+
+  /* Villes — positionnées sur l'équateur, rotateY = longitude. */
+  .globe__city {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    transform-style: preserve-3d;
+    /* transform inline : rotateY(lng) translateZ(rayon) */
+  }
+  .globe__city-dot {
+    position: absolute;
+    left: -5px;
+    top: -5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--color-terra);
+    box-shadow: 0 0 10px rgba(200, 99, 31, 0.75);
+    /* Compense le tilt du globe pour rester face à la caméra. */
+    transform: rotateX(12deg);
+  }
+  .globe__city-dot::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border: 1px solid var(--color-terra);
+    border-radius: 50%;
+    opacity: 0;
+    animation: globe-pulse 2.8s var(--ease-out) infinite;
+    animation-delay: var(--delay, 0s);
+  }
+  .globe__city--primary .globe__city-dot {
+    width: 14px;
+    height: 14px;
+    left: -7px;
+    top: -7px;
+    background: var(--color-text);
+    box-shadow:
+      0 0 0 3px rgba(244, 241, 235, 0.85),
+      0 0 18px rgba(15, 20, 23, 0.55);
+  }
+  .globe__city--primary .globe__city-dot::after {
+    border-color: var(--color-text);
+    inset: -8px;
+  }
+  @keyframes globe-pulse {
+    0%   { opacity: 0; transform: scale(0.7); }
+    35%  { opacity: 0.7; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.8); }
+  }
+
+  /* Ombre au sol */
+  .globe__floor {
+    margin-top: calc(var(--globe-size) * -0.08);
+    width: calc(var(--globe-size) * 0.78);
+    height: calc(var(--globe-size) * 0.07);
+    background: radial-gradient(closest-side, rgba(15, 20, 23, 0.4), transparent 70%);
+    border-radius: 50%;
+    filter: blur(2px);
+    z-index: 0;
+  }
+
+  /* Légendes */
+  .globe__legend {
+    margin-top: clamp(1rem, 2vw, 1.5rem);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px 22px;
+    justify-content: center;
+    font-family: var(--font-family-mono);
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    color: var(--color-text-soft);
+  }
+  .globe__legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .globe__legend-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--color-terra);
+  }
+  .globe__legend li.is-primary {
+    color: var(--color-text);
+  }
+  .globe__legend li.is-primary .globe__legend-dot {
+    background: var(--color-text);
+    box-shadow: 0 0 0 2px rgba(244, 241, 235, 0.85);
+  }
+
+  /* Reduced motion : fige la rotation, garde l'aspect 3D statique. */
+  @media (prefers-reduced-motion: reduce) {
+    .globe__sphere {
+      animation: none;
+      transform: rotateX(-12deg) rotateY(-18deg);
+    }
+    .globe__city-dot::after { animation: none; }
+  }
+</style>

@@ -22,3 +22,9 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Claude Code — params locaux non versionnés
+.claude/settings.local.json
+
+# Source media provisoire (à remplacer par les vraies photos du client)
+Ypp Plomberie - image/

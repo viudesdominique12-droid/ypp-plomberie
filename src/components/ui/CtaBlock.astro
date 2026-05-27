@@ -2,29 +2,25 @@
 /**
  * CtaBlock.astro — Primitive UI.
  *
- * Rôle : bandeau de conversion final — fond azur plein, filet laiton
- * centré, H2 blanc Playfair, sous-titre 85 % blanc, duo CTAs (urgence
- * + devis-secondary outline blanc).
- *
- * Rendu dans : FinalCta (qui ne fait que l'envelopper d'une Section).
+ * Direction "Éditorial Architecture" :
+ *   - Bloc pleine largeur charbon profond.
+ *   - Pas d'effet décoratif. Une grosse phrase Fraunces, le numéro
+ *     mono géant en typo display, deux CTAs.
  */
 
 import Button from './Button.astro';
-import Icon from './Icon.astro';
-import Ripple from './Ripple.astro';
 import { nap, labels } from '@/data/site';
 
 export interface Props {
   title?: string;
   lead?: string;
-  /** Désactive le bouton « Demander un devis ». */
   showQuoteButton?: boolean;
   headingLevel?: 2 | 3;
 }
 
 const {
-  title = 'Une fuite, un projet de rénovation ?',
-  lead = 'Réponse rapide, devis annoncé avant intervention, et un seul interlocuteur du diagnostic à la dernière finition.',
+  title = 'Une fuite, un projet ? Décrochez.',
+  lead = "Réponse rapide, devis annoncé avant intervention, un seul interlocuteur du diagnostic à la dernière finition.",
   showQuoteButton = true,
   headingLevel = 2,
 } = Astro.props;
@@ -32,24 +28,33 @@ const {
 const Heading = `h${headingLevel}` as 'h2' | 'h3';
 ---
 
-<div class="cta-band">
-  <Ripple class="cta-band__ripple" size={260} opacity={0.16} count={6} />
-  <hr class="brass-rule is-center cta-band__rule" />
-  <Heading class="cta-band__title">{title}</Heading>
-  {lead && <p class="cta-band__lead">{lead}</p>}
-  <div class="cta-band__actions">
+<div class="cta-band" data-cursor-light>
+  <p class="cta-band__meta" data-anim="rise">
+    <span>06</span>
+    <span class="cta-band__rule"></span>
+    <span>On vous rappelle dans l'heure</span>
+  </p>
+  <Heading class="cta-band__title" data-anim="rise" set:html={title} />
+  {lead && <p class="cta-band__lead" data-anim="rise">{lead}</p>}
+
+  <div class="cta-band__phone" data-anim="rise">
+    <a href={`tel:${nap.phoneE164}`} aria-label={`${labels.callNow} — ${nap.phoneDisplay}`} class="cta-band__phone-link">
+      {nap.phoneDisplay}
+    </a>
+  </div>
+
+  <div class="cta-band__actions" data-anim="rise">
     <Button
       href={`tel:${nap.phoneE164}`}
       variant="urgence"
       size="lg"
       ariaLabel={`${labels.callNow} — ${nap.phoneDisplay}`}
     >
-      <Icon slot="icon-leading" name="phone" size={18} />
-      {labels.callNow} · {nap.phoneDisplay}
+      Appeler maintenant
     </Button>
     {showQuoteButton && (
       <Button href="/contact/" variant="secondary" size="lg" class="cta-band__secondary">
-        {labels.requestQuote}
+        Demander un devis
       </Button>
     )}
   </div>
@@ -58,48 +63,117 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
 <style>
   .cta-band {
     position: relative;
-    background: var(--color-azur);
-    color: #fff;
-    text-align: center;
-    padding: var(--space-12) var(--space-5);
-    border-radius: var(--radius-xl);
-    max-width: 1024px;
-    margin-inline: auto;
+    background: var(--color-surface-dark);
+    color: var(--color-on-dark);
+    padding: clamp(4rem, 8vw, 8rem) clamp(1.5rem, 4vw, 4rem);
     overflow: hidden;
+    --cx: 50%;
+    --cy: 50%;
+    --c-opacity: 0;
   }
-  /* Le ripple ondule en fond, son fade-out du haut le rend discret. */
-  .cta-band > :global(.cta-band__ripple) {
+  /* Cursor light : grand spot terracotta translucide qui suit le pointeur. */
+  .cta-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(
+      560px circle at var(--cx) var(--cy),
+      rgba(200, 99, 31, 0.18),
+      transparent 60%
+    );
+    opacity: var(--c-opacity);
+    transition: opacity 300ms var(--ease-out);
     z-index: 0;
   }
-  .cta-band > *:not(.cta-band__ripple) {
+  .cta-band > * {
     position: relative;
     z-index: 1;
   }
-  @media (min-width: 768px) {
-    .cta-band { padding: 88px var(--space-8); }
+  @media (prefers-reduced-motion: reduce) {
+    .cta-band::before { display: none; }
   }
 
-  .cta-band__rule {
-    margin-bottom: var(--space-5);
+  .cta-band__meta {
+    margin: 0 0 clamp(2rem, 4vw, 3rem);
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-4);
+    font-family: var(--font-family-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(244, 241, 235, 0.5);
   }
+  .cta-band__rule {
+    display: inline-block;
+    width: 48px;
+    height: 1px;
+    background: rgba(244, 241, 235, 0.4);
+  }
+
   .cta-band__title {
     margin: 0;
-    color: #fff;
-    font-size: clamp(1.875rem, 3vw, 2.375rem); /* 30→38 */
-    line-height: 1.15;
+    max-width: 18ch;
+    font-family: var(--font-family-display);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(2.25rem, 6.5vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: var(--letter-spacing-tighter);
+    color: var(--color-on-dark);
   }
+
   .cta-band__lead {
-    margin: var(--space-4) auto 0;
-    max-width: 60ch;
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 1.0625rem; /* 17px */
-    line-height: 1.6;
+    margin: clamp(1.5rem, 3vw, 2.25rem) 0 0;
+    max-width: 52ch;
+    color: rgba(244, 241, 235, 0.7);
+    font-size: clamp(1rem, 1.3vw, 1.125rem);
+    line-height: 1.55;
   }
+
+  .cta-band__phone {
+    margin: clamp(3rem, 6vw, 5rem) 0 clamp(2rem, 4vw, 3rem);
+    padding-block: clamp(1.5rem, 3vw, 2.5rem);
+    border-top: 1px solid rgba(244, 241, 235, 0.15);
+    border-bottom: 1px solid rgba(244, 241, 235, 0.15);
+  }
+  .cta-band__phone-link {
+    position: relative;
+    display: inline-block;
+    font-family: var(--font-family-mono);
+    font-weight: var(--font-weight-medium);
+    font-size: clamp(2rem, 7vw, 5.5rem);
+    letter-spacing: -0.02em;
+    color: var(--color-terra);
+    text-decoration: none;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    transition: opacity var(--transition-fast) var(--ease-out);
+  }
+  .cta-band__phone-link::after {
+    content: '';
+    position: absolute;
+    inset: -8px -16px;
+    border: 1px solid var(--color-terra);
+    border-radius: 4px;
+    opacity: 0;
+    transform: scale(0.85);
+    pointer-events: none;
+    animation: cta-pulse 2.6s var(--ease-out) infinite;
+  }
+  @keyframes cta-pulse {
+    0%   { opacity: 0; transform: scale(0.9); }
+    40%  { opacity: 0.5; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.15); }
+  }
+  .cta-band__phone-link:hover { opacity: 0.85; }
+  @media (prefers-reduced-motion: reduce) {
+    .cta-band__phone-link::after { display: none; }
+  }
+
   .cta-band__actions {
-    margin-top: var(--space-7);
     display: flex;
-    gap: var(--space-3);
-    justify-content: center;
+    gap: var(--space-4);
     flex-direction: column;
     align-items: stretch;
   }
@@ -110,15 +184,14 @@ const Heading = `h${headingLevel}` as 'h2' | 'h3';
     }
   }
 
-  /* La variante secondary, sur fond azur, devient outline blanc. */
   :global(.cta-band .btn--secondary) {
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.5);
+    color: var(--color-on-dark);
+    border-color: rgba(244, 241, 235, 0.5);
     background: transparent;
   }
   :global(.cta-band .btn--secondary:hover) {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: #fff;
-    color: #fff;
+    background: var(--color-on-dark);
+    color: var(--color-text);
+    border-color: var(--color-on-dark);
   }
 </style>
