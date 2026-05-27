@@ -101,10 +101,10 @@
   /* =========================================================================
    * 5. OMBRES — quasi inexistantes, on travaille en lignes pures.
    * ========================================================================= */
-  --shadow-sm:   0 1px 2px rgba(15,20,23,.04);
-  --shadow-md:   0 8px 28px rgba(15,20,23,.08);
-  --shadow-lg:   0 24px 60px rgba(15,20,23,.14);
-  --shadow-focus: 0 0 0 3px rgba(200, 99, 31, 0.35);
+  --shadow-sm:   0 1px 2px rgba(14,26,36,.04);
+  --shadow-md:   0 8px 28px rgba(14,26,36,.08);
+  --shadow-lg:   0 24px 60px rgba(14,26,36,.14);
+  --shadow-focus: 0 0 0 3px rgba(12, 165, 196, 0.35);
 
   /* =========================================================================
    * 6. TRANSITIONS
@@ -132,31 +132,31 @@
    * terracotta pour les CTA. Aucune autre couleur.
    * ========================================================================= */
 
-  /* Surfaces. */
-  --color-bg:           #F4F1EB;   /* crème pierre */
+  /* Surfaces — "Bleu Riviera". */
+  --color-bg:           #EEF3F6;   /* bleu très pâle, quasi blanc */
   --color-surface:      #FFFFFF;
-  --color-surface-alt:  #EBE6DC;   /* crème plus chaud */
-  --color-surface-dark: #0F1417;   /* charbon (sections inversées) */
+  --color-surface-alt:  #DDE7EC;   /* bleu pâle un cran plus marqué */
+  --color-surface-dark: #0E1A24;   /* charbon bleuté (sections inversées) */
 
   /* Texte. */
-  --color-text:         #0F1417;   /* encre charbon */
-  --color-text-muted:   #535B62;   /* gris asphalte */
-  --color-text-soft:    #8A8478;   /* gris pierre — captions/mono */
-  --color-text-inverse: #F4F1EB;
+  --color-text:         #0E1A24;   /* encre charbon bleuté */
+  --color-text-muted:   #4B5C68;   /* gris bleuté secondaire */
+  --color-text-soft:    #7B8E99;   /* gris bleuté — captions/mono */
+  --color-text-inverse: #EEF3F6;
 
   /* Bordures — toujours fines, presque transparentes. */
-  --color-border:        rgba(15, 20, 23, 0.12);
-  --color-border-soft:   rgba(15, 20, 23, 0.06);
-  --color-border-strong: rgba(15, 20, 23, 0.24);
+  --color-border:        rgba(14, 26, 36, 0.12);
+  --color-border-soft:   rgba(14, 26, 36, 0.06);
+  --color-border-strong: rgba(14, 26, 36, 0.24);
 
-  /* Accents. */
+  /* Accents — bleu plombier élégant. */
   --color-petrol:        #1F3D4E;   /* pétrole profond — brand */
   --color-petrol-hover:  #163040;
-  --color-petrol-light:  #E3EAEE;
-  --color-terra:         #C8631F;   /* terracotta — CTA, accents chauds */
-  --color-terra-hover:   #A75218;
-  --color-terra-light:   #F5E4D6;
-  --color-warm:          #B6873B;   /* laiton — étoiles, badges qualité */
+  --color-petrol-light:  #D9E5EB;
+  --color-terra:         #0CA5C4;   /* aqua/cyan vif — CTA, accents (ex-terracotta) */
+  --color-terra-hover:   #0890AB;
+  --color-terra-light:   #D7EEF5;
+  --color-warm:          #5BA3D0;   /* bleu pâle — étoiles, badges qualité */
 
   /* Alias sémantiques. */
   --color-accent:        var(--color-petrol);
@@ -164,15 +164,15 @@
   --color-accent-light:  var(--color-petrol-light);
   --color-urgent:        var(--color-terra);
   --color-urgent-hover:  var(--color-terra-hover);
-  --color-focus:         rgba(200, 99, 31, 0.35);
+  --color-focus:         rgba(12, 165, 196, 0.35);
 
   --color-success: var(--color-petrol);
   --color-error:   var(--color-terra);
 
-  --color-on-accent:    #F4F1EB;
+  --color-on-accent:    #EEF3F6;
   --color-on-urgent:    #FFFFFF;
   --color-on-surface:   var(--color-text);
-  --color-on-dark:      #F4F1EB;
+  --color-on-dark:      #EEF3F6;
 
   /* Legacy aliases — gardés pour compat composants existants pendant refonte.
      À supprimer une fois tous les composants migrés. */
